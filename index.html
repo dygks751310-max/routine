@@ -2324,18 +2324,32 @@ async function runBookSearch(){
   }
 }
 async function searchBooks(q){
+  let kakaoNote='동기화 미연결';
   if(syncEnabled()){
     try{
       const u=syncConfig.url+(syncConfig.url.indexOf('?')<0?'?':'&')+'action=books&token='+encodeURIComponent(syncConfig.token)+'&q='+encodeURIComponent(q);
       const r=await fetch(u);
-      const j=await r.json();
-      if(j&&j.ok&&Array.isArray(j.books)&&j.books.length)return {books:j.books,source:'kakao'};
-    }catch(e){}
+      const txt=await r.text();
+      let j=null;try{j=JSON.parse(txt);}catch(e){}
+      if(!j)kakaoNote='서버 응답이 JSON이 아님';
+      else if(j.ok&&Array.isArray(j.books)){
+        if(j.books.length)return {books:j.books,source:'kakao'};
+        kakaoNote='결과 0건';
+      }
+      else if(j.ok&&j.reason==='no_kakao_key')kakaoNote='서버에 카카오 키 없음';
+      else if(j.ok&&j.message)kakaoNote='서버가 책 검색 기능 없는 옛 버전';
+      else if(j.error==='unauthorized')kakaoNote='비밀번호 불일치';
+      else kakaoNote=j.error||'알 수 없는 오류';
+    }catch(e){kakaoNote='서버 연결 실패';}
   }
-  const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=20&printType=books');
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const j=await r.json();
-  return {books:(j.items||[]).map(googleToBook),source:'google'};
+  try{
+    const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=20&printType=books');
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const j=await r.json();
+    return {books:(j.items||[]).map(googleToBook),source:'google'};
+  }catch(e){
+    throw new Error('카카오: '+kakaoNote+' / 구글: '+((e&&e.message)||'연결 실패'));
+  }
 }
 function googleToBook(it){
   const v=it.volumeInfo||{};
