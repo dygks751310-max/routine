@@ -153,6 +153,39 @@
   .rd-pill-num.accent{color:#1D9E75}
   .rd-pill-lbl{font-size:11px;color:#999;margin-top:2px}
   .rdm-empty{font-size:13px;color:#999;line-height:1.6;padding:6px 0 4px}
+  .modal-title-actions{display:flex;align-items:center;gap:6px}
+  .modal-mini-btn{height:30px;padding:0 10px;border:1.5px solid #b8e8d4;background:#f0faf5;color:#0d6b47;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .modal-mini-btn:hover{background:#e1f5ec}
+  .modal-foot{display:flex;justify-content:center;gap:14px;margin-top:10px;flex-wrap:wrap}
+  .exm-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .exm-chip{padding:8px 12px;border:1.5px solid #e8e6e0;border-radius:20px;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;color:#444;position:relative}
+  .exm-chip.sel{border-color:#1D9E75;background:#1D9E75;color:#fff;font-weight:600}
+  .exm-chip.has{border-color:#5DCAA5}
+  .exm-chip .exm-badge{display:inline-block;margin-left:4px;font-size:11px;font-weight:700;color:#1D9E75}
+  .exm-chip.sel .exm-badge{color:#d4f5e6}
+  .exm-sets{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:6px}
+  .exm-set{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .exm-set-lbl{font-size:11px;color:#999}
+  .exm-set input{width:100%;box-sizing:border-box;text-align:center;font-size:17px;font-weight:600;padding:9px 4px;border:1.5px solid #e8e6e0;border-radius:9px;font-family:inherit}
+  .exm-set input:focus{outline:none;border-color:#1D9E75}
+  .exm-set input::placeholder{color:#cfcfcf;font-weight:500}
+  .exm-sub{font-size:12px;color:#999;margin:14px 0 4px;display:flex;justify-content:space-between;align-items:center}
+  .exm-sum{font-size:12px;color:#1D9E75;font-weight:700}
+  .exm-weight{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;color:#888}
+  .exm-weight input{width:80px;text-align:center;padding:8px;border:1.5px solid #e8e6e0;border-radius:9px;font-size:15px;font-family:inherit}
+  .exm-run-note{font-size:13px;color:#555;line-height:1.6;margin-top:14px;padding:12px;background:#f0faf5;border-radius:10px}
+  .bs-search-row{display:flex;gap:6px}
+  .bs-search-btn{flex:0 0 auto !important;padding:8px 14px !important}
+  .bs-status{font-size:12px;color:#999;margin:8px 0 2px;text-align:center;min-height:16px;line-height:1.5}
+  .bs-item{display:flex;gap:10px;align-items:center;padding:9px 6px;border-bottom:1px solid #f0efe9;cursor:pointer;border-radius:8px}
+  .bs-item:hover{background:#f8f7f3}
+  .bs-thumb{width:38px;height:54px;border-radius:5px;object-fit:cover;background:#f5f4f0;flex-shrink:0;border:1px solid #f0efe9;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:16px}
+  .bs-info{flex:1;min-width:0}
+  .bs-title{font-size:14px;font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .bs-meta{font-size:12px;color:#999;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .run-cell.tap{cursor:pointer;transition:transform 0.1s}
+  .run-cell.tap:hover{transform:scale(1.08);box-shadow:0 0 0 1.5px #c9c6bc}
+  .run-cell.future{opacity:0.35}
   .rd-book{flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit;color:#1a1a1a}
   .rd-book:focus{outline:none;border-color:#1D9E75}
   .rd-pages{width:64px;border:1.5px solid #e8e6e0;border-radius:8px;padding:9px 8px;font-size:14px;font-family:inherit;color:#1a1a1a;text-align:center;-moz-appearance:textfield}
@@ -306,7 +339,7 @@
   .save-btn{width:100%;padding:12px;border-radius:12px;border:1.5px solid #d0d0d0;background:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;margin-top:4px;transition:all 0.15s;letter-spacing:0.01em}
   .save-btn:hover{background:#f5f4f0;border-color:#bbb}
   .save-btn:active{transform:scale(0.98)}
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;z-index:999}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;z-index:2000}
   .toast.show{opacity:1}
   .week-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
   .stat-card{background:#f8f7f3;border-radius:10px;padding:12px 14px}
@@ -575,17 +608,6 @@
         <span class="rd-unit" id="rd-total-label">p</span>
       </div>
       <div class="rd-result" id="rd-result"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">💚 컨디션</div>
-      <div class="mood-row">
-        <button class="mood-btn" onclick="setMood('최고')">최고 😄</button>
-        <button class="mood-btn" onclick="setMood('좋음')">좋음 🙂</button>
-        <button class="mood-btn" onclick="setMood('보통')">보통 😐</button>
-        <button class="mood-btn" onclick="setMood('피곤')">피곤 😪</button>
-        <button class="mood-btn" onclick="setMood('힘듦')">힘듦 😞</button>
-      </div>
     </div>
 
     <div class="section">
@@ -932,18 +954,21 @@
   </div>
 </div>
 
-<!-- 독서 기록 팝업 (루틴 '기상 후 독서' 체크 시) -->
+<!-- 독서 기록 팝업 (루틴 '기상 후 독서' 체크 / 주간 독서 칸 클릭 시) -->
 <div class="modal-overlay" id="reading-modal">
   <div class="modal">
     <div class="modal-title">
-      📖 오늘의 독서 기록
-      <button class="modal-close" onclick="closeReadingModal()">×</button>
+      <span id="rdm-title">📖 오늘의 독서 기록</span>
+      <span class="modal-title-actions">
+        <button class="modal-mini-btn" onclick="openBookSearch('reading')">＋ 책 추가</button>
+        <button class="modal-close" onclick="closeReadingModal()">×</button>
+      </span>
     </div>
     <div id="rdm-body">
       <div style="font-size:12px;color:#999;margin-bottom:6px">읽은 책</div>
       <select id="rdm_book_select" class="rd-book-select" style="width:100%" onchange="updateReadingModalInfo()"></select>
       <div class="rd-pageinfo" id="rdm-pageinfo"></div>
-      <div style="font-size:12px;color:#999;margin:14px 0 6px">오늘 어디까지 읽었나요?</div>
+      <div style="font-size:12px;color:#999;margin:14px 0 6px" id="rdm-question">오늘 어디까지 읽었나요?</div>
       <div class="reading-row">
         <span class="rd-cur-label">현재</span>
         <input type="number" inputmode="numeric" min="0" id="rdm_curpage" class="rd-pages" placeholder="0" oninput="updateReadingModalInfo()">
@@ -953,10 +978,31 @@
       <button class="modal-save" onclick="saveReadingModal()">독서 기록 저장</button>
     </div>
     <div id="rdm-nobook" style="display:none">
-      <div class="rdm-empty">'읽는 중'인 책이 없어요. 책을 먼저 등록하면 페이지를 기록할 수 있어요.<br>루틴 체크는 그대로 저장돼요.</div>
-      <button class="modal-save" onclick="closeReadingModal();openBookManager()">📚 책 등록하러 가기</button>
+      <div class="rdm-empty">'읽는 중'인 책이 없어요. 오른쪽 위 <b>＋ 책 추가</b>로 지금 읽는 책을 등록해 보세요.</div>
+      <button class="modal-save" onclick="openBookSearch('reading')">📚 책 추가하기</button>
     </div>
-    <div style="text-align:center;margin-top:10px"><span class="review-manage-link" onclick="closeReadingModal()">나중에 기록할게요</span></div>
+    <div class="modal-foot">
+      <span class="review-manage-link danger" id="rdm-uncheck" style="display:none" onclick="uncheckReadingDay()">이날 독서 체크 해제</span>
+      <span class="review-manage-link" id="rdm-later" onclick="readingModalLater()">나중에 기록할게요</span>
+    </div>
+  </div>
+</div>
+
+<!-- 운동 기록 팝업 (루틴 '맨몸운동' 체크 / 주간 운동 칸 클릭 시) -->
+<div class="modal-overlay" id="exercise-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="exm-title">💪 오늘의 운동 기록</span>
+      <button class="modal-close" onclick="closeExerciseModal()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:8px">운동 종류</div>
+    <div class="exm-chips" id="exm-chips"></div>
+    <div id="exm-detail"></div>
+    <button class="modal-save" onclick="saveExerciseModal()">운동 기록 저장</button>
+    <div class="modal-foot">
+      <span class="review-manage-link danger" id="exm-uncheck" style="display:none" onclick="uncheckExerciseDay()">이날 운동 체크 해제</span>
+      <span class="review-manage-link" id="exm-later" onclick="exerciseModalLater()">나중에 기록할게요</span>
+    </div>
   </div>
 </div>
 
@@ -980,7 +1026,7 @@
     </div>
     <div style="font-size:12px;color:#999;margin-bottom:14px;line-height:1.6">책 제목과 총 페이지수를 등록해두면, 일간 리뷰에서 책을 고르고 현재 페이지만 입력하면 읽은 양이 자동 계산돼요.</div>
     <div id="edit-book-list"></div>
-    <button class="add-routine-btn" onclick="addBookRow()">+ 책 추가</button>
+    <button class="add-routine-btn" onclick="openBookSearch('manager')">+ 책 추가 (검색)</button>
     <button class="modal-save" onclick="saveBooks()">저장</button>
   </div>
 </div>
@@ -1074,6 +1120,46 @@
     <div id="edit-retire-list"></div>
     <button class="add-routine-btn" onclick="addRetireRow()">+ 지표 추가</button>
     <button class="modal-save" onclick="saveRetire()">저장</button>
+  </div>
+</div>
+
+<!-- 책 검색·추가 팝업 -->
+<div class="modal-overlay" id="book-search-modal" style="z-index:1100">
+  <div class="modal">
+    <div class="modal-title">
+      📚 책 추가
+      <button class="modal-close" onclick="closeBookSearch()">×</button>
+    </div>
+    <div id="bs-search-area">
+      <div class="bs-search-row">
+        <input type="search" id="bs-query" class="bec-input" placeholder="책 제목, 저자, ISBN" onkeydown="if(event.key==='Enter'){event.preventDefault();runBookSearch();}">
+        <button class="backup-btn bs-search-btn" onclick="runBookSearch()">검색</button>
+      </div>
+      <div id="bs-status" class="bs-status"></div>
+      <div id="bs-results"></div>
+      <div style="text-align:center;margin-top:8px"><span class="review-manage-link" onclick="showBookForm(null)">검색 없이 직접 입력할게요</span></div>
+    </div>
+    <div id="bs-form" style="display:none">
+      <div class="bec-row" style="align-items:flex-start;margin-bottom:10px">
+        <div class="bec-cover" id="bs-cover" onclick="document.getElementById('bs-cover-input').click()"><span class="bec-cover-plus">📷</span></div>
+        <input type="file" accept="image/*" id="bs-cover-input" style="display:none" onchange="onBookSearchCover(this)">
+        <div style="flex:1;min-width:0">
+          <input type="text" id="bs-title" class="bec-input" placeholder="책 제목" style="width:100%;margin-bottom:6px">
+          <input type="text" id="bs-author" class="bec-input" placeholder="작가명 (선택)" style="width:100%">
+        </div>
+      </div>
+      <div class="bec-row">
+        <input type="number" inputmode="numeric" min="0" id="bs-total" class="bec-input" placeholder="총 페이지">
+        <select id="bs-status-sel" class="bec-input bec-select">
+          <option value="reading">읽는 중</option>
+          <option value="toread">읽을 책</option>
+          <option value="done">완독</option>
+        </select>
+      </div>
+      <div id="bs-pages-hint" class="bs-status" style="text-align:left;margin-top:6px"></div>
+      <button class="modal-save" onclick="confirmAddBook()">책장에 추가</button>
+      <div style="text-align:center;margin-top:8px"><span class="review-manage-link" onclick="backToBookSearch()">← 다시 검색</span></div>
+    </div>
   </div>
 </div>
 
@@ -1952,30 +2038,74 @@ function dayDidStrength(dd){
 }
 function dayDidExercise(dd){return dayExerciseByRoutine(dd)||dayDidStrength(dd);}
 
+/* ── 날짜별 기록 수정 공용 (일간 팝업·주간 칸 클릭) ── */
+function getDayForEdit(dk){
+  flushPendingSaves(); // 입력 중이던 글 먼저 저장
+  let dd=getDailyData(dk);
+  const dObj=new Date(dk+'T00:00:00');
+  if(!dd)dd={checkMap:{},posts:0,memo:'',tmr:'',mode:modeForDate(dObj,null)};
+  if(!dd.mode)dd.mode=modeForDate(dObj,dd);
+  dd.checkMap=dd.checkMap||getChecksMap(dd);
+  if(dd.checks)delete dd.checks;
+  return dd;
+}
+function commitDay(dk,dd){
+  saveDailyData(dk,dd);
+  if(dk===dateToKey(currentDate))loadDaily();
+  if(currentTab==='weekly'&&document.getElementById('weekly-view').style.display!=='none')loadWeekly();
+}
+// 그날 모드의 해당 루틴 id (없으면 다른 모드에서라도)
+function routineIdFor(dd,pred){
+  let r=routinesFor(dd.mode).find(pred);
+  if(!r)r=allRoutineDefs().find(pred);
+  return r?r.id:null;
+}
+function checkRoutineOn(dd,pred){const id=routineIdFor(dd,pred);if(id)dd.checkMap[id]=true;}
+function uncheckRoutinesOn(dd,pred){allRoutineDefs().forEach(r=>{if(pred(r))delete dd.checkMap[r.id];});}
+function dayLabelOf(dk){
+  if(dk===dateToKey(todayDate()))return '오늘의';
+  const d=new Date(dk+'T00:00:00');
+  return (d.getMonth()+1)+'/'+d.getDate()+'('+DAY_NAMES[d.getDay()]+')';
+}
+
 /* ── 독서 기록 팝업 ── */
-function openReadingModal(){
+let rdmCtx={dk:null,fromWeekly:false,already:false};
+function openReadingModal(dk,opts){
+  opts=opts||{};
+  dk=dk||dateToKey(currentDate);
+  const dd=getDailyData(dk);
+  rdmCtx={dk,fromWeekly:!!opts.fromWeekly,already:dayDidRead(dd,dk)};
+  const isToday=dk===dateToKey(todayDate());
+  document.getElementById('rdm-title').textContent='📖 '+dayLabelOf(dk)+' 독서 기록';
+  document.getElementById('rdm-question').textContent=isToday?'오늘 어디까지 읽었나요?':'이날 어디까지 읽었나요?';
+  document.getElementById('rdm-uncheck').style.display=(rdmCtx.fromWeekly&&rdmCtx.already)?'inline':'none';
+  document.getElementById('rdm-later').textContent=rdmCtx.fromWeekly?(rdmCtx.already?'닫기':'페이지 없이 체크만 할게요'):'나중에 기록할게요';
+  populateReadingModal(null);
+  document.getElementById('reading-modal').classList.add('show');
+}
+function populateReadingModal(selectId){
+  const dd=getDailyData(rdmCtx.dk);
+  const rec=(dd&&dd.reading)?dd.reading:{};
   const readingBooks=books.filter(b=>b.status==='reading');
-  const hasBooks=readingBooks.length>0;
+  let cur=selectId||rec.bookId||'';
+  if(!cur||!bookById(cur))cur=readingBooks.length===1?readingBooks[0].id:'';
+  const hasBooks=readingBooks.length>0||!!bookById(cur);
   document.getElementById('rdm-body').style.display=hasBooks?'block':'none';
   document.getElementById('rdm-nobook').style.display=hasBooks?'none':'block';
-  if(hasBooks){
-    let cur=(state.reading&&state.reading.bookId)?state.reading.bookId:'';
-    if(!cur||!bookById(cur))cur=readingBooks.length===1?readingBooks[0].id:'';
-    let opts='<option value="">책 선택…</option>';
-    books.filter(b=>b.status==='reading'||b.id===cur).forEach(b=>{opts+=`<option value="${b.id}" ${b.id===cur?'selected':''}>${escapeHtml(b.title)}</option>`;});
-    document.getElementById('rdm_book_select').innerHTML=opts;
-    const sameBook=state.reading&&state.reading.bookId===cur;
-    document.getElementById('rdm_curpage').value=(sameBook&&state.reading.cur!=null&&state.reading.cur!=='')?state.reading.cur:'';
-    updateReadingModalInfo();
-  }
-  document.getElementById('reading-modal').classList.add('show');
-  if(hasBooks)setTimeout(()=>{const el=document.getElementById('rdm_curpage');if(el)el.focus();},150);
+  if(!hasBooks)return;
+  let opts='<option value="">책 선택…</option>';
+  books.filter(b=>b.status==='reading'||b.id===cur).forEach(b=>{opts+=`<option value="${b.id}" ${b.id===cur?'selected':''}>${escapeHtml(b.title)}</option>`;});
+  document.getElementById('rdm_book_select').innerHTML=opts;
+  const sameBook=rec.bookId===cur&&!selectId;
+  document.getElementById('rdm_curpage').value=(sameBook&&rec.cur!=null&&rec.cur!=='')?rec.cur:'';
+  updateReadingModalInfo();
+  setTimeout(()=>{const el=document.getElementById('rdm_curpage');if(el&&cur)el.focus();},150);
 }
 function closeReadingModal(){document.getElementById('reading-modal').classList.remove('show');}
 function updateReadingModalInfo(){
   const bookId=document.getElementById('rdm_book_select').value;
   const book=bookById(bookId);
-  const prev=book?prevCurPage(bookId,dateToKey(currentDate)):0;
+  const prev=book?prevCurPage(bookId,rdmCtx.dk):0;
   renderPageInfo('rdm-pageinfo',book,prev);
   document.getElementById('rdm-total-label').textContent=book?('/ '+book.total+'p'):'p';
   const curEl=document.getElementById('rdm_curpage');
@@ -1984,7 +2114,7 @@ function updateReadingModalInfo(){
   if(!book||curEl.value===''){resEl.innerHTML='';return;}
   const cur=Math.max(0,parseInt(curEl.value,10)||0);
   const prog=book.total>0?Math.min(100,Math.round(cur/book.total*100)):0;
-  resEl.innerHTML=`오늘 읽은 양 ${Math.max(0,cur-prev)}p <span class="rd-prog">· 진도 ${prog}%</span>`;
+  resEl.innerHTML=`읽은 양 ${Math.max(0,cur-prev)}p <span class="rd-prog">· 진도 ${prog}%</span>`;
 }
 function saveReadingModal(){
   const bookId=document.getElementById('rdm_book_select').value;
@@ -1993,12 +2123,299 @@ function saveReadingModal(){
   if(raw===''){showToast('현재 페이지를 입력해주세요');return;}
   const book=bookById(bookId);
   const cur=Math.max(0,parseInt(raw,10)||0);
-  state.reading={bookId,cur};
-  autosaveDaily();
-  renderReading();
+  const dk=rdmCtx.dk;
+  const dd=getDayForEdit(dk);
+  dd.reading={bookId,cur};
+  checkRoutineOn(dd,isReadingRoutine);
+  commitDay(dk,dd);
   closeReadingModal();
   showToast('독서 기록이 저장됐어요 📖');
   if(book&&book.total>0&&cur>=book.total&&book.status!=='done')setTimeout(()=>openDoneReview(bookId),300);
+}
+function readingModalLater(){
+  if(rdmCtx.fromWeekly&&!rdmCtx.already){
+    const dd=getDayForEdit(rdmCtx.dk);
+    checkRoutineOn(dd,isReadingRoutine);
+    commitDay(rdmCtx.dk,dd);
+    showToast('📖 독서한 날로 체크했어요');
+  }
+  closeReadingModal();
+}
+function uncheckReadingDay(){
+  if(!confirm('이날 독서 체크와 페이지 기록을 지울까요?'))return;
+  const dd=getDayForEdit(rdmCtx.dk);
+  uncheckRoutinesOn(dd,isReadingRoutine);
+  delete dd.reading;
+  commitDay(rdmCtx.dk,dd);
+  closeReadingModal();
+  showToast('독서 체크를 해제했어요');
+}
+
+/* ── 운동 기록 팝업 ── */
+const EX_CHIP_LABELS={squat:'🦵 스쿼트',pushup:'💪 푸쉬업',bicep:'💪 이두 컬',tricep:'💪 등 로우'};
+let exmCtx={dk:null,fromWeekly:false,already:false,sel:'squat',buf:{},weights:{},run:false,prev:null};
+function openExerciseModal(dk,opts){
+  opts=opts||{};
+  dk=dk||dateToKey(currentDate);
+  const dd=getDailyData(dk);
+  const wo=(dd&&dd.workout)?dd.workout:{};
+  const buf={};
+  WORKOUT_KEYS.forEach(k=>{buf[k]=[];for(let i=0;i<WORKOUT_SETS;i++){const v=wo[k]&&wo[k][i];buf[k][i]=(v==null?'':v);}});
+  const weights=Object.assign({},wo.weights||{});
+  const sel=WORKOUT_KEYS.find(k=>buf[k].some(v=>Number(v)>0))||'squat';
+  exmCtx={dk,fromWeekly:!!opts.fromWeekly,already:dayDidExercise(dd),sel,buf,weights,
+          run:dayCheckedBy(dd,isRunRoutine),prev:prevWorkoutByExercise(dk)};
+  document.getElementById('exm-title').textContent='💪 '+dayLabelOf(dk)+' 운동 기록';
+  document.getElementById('exm-uncheck').style.display=(exmCtx.fromWeekly&&exmCtx.already)?'inline':'none';
+  document.getElementById('exm-later').textContent=exmCtx.fromWeekly?(exmCtx.already?'닫기':'개수 없이 체크만 할게요'):'나중에 기록할게요';
+  renderExerciseModal(true);
+  document.getElementById('exercise-modal').classList.add('show');
+}
+function exSum(k){return exmCtx.buf[k].reduce((a,b)=>a+(Number(b)||0),0);}
+function renderExerciseModal(focus){
+  const c=exmCtx;
+  let chips=WORKOUT_KEYS.map(k=>{
+    const sum=exSum(k);
+    return `<button class="exm-chip${c.sel===k?' sel':''}${sum>0?' has':''}" onclick="selectExercise('${k}')">${EX_CHIP_LABELS[k]}${sum>0?`<span class="exm-badge" id="exm-badge-${k}">${sum}</span>`:`<span class="exm-badge" id="exm-badge-${k}"></span>`}</button>`;
+  }).join('');
+  if(c.fromWeekly)chips+=`<button class="exm-chip${c.run?' sel':''}" onclick="toggleExerciseRun()">🏃 러닝${c.run?' ✓':''}</button>`;
+  document.getElementById('exm-chips').innerHTML=chips;
+  const k=c.sel, prevSets=c.prev.sets[k]||[], prevDate=c.prev.dates[k];
+  let h=`<div class="exm-sub"><span>${EX_CHIP_LABELS[k]} · 세트별 개수</span><span class="exm-sum" id="exm-sum">합계 ${exSum(k)}회</span></div><div class="exm-sets">`;
+  for(let i=0;i<WORKOUT_SETS;i++){
+    const pv=(prevSets[i]!=null&&Number(prevSets[i])>0)?prevSets[i]:'';
+    h+=`<div class="exm-set"><span class="exm-set-lbl">${i+1}세트</span><input type="number" inputmode="numeric" min="0" id="exm-set-${i}" value="${c.buf[k][i]}" placeholder="${pv}" oninput="onExerciseSetInput(${i},this.value)"></div>`;
+  }
+  h+='</div>';
+  if(WORKOUT_WEIGHTED.includes(k)){
+    const pw=c.prev.weights[k];
+    h+=`<div class="exm-weight">무게 <input type="number" inputmode="decimal" min="0" step="0.5" id="exm-weight" value="${c.weights[k]!=null?c.weights[k]:''}" placeholder="${pw!=null&&pw!==''?pw:'kg'}" oninput="onExerciseWeightInput(this.value)"> kg</div>`;
+  }
+  if(prevDate)h+=`<div class="bs-status" style="text-align:left">흐린 숫자는 직전 기록이에요 (${prevDate})</div>`;
+  document.getElementById('exm-detail').innerHTML=h;
+  if(focus){
+    setTimeout(()=>{
+      const idx=c.buf[k].findIndex(v=>v===''||v==null);
+      const el=document.getElementById('exm-set-'+(idx<0?0:idx));
+      if(el)el.focus();
+    },150);
+  }
+}
+function selectExercise(k){exmCtx.sel=k;renderExerciseModal(true);}
+function toggleExerciseRun(){exmCtx.run=!exmCtx.run;renderExerciseModal(false);}
+function onExerciseSetInput(i,raw){
+  const k=exmCtx.sel;
+  exmCtx.buf[k][i]=(raw===''?'':Math.max(0,parseInt(raw,10)||0));
+  const sum=exSum(k);
+  document.getElementById('exm-sum').textContent='합계 '+sum+'회';
+  const b=document.getElementById('exm-badge-'+k);if(b)b.textContent=sum>0?sum:'';
+}
+function onExerciseWeightInput(raw){
+  const k=exmCtx.sel;
+  if(raw==='')delete exmCtx.weights[k];else exmCtx.weights[k]=Math.max(0,parseFloat(raw)||0);
+}
+function closeExerciseModal(){document.getElementById('exercise-modal').classList.remove('show');}
+function saveExerciseModal(){
+  const c=exmCtx;
+  const wo={};
+  WORKOUT_KEYS.forEach(k=>{if(c.buf[k].some(v=>v!==''&&v!=null))wo[k]=c.buf[k].slice();});
+  const w={};WORKOUT_WEIGHTED.forEach(k=>{if(c.weights[k]!=null&&c.weights[k]!=='')w[k]=c.weights[k];});
+  if(Object.keys(w).length)wo.weights=w;
+  const strength=WORKOUT_KEYS.some(k=>exSum(k)>0);
+  if(c.fromWeekly&&!strength&&!c.run){showToast('운동을 골라 개수를 입력해주세요');return;}
+  const dd=getDayForEdit(c.dk);
+  dd.workout=wo;
+  if(strength)checkRoutineOn(dd,isStrengthRoutine);
+  if(c.fromWeekly){
+    if(c.run)checkRoutineOn(dd,isRunRoutine);else uncheckRoutinesOn(dd,isRunRoutine);
+  }
+  commitDay(c.dk,dd);
+  closeExerciseModal();
+  showToast('운동 기록이 저장됐어요 💪');
+}
+function exerciseModalLater(){
+  if(exmCtx.fromWeekly&&!exmCtx.already){
+    const dd=getDayForEdit(exmCtx.dk);
+    checkRoutineOn(dd,isStrengthRoutine);
+    commitDay(exmCtx.dk,dd);
+    showToast('🏋️ 운동한 날로 체크했어요');
+  }
+  closeExerciseModal();
+}
+function uncheckExerciseDay(){
+  if(!confirm('이날 운동 체크와 운동 개수 기록을 지울까요?'))return;
+  const dd=getDayForEdit(exmCtx.dk);
+  uncheckRoutinesOn(dd,isExerciseRoutine);
+  delete dd.workout;
+  commitDay(exmCtx.dk,dd);
+  closeExerciseModal();
+  showToast('운동 체크를 해제했어요');
+}
+
+/* ── 주간 '요일별 실천 체크' 칸 클릭 ── */
+function onWeekStripClick(type,dk){
+  if(type==='blog'){
+    const dd=getDayForEdit(dk);
+    const n=dd.posts||0;
+    if(n>0){
+      if(!confirm('이날 블로그 발행 기록('+n+'편)을 지울까요?'))return;
+      dd.posts=0;
+      commitDay(dk,dd);showToast('블로그 체크를 해제했어요');
+    }else{
+      dd.posts=1;
+      commitDay(dk,dd);showToast('📝 이날 블로그 1편 발행으로 기록했어요');
+    }
+  }else if(type==='ex'){
+    const cur=getDailyData(dk);
+    if(!dayDidExercise(cur)){openExerciseModal(dk,{fromWeekly:true});return;}
+    // 이미 체크된 칸 → 바로 해제 (개수 기록이 있으면 한 번 확인)
+    if(dayDidStrength(cur)&&!confirm('이날 운동 개수 기록도 함께 지워져요. 체크를 해제할까요?'))return;
+    const dd=getDayForEdit(dk);
+    uncheckRoutinesOn(dd,isExerciseRoutine);
+    delete dd.workout;
+    commitDay(dk,dd);showToast('운동 체크를 해제했어요');
+  }else if(type==='read'){
+    const cur=getDailyData(dk);
+    if(!dayDidRead(cur,dk)){openReadingModal(dk,{fromWeekly:true});return;}
+    const hasPages=!!(cur&&cur.reading&&cur.reading.bookId&&cur.reading.cur!=null&&cur.reading.cur!=='');
+    if(hasPages&&!confirm('이날 읽은 페이지 기록도 함께 지워져요. 체크를 해제할까요?'))return;
+    const dd=getDayForEdit(dk);
+    uncheckRoutinesOn(dd,isReadingRoutine);
+    delete dd.reading;
+    commitDay(dk,dd);showToast('독서 체크를 해제했어요');
+  }
+}
+
+/* ── 책 검색·추가 ──
+   1순위: 동기화 서버(Apps Script)에 카카오 키가 있으면 카카오 책 검색
+   2순위: 구글 북스 (설정 없이 바로 사용) */
+let bsCtx={from:null,results:[],cover:null};
+function openBookSearch(from){
+  bsCtx={from,results:[],cover:null};
+  document.getElementById('bs-query').value='';
+  document.getElementById('bs-results').innerHTML='';
+  document.getElementById('bs-status').textContent='';
+  backToBookSearch();
+  document.getElementById('book-search-modal').classList.add('show');
+  setTimeout(()=>document.getElementById('bs-query').focus(),150);
+}
+function closeBookSearch(){document.getElementById('book-search-modal').classList.remove('show');}
+function backToBookSearch(){
+  document.getElementById('bs-search-area').style.display='block';
+  document.getElementById('bs-form').style.display='none';
+}
+async function runBookSearch(){
+  const q=document.getElementById('bs-query').value.trim();
+  if(!q){showToast('검색어를 입력해주세요');return;}
+  const st=document.getElementById('bs-status'), list=document.getElementById('bs-results');
+  st.textContent='검색 중…';list.innerHTML='';
+  try{
+    const res=await searchBooks(q);
+    bsCtx.results=res.books;
+    if(!res.books.length){st.textContent='검색 결과가 없어요. 다른 검색어로 찾거나 직접 입력해 주세요.';return;}
+    st.textContent=(res.source==='kakao'?'카카오 책 검색':'구글 북스')+' 결과 '+res.books.length+'건 · 눌러서 선택';
+    list.innerHTML=res.books.map((b,i)=>{
+      const thumb=b.thumbnail?`<img class="bs-thumb" src="${escapeAttr(b.thumbnail)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'bs-thumb',textContent:'📖'}))">`:'<div class="bs-thumb">📖</div>';
+      const meta=[(b.authors||[]).join(', '),b.publisher,b.pages?b.pages+'p':''].filter(Boolean).join(' · ');
+      return `<div class="bs-item" onclick="pickBookResult(${i})">${thumb}<div class="bs-info"><div class="bs-title">${escapeHtml(b.title)}</div><div class="bs-meta">${escapeHtml(meta)}</div></div></div>`;
+    }).join('');
+  }catch(e){
+    st.textContent='검색하지 못했어요 ('+((e&&e.message)||'연결 실패')+'). 직접 입력해 주세요.';
+  }
+}
+async function searchBooks(q){
+  if(syncEnabled()){
+    try{
+      const u=syncConfig.url+(syncConfig.url.indexOf('?')<0?'?':'&')+'action=books&token='+encodeURIComponent(syncConfig.token)+'&q='+encodeURIComponent(q);
+      const r=await fetch(u);
+      const j=await r.json();
+      if(j&&j.ok&&Array.isArray(j.books)&&j.books.length)return {books:j.books,source:'kakao'};
+    }catch(e){}
+  }
+  const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=20&printType=books');
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  return {books:(j.items||[]).map(googleToBook),source:'google'};
+}
+function googleToBook(it){
+  const v=it.volumeInfo||{};
+  const ids=v.industryIdentifiers||[];
+  const isbn=((ids.find(x=>x.type==='ISBN_13')||ids[0]||{}).identifier)||'';
+  const img=(v.imageLinks&&(v.imageLinks.thumbnail||v.imageLinks.smallThumbnail))||'';
+  return {title:v.title||'',authors:v.authors||[],publisher:v.publisher||'',pages:Number(v.pageCount)||0,thumbnail:img.replace(/^http:/,'https:'),isbn};
+}
+function cleanCoverUrl(u){return (u||'').replace(/["'<>\s]/g,'');}
+function pickBookResult(i){
+  const b=bsCtx.results[i];if(!b)return;
+  showBookForm(b);
+  if(!b.pages&&b.isbn)lookupPagesByIsbn(b.isbn);
+}
+async function lookupPagesByIsbn(isbn){
+  const hint=document.getElementById('bs-pages-hint');
+  hint.textContent='쪽수를 찾는 중…';
+  try{
+    const r=await fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+encodeURIComponent(isbn));
+    const j=await r.json();
+    const it=(j.items||[]).find(x=>x.volumeInfo&&x.volumeInfo.pageCount);
+    const totalEl=document.getElementById('bs-total');
+    if(it&&totalEl.value===''){totalEl.value=it.volumeInfo.pageCount;hint.textContent='쪽수를 구글 북스에서 불러왔어요. 실제 책과 다르면 고쳐 주세요.';return;}
+  }catch(e){}
+  hint.textContent='쪽수 정보가 없어요. 총 페이지는 직접 입력해 주세요.';
+}
+function showBookForm(b){
+  document.getElementById('bs-search-area').style.display='none';
+  document.getElementById('bs-form').style.display='block';
+  document.getElementById('bs-title').value=b?b.title:'';
+  document.getElementById('bs-author').value=b?(b.authors||[]).join(', '):'';
+  document.getElementById('bs-total').value=(b&&b.pages)?b.pages:'';
+  document.getElementById('bs-status-sel').value=bsCtx.from==='reading'?'reading':'toread';
+  document.getElementById('bs-pages-hint').textContent=(b&&b.pages)?'쪽수는 검색 정보예요. 실제 책과 다르면 고쳐 주세요.':'';
+  setBookFormCover(b&&b.thumbnail?cleanCoverUrl(b.thumbnail):null);
+  if(!b)setTimeout(()=>document.getElementById('bs-title').focus(),100);
+}
+function setBookFormCover(src){
+  bsCtx.cover=src||null;
+  document.getElementById('bs-cover').innerHTML=src?`<img src="${escapeAttr(src)}" alt="표지">`:'<span class="bec-cover-plus">📷</span>';
+}
+function onBookSearchCover(inputEl){
+  const file=inputEl.files&&inputEl.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/')){showToast('이미지 파일만 가능해요');return;}
+  resizeImageFile(file,dataUrl=>setBookFormCover(dataUrl));
+  inputEl.value='';
+}
+function confirmAddBook(){
+  const title=document.getElementById('bs-title').value.trim();
+  if(!title){showToast('책 제목을 입력해주세요');return;}
+  const status=document.getElementById('bs-status-sel').value;
+  const today=dateToKey(todayDate());
+  const book={id:'bk_'+Date.now()+'_'+Math.floor(Math.random()*1000),title,
+    author:document.getElementById('bs-author').value.trim(),
+    total:Math.max(0,parseInt(document.getElementById('bs-total').value,10)||0),
+    status,startDate:(status==='reading'||status==='done')?today:null,doneDate:status==='done'?today:null,
+    rating:0,comment:'',planMonth:null,purpose:'',cover:bsCtx.cover};
+  if(bsCtx.from==='manager'){
+    bookBuffer.push(book);
+    renderBookEditList();
+    closeBookSearch();
+    showToast('목록에 넣었어요. 아래 [저장]을 눌러주세요');
+    return;
+  }
+  const dup=books.find(b=>b.title===title&&b.status!=='done');
+  if(dup){
+    if(dup.status!=='reading'){dup.status='reading';if(!dup.startDate)dup.startDate=today;persistBooks();}
+    closeBookSearch();
+    populateReadingModal(dup.id);
+    showToast('이미 책장에 있는 책이라 그 책을 골랐어요');
+    return;
+  }
+  books.push(book);
+  persistBooks();
+  if(booksOpen)renderBookShelf();
+  renderReading();
+  closeBookSearch();
+  if(document.getElementById('reading-modal').classList.contains('show'))populateReadingModal(book.id);
+  showToast('📚 책장에 추가했어요');
 }
 
 // 완독 리뷰(별점+코멘트+기간) 모달
@@ -2542,7 +2959,8 @@ function toggleRoutine(id){
   autosaveDaily();
   if(chk.checked){
     const r=routinesFor(currentMode).find(x=>x.id===id);
-    if(isReadingRoutine(r))setTimeout(openReadingModal,250);
+    if(isReadingRoutine(r))setTimeout(()=>openReadingModal(dateToKey(currentDate)),250);
+    else if(isStrengthRoutine(r))setTimeout(()=>openExerciseModal(dateToKey(currentDate)),250);
   }
 }
 function changeCount(d){state.posts=Math.max(0,state.posts+d);document.getElementById('post-count').textContent=state.posts;autosaveDaily();}
@@ -2943,7 +3361,7 @@ function updateWeekStats(){
   const pillsEl=document.getElementById('week-day-pills');pillsEl.innerHTML='';
   const tKey=dateToKey(todayDate());
   // 요일별 체크바용 (블로그 / 운동 / 독서)
-  const blogFlags=[],exFlags=[],readFlags=[],stripLabels=[];
+  const blogFlags=[],exFlags=[],readFlags=[],stripLabels=[],stripKeys=[],stripFuture=[];
   weekDays.forEach(({dk,d,dd,dayLabel,isFuture,mode})=>{
     const m=getChecksMap(dd);
     const rs=routinesFor(mode);
@@ -2959,7 +3377,7 @@ function updateWeekStats(){
       // 책 읽은 날: '기상 후 독서' 체크 또는 그날 읽은 페이지가 있는 경우
       if(dayDidRead(dd,dk)){readOn=true;readDays++;}
     }
-    blogFlags.push(blogOn);exFlags.push(exOn);readFlags.push(readOn);stripLabels.push(dayLabel);
+    blogFlags.push(blogOn);exFlags.push(exOn);readFlags.push(readOn);stripLabels.push(dayLabel);stripKeys.push(dk);stripFuture.push(!!isFuture);
     const pct=dd?dayPct(dd,d):0;
     if(dd&&pct===100)perfectDays++;
     const cell=document.createElement('div');
@@ -2997,19 +3415,21 @@ function updateWeekStats(){
   // 요일별 체크바 (블로그 / 운동 / 독서)
   const stripsEl=document.getElementById('week-check-strips');
   if(stripsEl){
-    const mkStrip=(label,flags,cls,total,last)=>{
+    const mkStrip=(label,flags,cls,total,last,type)=>{
       let h=`<div class="run-strip run-strip-stat${last?' run-strip-stat-last':''}"><span class="run-strip-label">${label}</span><div class="run-strip-cells">`;
       flags.forEach((v,i)=>{
-        h+=`<div class="run-cell ${cls}${v?' ran':''}" title="${stripLabels[i]}">${v?'✓':''}</div>`;
+        const fut=stripFuture[i];
+        const click=fut?'':` onclick="onWeekStripClick('${type}','${stripKeys[i]}')"`;
+        h+=`<div class="run-cell ${cls}${v?' ran':''}${fut?' future':' tap'}" title="${stripLabels[i]}${fut?'':' · 눌러서 기록'}"${click}>${v?'✓':''}</div>`;
       });
       h+=`</div><span style="font-size:11px;color:#888;font-weight:600;flex-shrink:0;width:34px;text-align:right">${total}일</span></div>`;
       return h;
     };
     const blogDays=blogFlags.filter(Boolean).length;
     stripsEl.innerHTML=
-      mkStrip('📝 블로그',blogFlags,'blogc',blogDays,false)+
-      mkStrip('🏋️ 운동',exFlags,'exc',exerciseDays,false)+
-      mkStrip('📖 독서',readFlags,'readc',readDays,true);
+      mkStrip('📝 블로그',blogFlags,'blogc',blogDays,false,'blog')+
+      mkStrip('🏋️ 운동',exFlags,'exc',exerciseDays,false,'ex')+
+      mkStrip('📖 독서',readFlags,'readc',readDays,true,'read');
   }
 }
 
@@ -3666,6 +4086,8 @@ document.getElementById('idea-modal').addEventListener('click',e=>{if(e.target.i
 document.getElementById('book-modal').addEventListener('click',e=>{if(e.target.id==='book-modal')closeBookManager();});
 document.getElementById('review-modal').addEventListener('click',e=>{if(e.target.id==='review-modal')closeDoneReview();});
 document.getElementById('reading-modal').addEventListener('click',e=>{if(e.target.id==='reading-modal')closeReadingModal();});
+document.getElementById('exercise-modal').addEventListener('click',e=>{if(e.target.id==='exercise-modal')closeExerciseModal();});
+document.getElementById('book-search-modal').addEventListener('click',e=>{if(e.target.id==='book-search-modal')closeBookSearch();});
 document.getElementById('month-books-modal').addEventListener('click',e=>{if(e.target.id==='month-books-modal')closeMonthBooks();});
 
 /* ── 저장소 내용을 화면에 다시 반영 (백업 복원·동기화 공용) ── */
