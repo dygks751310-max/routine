@@ -2339,6 +2339,7 @@ async function searchBooks(q){
       else if(j.ok&&j.reason==='no_kakao_key')kakaoNote='서버에 카카오 키 없음';
       else if(j.ok&&j.message)kakaoNote='서버가 책 검색 기능 없는 옛 버전';
       else if(j.error==='unauthorized')kakaoNote='비밀번호 불일치';
+      else if(j.error)kakaoNote=j.error;
       else kakaoNote=j.error||'알 수 없는 오류';
     }catch(e){kakaoNote='서버 연결 실패';}
   }
@@ -2348,7 +2349,7 @@ async function searchBooks(q){
     const j=await r.json();
     return {books:(j.items||[]).map(googleToBook),source:'google'};
   }catch(e){
-    throw new Error('카카오: '+kakaoNote+' / 구글: '+((e&&e.message)||'연결 실패'));
+    throw new Error('서버: '+kakaoNote+' / 브라우저 구글: '+((e&&e.message)||'연결 실패'));
   }
 }
 function googleToBook(it){
@@ -2362,32 +2363,37 @@ function cleanCoverUrl(u){return (u||'').replace(/["'<>\s]/g,'');}
 function pickBookResult(i){
   const b=bsCtx.results[i];if(!b)return;
   showBookForm(b);
-  if(!b.pages&&b.isbn)lookupPagesByIsbn(b.isbn);
+  if(!b.pages&&(b.isbn||b.title))lookupPagesByIsbn(b.isbn||'',b.title,(b.authors||[]).join(', '));
 }
-async function lookupPagesByIsbn(isbn){
+async function lookupPagesByIsbn(isbn,title,author){
   const hint=document.getElementById('bs-pages-hint');
   const totalEl=document.getElementById('bs-total');
   hint.textContent='쪽수를 찾는 중…';
+  let pageNote='';
   // 1순위: 동기화 서버 → 국립중앙도서관 ISBN 서지정보
   if(syncEnabled()){
     try{
-      const u=syncConfig.url+(syncConfig.url.indexOf('?')<0?'?':'&')+'action=pages&token='+encodeURIComponent(syncConfig.token)+'&isbn='+encodeURIComponent(isbn);
+      const u=syncConfig.url+(syncConfig.url.indexOf('?')<0?'?':'&')+'action=pages&token='+encodeURIComponent(syncConfig.token)+'&isbn='+encodeURIComponent(isbn)+'&title='+encodeURIComponent(title||'')+'&author='+encodeURIComponent(author||'');
       const j=await (await fetch(u)).json();
       if(j&&j.ok&&Number(j.pages)>0){
         if(totalEl.value==='')totalEl.value=j.pages;
-        hint.textContent='쪽수를 '+(j.source==='google'?'구글 북스':'국립중앙도서관 정보')+'에서 불러왔어요. 실제 책과 다르면 고쳐 주세요.';
+        hint.textContent=j.approx
+          ?'같은 제목 책의 쪽수를 구글 북스에서 불러왔어요. 판본마다 다를 수 있으니 확인해 주세요.'
+          :'쪽수를 '+(j.source==='google'?'구글 북스':'국립중앙도서관 정보')+'에서 불러왔어요. 실제 책과 다르면 고쳐 주세요.';
         return;
       }
-    }catch(e){}
+      pageNote=(j&&(j.note||j.reason||j.error))||'';
+    }catch(e){pageNote='서버 연결 실패';}
   }
   // 2순위: 구글 북스
   try{
+    if(!isbn)throw new Error('no isbn');
     const r=await fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+encodeURIComponent(isbn));
     const j=await r.json();
     const it=(j.items||[]).find(x=>x.volumeInfo&&x.volumeInfo.pageCount);
     if(it&&totalEl.value===''){totalEl.value=it.volumeInfo.pageCount;hint.textContent='쪽수를 구글 북스에서 불러왔어요. 실제 책과 다르면 고쳐 주세요.';return;}
   }catch(e){}
-  hint.textContent='쪽수 정보가 없어요. 총 페이지는 직접 입력해 주세요.';
+  hint.textContent='쪽수 정보가 없어요. 총 페이지는 직접 입력해 주세요.'+(pageNote?' ('+pageNote+')':'');
 }
 function showBookForm(b){
   document.getElementById('bs-search-area').style.display='none';
