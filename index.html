@@ -2313,7 +2313,7 @@ async function runBookSearch(){
     const res=await searchBooks(q);
     bsCtx.results=res.books;
     if(!res.books.length){st.textContent='검색 결과가 없어요. 다른 검색어로 찾거나 직접 입력해 주세요.';return;}
-    st.textContent=(res.source==='kakao'?'카카오 책 검색':'구글 북스')+' 결과 '+res.books.length+'건 · 눌러서 선택';
+    st.textContent=({aladin:'알라딘',kakao:'카카오 책 검색',google:'구글 북스'}[res.source]||'검색')+' 결과 '+res.books.length+'건 · 눌러서 선택';
     list.innerHTML=res.books.map((b,i)=>{
       const thumb=b.thumbnail?`<img class="bs-thumb" src="${escapeAttr(b.thumbnail)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'bs-thumb',textContent:'📖'}))">`:'<div class="bs-thumb">📖</div>';
       const meta=[(b.authors||[]).join(', '),b.publisher,b.pages?b.pages+'p':''].filter(Boolean).join(' · ');
@@ -2333,7 +2333,7 @@ async function searchBooks(q){
       let j=null;try{j=JSON.parse(txt);}catch(e){}
       if(!j)kakaoNote='서버 응답이 JSON이 아님';
       else if(j.ok&&Array.isArray(j.books)){
-        if(j.books.length)return {books:j.books,source:'kakao'};
+        if(j.books.length)return {books:j.books,source:j.source||'kakao'};
         kakaoNote='결과 0건';
       }
       else if(j.ok&&j.reason==='no_kakao_key')kakaoNote='서버에 카카오 키 없음';
@@ -2366,12 +2366,25 @@ function pickBookResult(i){
 }
 async function lookupPagesByIsbn(isbn){
   const hint=document.getElementById('bs-pages-hint');
+  const totalEl=document.getElementById('bs-total');
   hint.textContent='쪽수를 찾는 중…';
+  // 1순위: 동기화 서버 → 국립중앙도서관 ISBN 서지정보
+  if(syncEnabled()){
+    try{
+      const u=syncConfig.url+(syncConfig.url.indexOf('?')<0?'?':'&')+'action=pages&token='+encodeURIComponent(syncConfig.token)+'&isbn='+encodeURIComponent(isbn);
+      const j=await (await fetch(u)).json();
+      if(j&&j.ok&&Number(j.pages)>0){
+        if(totalEl.value==='')totalEl.value=j.pages;
+        hint.textContent='쪽수를 '+(j.source==='google'?'구글 북스':'국립중앙도서관 정보')+'에서 불러왔어요. 실제 책과 다르면 고쳐 주세요.';
+        return;
+      }
+    }catch(e){}
+  }
+  // 2순위: 구글 북스
   try{
     const r=await fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+encodeURIComponent(isbn));
     const j=await r.json();
     const it=(j.items||[]).find(x=>x.volumeInfo&&x.volumeInfo.pageCount);
-    const totalEl=document.getElementById('bs-total');
     if(it&&totalEl.value===''){totalEl.value=it.volumeInfo.pageCount;hint.textContent='쪽수를 구글 북스에서 불러왔어요. 실제 책과 다르면 고쳐 주세요.';return;}
   }catch(e){}
   hint.textContent='쪽수 정보가 없어요. 총 페이지는 직접 입력해 주세요.';
