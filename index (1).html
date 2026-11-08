@@ -1,0 +1,3869 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>루틴 기록기</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh;padding:24px 16px}
+  .container{max-width:640px;margin:0 auto}
+  .top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  h1{font-size:22px;font-weight:600;color:#1a1a1a}
+  .cal-badge{width:40px;height:40px;border-radius:11px;border:1.5px solid #e0ddd5;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all 0.15s;flex-shrink:0}
+  .cal-badge:hover{background:#f0faf5;border-color:#5DCAA5}
+  .cal-badge.active{background:#1D9E75;border-color:#1D9E75}
+  .tabs{display:flex;gap:4px;margin-bottom:16px;background:#e8e6e0;border-radius:10px;padding:3px}
+  .tab{flex:1;padding:7px;border:none;border-radius:8px;background:transparent;cursor:pointer;font-size:14px;color:#666;font-family:inherit;font-weight:500;transition:all 0.15s}
+  .tab.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+  .section{background:#fff;border-radius:14px;padding:16px 18px;margin-bottom:12px;border:1px solid #ebebeb}
+  .identity-card{background:linear-gradient(135deg,#1D9E75,#157d5c);border-radius:14px;padding:16px 18px;margin-bottom:12px;cursor:pointer;transition:transform 0.1s;box-shadow:0 2px 12px rgba(29,158,117,0.25)}
+  .identity-card:hover{transform:translateY(-1px)}
+  .identity-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .identity-label{font-size:11px;font-weight:700;color:rgba(255,255,255,0.85);letter-spacing:0.08em;text-transform:uppercase}
+  .identity-edit{font-size:13px;opacity:0.7}
+  .identity-line{display:flex;align-items:flex-start;gap:8px;padding:5px 0;font-size:15px;font-weight:600;color:#fff;line-height:1.45}
+  .identity-line .ic-bullet{flex-shrink:0;opacity:0.7;font-size:13px;margin-top:2px}
+  .identity-empty{font-size:13px;color:rgba(255,255,255,0.8)}
+  .goal-card{background:linear-gradient(135deg,#2d3e63,#1f2c4a);border-radius:14px;padding:16px 18px;margin-bottom:12px;cursor:pointer;transition:transform 0.1s;box-shadow:0 2px 12px rgba(45,62,99,0.25)}
+  .goal-card:hover{transform:translateY(-1px)}
+  .goal-line{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.12)}
+  .goal-line:last-child{border-bottom:none}
+  .goal-line .g-num{flex-shrink:0;width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,0.18);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+  .goal-text{flex:1}
+  .goal-result{font-size:15px;font-weight:600;color:#fff;line-height:1.4}
+  .goal-system{font-size:12px;color:rgba(255,255,255,0.7);margin-top:2px;line-height:1.4}
+  .goal-empty{font-size:13px;color:rgba(255,255,255,0.75)}
+  .quote-card{background:#faf6ee;border:1px solid #ecdfc4;border-radius:14px;padding:18px 20px;margin-bottom:12px;cursor:pointer;transition:transform 0.1s}
+  .quote-card:hover{transform:translateY(-1px)}
+  .quote-text{font-size:14px;color:#5c4a2a;line-height:1.6;font-style:italic;text-align:center;white-space:pre-wrap}
+  .quote-edit-hint{font-size:10px;color:#c2ad7f;text-align:center;margin-top:8px}
+  .rm-item{display:flex;gap:12px;position:relative;padding-bottom:14px}
+  .rm-item:last-child{padding-bottom:0}
+  .rm-item:not(:last-child)::before{content:'';position:absolute;left:23px;top:28px;bottom:-2px;width:2px;background:#e8e6e0}
+  .rm-year{flex-shrink:0;width:48px;height:48px;border-radius:12px;background:#f0faf5;border:1.5px solid #b8e8d4;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}
+  .rm-year-y{font-size:14px;font-weight:700;color:#0d6b47;line-height:1}
+  .rm-year-d{font-size:9px;color:#5DCAA5;margin-top:1px}
+  .rm-body{flex:1;padding-top:3px}
+  .rm-title{font-size:14px;font-weight:600;color:#1a1a1a;line-height:1.4}
+  .rm-desc{font-size:12px;color:#888;margin-top:3px;line-height:1.5}
+  .rm-empty{font-size:13px;color:#bbb;text-align:center;padding:16px 0}
+  .ret-item{padding:12px 0;border-bottom:1px solid #f2f2f0}
+  .ret-item:first-child{padding-top:0}
+  .ret-item:last-child{border-bottom:none;padding-bottom:0}
+  .ret-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+  .ret-name{font-size:14px;font-weight:600;color:#1a1a1a}
+  .ret-pct{font-size:15px;font-weight:700;color:#1D9E75}
+  .ret-bar{height:10px;background:#eee;border-radius:5px;overflow:hidden}
+  .ret-fill{height:100%;background:linear-gradient(90deg,#5DCAA5,#1D9E75);border-radius:5px;transition:width 0.5s}
+  .ret-vals{display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:5px}
+  .ret-vals b{color:#555;font-weight:600}
+  .ret-empty{font-size:13px;color:#bbb;text-align:center;padding:16px 0}
+  .backup-btn{flex:1;padding:11px;border-radius:11px;border:1.5px solid #d0d0d0;background:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;transition:all 0.15s}
+  .backup-btn:hover{background:#f5f4f0;border-color:#bbb}
+  .backup-btn:active{transform:scale(0.98)}
+  .section-title{font-size:12px;font-weight:600;color:#999;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px}
+  .section-title .edit-link,.idea-head .edit-link{margin-left:auto;font-size:11px;color:#1D9E75;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;padding:3px 8px;border-radius:6px;border:1px solid #b8e8d4;background:#f0faf5;transition:all 0.15s}
+  .section-title .edit-link:hover{background:#d4f0e4}
+  .routine-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f2f2f0}
+  .edit-dow-row{display:flex;align-items:center;gap:8px;padding:0 0 12px 38px;margin-top:-4px}
+  .edit-dow-label{font-size:11px;color:#999;flex-shrink:0}
+  .dow-btns{display:flex;gap:4px}
+  .dow-btn{width:24px;height:24px;border-radius:6px;background:#f0faf5;border:1px solid #b8e8d4;color:#0d6b47;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .dow-btn.off{background:#f5f4f0;border-color:#e0ddd5;color:#bbb;text-decoration:line-through}
+  .mode-row{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+  .mode-toggle{padding:6px 14px;border-radius:20px;border:1.5px solid #c5d0e8;background:#eef2fb;color:#3a5a9c;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s}
+  .mode-toggle:hover{filter:brightness(0.97)}
+  .mode-toggle.weekend{border-color:#f0d9b8;background:#fdf3e3;color:#a9711f}
+  .mini-toggle{padding:6px 12px;border-radius:20px;border:1.5px solid #e0ddd5;background:#fff;color:#999;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s}
+  .mini-toggle:hover{filter:brightness(0.97)}
+  .mini-toggle.on{border-color:#e8a0a0;background:#fdeeee;color:#c0504d}
+  .mode-auto-note{font-size:11px;color:#bbb}
+  .routine-item:last-child{border-bottom:none}
+  .routine-item input[type=checkbox]{width:17px;height:17px;cursor:pointer;accent-color:#1D9E75;flex-shrink:0}
+  .routine-item label{font-size:14px;color:#1a1a1a;cursor:pointer;flex:1;line-height:1.4}
+  .routine-item label.checked{color:#bbb;text-decoration:line-through}
+  .done-count{font-size:12px;color:#1D9E75;font-weight:600;margin-left:auto;flex-shrink:0}
+  .mood-row{display:flex;gap:6px;flex-wrap:wrap}
+  .mood-btn{padding:6px 14px;border-radius:20px;border:1.5px solid #e8e6e0;background:#fff;font-size:13px;cursor:pointer;color:#666;font-family:inherit;transition:all 0.15s}
+  .mood-btn:hover{border-color:#bbb}
+  .mood-btn.selected{background:#f0faf5;border-color:#1D9E75;color:#0d6b47;font-weight:500}
+  .counter-row{display:flex;align-items:center;gap:14px}
+  .counter-btn{width:32px;height:32px;border-radius:50%;border:1.5px solid #ddd;background:#fff;cursor:pointer;font-size:18px;color:#333;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:all 0.1s}
+  .counter-btn:hover{background:#f5f4f0}
+  .counter-btn:active{transform:scale(0.95)}
+  .counter-num{font-size:26px;font-weight:600;min-width:36px;text-align:center;color:#1a1a1a}
+  .counter-label{font-size:14px;color:#888}
+  .idea-block{margin-top:14px;padding-top:14px;border-top:1px solid #f2f2f0}
+  .idea-head{font-size:12px;color:#888;font-weight:600;margin-bottom:8px;display:flex;align-items:center}
+  .idea-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .idea-chip{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:#3a5a9c;background:#eef2fb;border:1px solid #d3deef;border-radius:14px;padding:5px 12px;cursor:pointer;transition:all 0.15s}
+  .idea-chip:hover{background:#dce6f7}
+  .idea-chip.has-note{background:#fdf3e3;border-color:#f0d9b8;color:#a9711f}
+  .idea-chip .idea-dot{font-size:7px;color:#f0a500}
+  .idea-date-tag{font-size:10px;font-weight:700;color:#1D9E75;background:#fff;border-radius:5px;padding:1px 5px;margin-right:2px}
+  .idea-chip.add{color:#888;background:#fff;border-style:dashed;border-color:#ccc}
+  .idea-chip.allview{color:#0d6b47;background:#f0faf5;border-color:#b8e8d4}
+  /* 글감 접기/펼치기 */
+  .idea-chips.folded{overflow:hidden;position:relative}
+  .idea-chips.folded::after{content:'';position:absolute;left:0;right:0;bottom:0;height:16px;background:linear-gradient(to bottom,rgba(255,255,255,0),#fff);pointer-events:none}
+  .idea-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:7px}
+  .idea-more{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;color:#0d6b47;background:#f0faf5;border:1px solid #b8e8d4;border-radius:14px;padding:5px 12px;cursor:pointer;transition:all 0.15s}
+  .idea-more:hover{background:#e2f5ec}
+  .idea-empty{font-size:12px;color:#bbb;padding:2px 0}
+  /* 스레드 글감 */
+  .idea-chip.thread{color:#5b4a9c;background:#f2effb;border-color:#ddd4f0}
+  .idea-chip.thread:hover{background:#e8e1f7}
+  .idea-chip.thread.has-note{background:#fdf3e3;border-color:#f0d9b8;color:#a9711f}
+  .idea-chip.thread .idea-date-tag{color:#6b4fbb}
+  .ai-card{border:1.5px solid #e8e6e0;border-radius:12px;padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:border-color 0.15s}
+  .ai-card:hover{border-color:#c8e6d8}
+  .ai-card.done{background:#f8f7f3;opacity:0.75}
+  .ai-card.done .ai-keyword{text-decoration:line-through;color:#999}
+  .ai-card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .ai-keyword{font-size:15px;font-weight:700;color:#1a1a1a}
+  .ai-done-badge{font-size:11px;font-weight:600;color:#0d6b47;background:#e3f5ec;border-radius:6px;padding:2px 7px}
+  .ai-date{font-size:12px;color:#1D9E75;font-weight:600}
+  .ai-meta{margin-top:5px}
+  .ai-note{font-size:13px;color:#555;line-height:1.6;margin-top:7px;white-space:pre-wrap}
+  .workout-table{width:100%;border-collapse:collapse}
+  .workout-table th{font-size:11px;font-weight:600;color:#aaa;padding:0 0 8px;text-align:center;white-space:nowrap}
+  .workout-table th.wt-sum{color:#1D9E75}
+  .workout-table td{padding:4px 3px;text-align:center}
+  .workout-table td.wt-name{text-align:left;font-size:13px;color:#1a1a1a;white-space:nowrap;padding-right:8px}
+  .wt-input{width:100%;max-width:48px;border:1.5px solid #e8e6e0;border-radius:8px;padding:7px 2px;font-size:14px;font-family:inherit;color:#1a1a1a;text-align:center;-moz-appearance:textfield}
+  .wt-input::placeholder{color:#cdcdcd;font-style:italic}
+  .workout-prev-hint{font-size:11px;color:#bbb;margin-bottom:8px}
+  .wt-input::-webkit-outer-spin-button,.wt-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .wt-input:focus{outline:none;border-color:#1D9E75}
+  .workout-table td.wt-sum{font-size:15px;font-weight:700;color:#1D9E75}
+  .workout-table th.wt-wcol,.workout-table td.wt-wcol{width:52px}
+  .wt-winput{max-width:48px}
+  .wt-dash{color:#ccc;font-size:13px}
+  .reading-row{display:flex;align-items:center;gap:8px}
+  .rd-book-select{flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit;color:#1a1a1a;background:#fff;cursor:pointer}
+  .rd-book-select:focus{outline:none;border-color:#1D9E75}
+  .rd-cur-label{font-size:13px;color:#888;flex-shrink:0}
+  .rd-result{font-size:12px;color:#1D9E75;font-weight:600;margin-top:8px;min-height:16px}
+  .rd-result .rd-prog{color:#888;font-weight:500}
+  .rd-pageinfo{display:flex;gap:6px;margin-top:8px}
+  .rd-pageinfo:empty{display:none}
+  .rd-pill{flex:1;background:#f8f7f3;border-radius:9px;padding:8px 6px;text-align:center}
+  .rd-pill-num{font-size:16px;font-weight:700;color:#1a1a1a}
+  .rd-pill-num.accent{color:#1D9E75}
+  .rd-pill-lbl{font-size:11px;color:#999;margin-top:2px}
+  .rdm-empty{font-size:13px;color:#999;line-height:1.6;padding:6px 0 4px}
+  .rd-book{flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:9px 11px;font-size:14px;font-family:inherit;color:#1a1a1a}
+  .rd-book:focus{outline:none;border-color:#1D9E75}
+  .rd-pages{width:64px;border:1.5px solid #e8e6e0;border-radius:8px;padding:9px 8px;font-size:14px;font-family:inherit;color:#1a1a1a;text-align:center;-moz-appearance:textfield}
+  .rd-pages::-webkit-outer-spin-button,.rd-pages::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .rd-pages:focus{outline:none;border-color:#1D9E75}
+  .rd-unit{font-size:13px;color:#888}
+  .rd-hint{font-size:11px;color:#bbb;margin-top:7px}
+  .rdw-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+  .rdw-stat{background:#f8f7f3;border-radius:10px;padding:10px;text-align:center}
+  .rdw-num{font-size:20px;font-weight:700;color:#1D9E75}
+  .rdw-lbl{font-size:11px;color:#999;margin-top:2px}
+  .rdw-bars{display:flex;align-items:flex-end;gap:6px;height:90px;margin-bottom:14px}
+  .rdw-bar-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%}
+  .rdw-clickable{cursor:pointer;border-radius:6px;transition:background 0.15s}
+  .rdw-clickable:hover{background:#f5f4f0}
+  .rdw-edit-hint{font-size:11px;color:#bbb;text-align:center;margin-bottom:12px}
+  .mb-item{padding:11px 0;border-bottom:1px solid #f2f2f0}
+  .mb-item:last-child{border-bottom:none}
+  .mb-title{font-size:14px;font-weight:600;color:#1a1a1a}
+  .mb-sub{font-size:12px;color:#999;margin-top:2px}
+  .mb-stars{font-size:13px;color:#f0a500;margin-top:4px;letter-spacing:1px}
+  .mb-comment{font-size:13px;color:#555;line-height:1.5;margin-top:4px;background:#faf9f5;border-radius:8px;padding:7px 10px}
+  .rdw-bar-val{font-size:10px;color:#888;font-weight:600;margin-bottom:2px}
+  .rdw-bar-track{flex:1;width:100%;max-width:24px;background:#f0efe9;border-radius:5px;display:flex;align-items:flex-end;overflow:hidden}
+  .rdw-bar-fill{width:100%;background:linear-gradient(to top,#1D9E75,#5DCAA5);border-radius:5px;min-height:2px}
+  .rdw-bar-day{font-size:11px;color:#aaa;margin-top:5px}
+  .rdw-booklist{display:flex;flex-direction:column;gap:6px}
+  .rdw-book{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:7px 10px;background:#faf9f5;border-radius:8px}
+  .rdw-book-name{color:#1a1a1a;font-weight:500}
+  .rdw-book-pages{color:#1D9E75;font-weight:700}
+  .rd-done-hint{color:#1D9E75;font-weight:700;cursor:pointer;margin-left:6px;text-decoration:underline}
+  .shelf-book{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f2f2f0}
+  .shelf-book:last-child{border-bottom:none}
+  .shelf-book-main{flex:1;min-width:0}
+  .shelf-book-title{font-size:15px;font-weight:700;color:#1a1a1a;line-height:1.4}
+  .shelf-book-sub{font-size:12px;color:#999;margin-top:3px}
+  .shelf-actions{flex-shrink:0}
+  .shelf-btn{padding:6px 12px;border-radius:8px;border:1.5px solid #b8e8d4;background:#f0faf5;color:#0d6b47;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap}
+  .shelf-btn:hover{background:#d4f0e4}
+  .shelf-btn.ghost{border-color:#e0ddd5;background:#fff;color:#999}
+  .shelf-btn.danger{border-color:#f0c4c0;color:#c0504d}
+  .shelf-btn.danger:hover{background:#fdeeee}
+  /* 완독 카드: 전체(표지·제목·리뷰)를 탭하면 리뷰 편집이 열림. 관리 모드에선 하단에 상태변경/삭제 컨트롤 노출 */
+  .shelf-book-done{position:relative;display:block;padding:14px 0}
+  .shelf-book-done .shelf-book-sub{margin-bottom:6px}
+  .shelf-done-clickable{border-radius:10px;transition:background 0.15s;margin:-6px;padding:6px}
+  .shelf-done-clickable[onclick]{cursor:pointer}
+  .shelf-done-clickable:hover{background:#faf9f5}
+  .shelf-done-clickable .shelf-review{margin-top:8px}
+  .shelf-manage-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;padding-top:8px;border-top:1px dashed #eee}
+  .month-group{margin-bottom:16px}
+  .month-group:last-child{margin-bottom:0}
+  .month-group-head{font-size:13px;font-weight:700;color:#1D9E75;padding:6px 10px;background:#f0faf5;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .month-group-head.muted{color:#999;background:#f5f4f0}
+  .mg-count{font-size:11px;font-weight:600;color:#aaa;background:#fff;border-radius:6px;padding:1px 7px}
+  .month-group .shelf-book{padding-left:6px;padding-right:6px}
+  .month-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+  .month-scroll::-webkit-scrollbar{height:6px}
+  .month-scroll::-webkit-scrollbar-thumb{background:#ddd;border-radius:3px}
+  .month-col{flex:0 0 200px;scroll-snap-align:start;background:#fafaf8;border:1px solid #f0efe9;border-radius:12px;padding:10px}
+  .month-col .month-group-head{margin-bottom:8px}
+  .month-col .shelf-book{display:block;padding:8px 0;border-bottom:1px solid #eee}
+  .month-col .shelf-book:last-child{border-bottom:none}
+  .month-col .shelf-book-row{flex-direction:column;align-items:stretch;gap:8px}
+  .month-col .shelf-actions{align-self:flex-start}
+  .shelf-book-row{display:flex;align-items:center;gap:10px}
+  .shelf-review{margin-top:8px;padding:10px 12px;background:#faf9f5;border-radius:10px}
+  .shelf-stars{font-size:15px;color:#f0a500;letter-spacing:1px}
+  .shelf-rating-num{font-size:12px;color:#c98a00;font-weight:700;margin-left:2px}
+  .shelf-comment{font-size:13px;color:#444;line-height:1.6;margin-top:6px;white-space:pre-wrap}
+  .rv-star-wrap{position:relative;display:inline-block;width:30px;height:30px;font-size:30px;line-height:1;cursor:pointer;touch-action:manipulation}
+  .rv-star-bg{position:absolute;top:0;left:0;color:#e0ddd5}
+  .rv-star-fill{position:absolute;top:0;left:0;overflow:hidden;white-space:nowrap;color:#f0a500;pointer-events:none}
+  .review-stars{display:flex;gap:6px;align-items:center}
+  .book-edit-card{border:1.5px solid #e8e6e0;border-radius:10px;padding:10px;margin-bottom:10px}
+  .bec-cover{flex-shrink:0;width:52px;height:70px;border-radius:8px;border:1.5px solid #e8e6e0;background:#f5f4f0;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+  .bec-cover img{width:100%;height:100%;object-fit:cover}
+  .bec-cover-plus{font-size:18px;color:#bbb}
+  .shelf-cover{flex-shrink:0;width:40px;height:54px;border-radius:6px;object-fit:cover;border:1px solid #f0efe9;display:block}
+  .shelf-cover-empty{display:flex;align-items:center;justify-content:center;background:#f5f4f0;font-size:16px;color:#ccc}
+  .shelf-cover-wrap{position:relative;flex-shrink:0;cursor:pointer}
+  .shelf-cover-edit{position:absolute;bottom:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#1D9E75;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;border:1.5px solid #fff}
+  .shelf-done-head{display:flex;gap:10px;align-items:flex-start}
+  .bec-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .bec-row:last-child{margin-bottom:0}
+  .bec-input{flex:1;min-width:0;box-sizing:border-box;border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:#1a1a1a;background:#fff}
+  .bec-input:focus{outline:none;border-color:#1D9E75}
+  .bec-select{cursor:pointer;flex:0 0 90px}
+  .bec-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+  .bec-chip{font-size:11px;color:#3a5a9c;background:#eef2fb;border:1px solid #d3deef;border-radius:12px;padding:3px 9px;cursor:pointer;transition:all 0.15s}
+  .bec-chip:hover{background:#dce6f7}
+  .shelf-purpose{display:inline-block;font-size:11px;color:#a9711f;background:#fdf3e3;border-radius:6px;padding:2px 8px;margin-top:5px}
+  .all-books-btn{width:100%;padding:13px;border:1.5px solid #e8e6e0;border-radius:12px;background:#fff;color:#555;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:4px;transition:all 0.15s}
+  .all-books-btn:hover{background:#faf9f5;border-color:#d8d5cd}
+  .all-books-header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+  .ab-back{width:38px;height:38px;border-radius:50%;border:none;background:#f5f4f0;color:#555;font-size:18px;cursor:pointer;flex-shrink:0}
+  .ab-title{font-size:24px;font-weight:800;color:#1a1a1a}
+  .ab-count{font-size:13px;color:#999;margin-top:2px}
+  .ab-sort-row{margin-bottom:16px}
+  .ab-sort-select{border:1.5px solid #e8e6e0;border-radius:10px;padding:8px 12px;font-size:13px;font-family:inherit;color:#555;background:#fff;cursor:pointer}
+  .ab-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+  .ab-card{cursor:pointer;min-width:0;border:1.5px solid #e8e6e0;border-radius:14px;background:#fff;padding:8px;box-sizing:border-box;transition:border-color 0.15s}
+  .ab-card:hover{border-color:#c8e6d8}
+  .ab-cover-wrap{position:relative;width:100%;aspect-ratio:3/4;border-radius:9px;overflow:hidden;background:#f5f4f0}
+  .ab-cover{width:100%;height:100%;object-fit:cover;display:block}
+  .ab-cover-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;color:#ccc;box-sizing:border-box}
+  .ab-status-badge{position:absolute;bottom:6px;left:6px;width:24px;height:24px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,0.15)}
+  .ab-stars{font-size:11px;color:#f0a500;letter-spacing:0.5px;margin-top:6px;text-align:right;white-space:nowrap;overflow:hidden}
+  .ab-book-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-top:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all}
+  .ab-add{display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fafaf8}
+  .ab-add-inner{width:100%;flex:1;border-radius:9px;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+  .ab-plus{font-size:34px;color:#bbb;font-weight:300}
+  .ww-item{padding:10px 0;border-bottom:1px solid #f2f2f0}
+  .ww-item:last-child{border-bottom:none}
+  .ww-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:7px}
+  .ww-name{font-size:14px;font-weight:600;color:#1a1a1a}
+  .ww-total{font-size:15px;font-weight:700;color:#1D9E75}
+  .ww-total span{font-size:12px;color:#999;font-weight:500}
+  .ww-bar{height:9px;background:#eee;border-radius:5px;overflow:hidden}
+  .ww-fill{height:100%;border-radius:5px;transition:width 0.4s}
+  .ww-days{font-size:11px;color:#aaa;margin-top:5px}
+  .ww-chart{margin-bottom:10px}
+  .ww-legend{display:flex;flex-direction:column;gap:6px}
+  .run-strip{display:flex;align-items:center;gap:8px;margin:6px 0 12px}
+  .run-strip-week-last{margin-bottom:24px!important}
+  .run-strip-label{font-size:11px;color:#888;font-weight:600;flex-shrink:0;width:44px}
+  .run-strip-cells{display:flex;gap:4px;flex:1}
+  .run-cell{flex:1;aspect-ratio:1;max-height:26px;border-radius:6px;background:#f0efe9;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:700}
+  .run-cell.ran{background:#5DCAA5}
+  .run-cell.strength.ran{background:#4d96ff}
+  /* 주간 통계용 체크바 (블로그/운동/독서) */
+  .run-strip-stat{margin:6px 0!important}
+  .run-strip-stat-last{margin:6px 0 2px 0!important}
+  .run-strip-stat .run-strip-label{width:56px}
+  .run-cell.blogc.ran{background:#1D9E75}
+  .run-cell.exc.ran{background:#4d96ff}
+  .run-cell.readc.ran{background:#b08968}
+  .run-strip-month{margin:2px 0!important}
+  .run-strip-month .run-strip-cells{gap:1.5px}
+  .run-strip-month-last{margin:2px 0 22px 0!important}
+  .run-cell.month{max-height:14px;border-radius:2px}
+  .wwl-item{display:flex;align-items:center;gap:7px;font-size:13px}
+  .wwl-divider{height:1px;background:#eee;margin:6px 0}
+  .wwl-dot{width:12px;height:3px;border-radius:2px;flex-shrink:0}
+  .wwl-name{color:#1a1a1a;font-weight:500}
+  .wwl-total{color:#1D9E75;font-weight:700;margin-left:auto}
+  .wwl-days{color:#aaa;font-size:11px}
+  textarea{width:100%;border:1.5px solid #ebebeb;border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;background:#fdfdfd;color:#1a1a1a;resize:none;line-height:1.65;transition:border-color 0.15s}
+  textarea:focus{outline:none;border-color:#aaa}
+  textarea::placeholder{color:#ccc}
+  .save-btn{width:100%;padding:12px;border-radius:12px;border:1.5px solid #d0d0d0;background:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:#333;margin-top:4px;transition:all 0.15s;letter-spacing:0.01em}
+  .save-btn:hover{background:#f5f4f0;border-color:#bbb}
+  .save-btn:active{transform:scale(0.98)}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;border-radius:10px;padding:10px 20px;font-size:13px;font-weight:500;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;z-index:999}
+  .toast.show{opacity:1}
+  .week-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+  .stat-card{background:#f8f7f3;border-radius:10px;padding:12px 14px}
+  .stat-num{font-size:24px;font-weight:700;color:#1a1a1a}
+  .stat-lbl{font-size:12px;color:#999;margin-top:3px}
+  .day-pills{display:flex;gap:6px;flex-wrap:wrap}
+  .week-grass{flex:1;min-width:38px;aspect-ratio:1;border-radius:9px;border:1px solid #f0efe9;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform 0.1s}
+  .week-grass.has-data{cursor:pointer}
+  .week-grass.has-data:hover{transform:scale(1.08);box-shadow:0 2px 8px rgba(0,0,0,0.12)}
+  .week-grass.future{border:none}
+  .week-grass.today{box-shadow:0 0 0 2px #1D9E75}
+  .wg-day{font-size:11px;font-weight:600}
+  .wg-pct{font-size:10px;font-weight:600;margin-top:1px}
+  .week-log-item{padding:11px 0;border-bottom:1px solid #f2f2f0}
+  .week-log-item:last-child{border-bottom:none}
+  .week-log-date{font-size:11px;color:#aaa;margin-bottom:4px;font-weight:500}
+  .week-log-note{font-size:13px;color:#444;line-height:1.55}
+  .week-log-posts{font-size:11px;color:#1D9E75;font-weight:600;margin-top:3px}
+  .empty-msg{font-size:13px;color:#bbb;text-align:center;padding:20px 0}
+  .progress-bar{height:6px;background:#eee;border-radius:3px;margin-top:10px;overflow:hidden}
+  .progress-fill{height:100%;background:#1D9E75;border-radius:3px;transition:width 0.3s}
+  .progress-label{font-size:11px;color:#aaa;margin-top:4px}
+  .date-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;background:#fff;border-radius:12px;padding:10px 14px;border:1px solid #ebebeb}
+  .date-nav-btn{width:32px;height:32px;border:1.5px solid #e8e6e0;border-radius:8px;background:transparent;cursor:pointer;font-size:16px;color:#555;display:flex;align-items:center;justify-content:center;transition:all 0.15s;font-family:inherit}
+  .date-nav-btn:hover{background:#f5f4f0;border-color:#bbb}
+  .date-nav-btn:disabled{opacity:0.3;cursor:default}
+  .date-nav-center{text-align:center;flex:1}
+  .date-nav-main{font-size:15px;font-weight:600;color:#1a1a1a}
+  .date-nav-sub{font-size:11px;color:#aaa;margin-top:2px}
+  .date-nav-today{font-size:11px;color:#1D9E75;font-weight:600;cursor:pointer;padding:3px 8px;border-radius:6px;border:1px solid #b8e8d4;background:#f0faf5;margin-top:4px;display:inline-block;transition:all 0.15s}
+  .date-nav-today:hover{background:#d4f0e4}
+  .past-badge{display:inline-block;font-size:11px;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:6px;padding:2px 8px;margin-left:8px;font-weight:500}
+  .future-badge{display:inline-block;font-size:11px;background:#e7f0fb;color:#2d5a9c;border:1px solid #9cc0ec;border-radius:6px;padding:2px 8px;margin-left:8px;font-weight:500}
+  .heatmap-table{width:100%;border-collapse:separate;border-spacing:0}
+  .heatmap-table th{font-size:11px;font-weight:500;color:#aaa;text-align:center;padding:0 0 8px;vertical-align:bottom}
+  .heatmap-table th.today-col{color:#1D9E75;font-weight:700}
+  .heatmap-table td.routine-name{font-size:12px;color:#555;padding:4px 8px 4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px}
+  .target-badge{display:inline-block;margin-right:5px;font-size:10px;font-weight:600;color:#999;background:#f0efe9;border-radius:8px;padding:1px 6px;vertical-align:middle}
+  .target-badge.met{color:#0d6b47;background:#d4f0e4}
+  .routine-name.rn-met{color:#aaa;text-decoration:line-through;text-decoration-color:#5DCAA5;text-decoration-thickness:1.5px}
+  .rn-check{display:inline-block;color:#1D9E75;font-weight:700;margin-right:4px;text-decoration:none}
+  .routine-name.rn-met .rn-check{text-decoration:none}
+  .routine-name.rn-met .target-badge{text-decoration:none}
+  .heatmap-dot{width:28px;height:28px;border-radius:7px;margin:2px auto;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .heatmap-dot.done{background:#d4f0e4;color:#0d6b47}
+  .heatmap-dot.miss{background:#f5f4f0}
+  .heatmap-dot.none{background:#f5f4f0;opacity:0.35}
+  .heatmap-dot.na{background:transparent;border:1px dashed #eee;opacity:0.5}
+  .hm-section{font-size:11px;font-weight:700;color:#a9711f;background:#fdf3e3;padding:5px 8px;border-radius:6px;text-align:left}
+  .heatmap-dot.today-dot{box-shadow:0 0 0 2px #1D9E75}
+  .heatmap-dot.clickable{cursor:pointer}
+  .heatmap-dot.clickable:hover{transform:scale(1.15);filter:brightness(0.95)}
+  .heatmap-dot.miss.clickable:hover{background:#e8f5ee}
+  .heatmap-legend{display:flex;align-items:center;gap:12px;margin-top:10px;font-size:11px;color:#aaa;flex-wrap:wrap}
+  .legend-dot{width:14px;height:14px;border-radius:4px;display:inline-block;flex-shrink:0}
+  /* 루틴 편집 모달 */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;align-items:center;justify-content:center;z-index:1000;padding:16px}
+  .modal-overlay.show{display:flex}
+  .modal{background:#fff;border-radius:16px;padding:20px;max-width:480px;width:100%;max-height:85vh;overflow-y:auto}
+  .modal-title{font-size:17px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+  .modal-close{width:30px;height:30px;border:none;background:#f5f4f0;border-radius:8px;cursor:pointer;font-size:18px;color:#666}
+  .edit-routine-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .drag-handle{flex-shrink:0;width:30px;height:36px;border:none;background:transparent;color:#bbb;font-size:18px;cursor:grab;touch-action:none;border-radius:8px;line-height:1}
+  .drag-handle:active{cursor:grabbing;background:#f0efe9}
+  .edit-routine-row.dragging{opacity:0.85;background:#f0faf5;border-radius:9px;box-shadow:0 4px 14px rgba(0,0,0,0.12)}
+  .edit-routine-row input[type=text]{flex:1;border:1.5px solid #e8e6e0;border-radius:9px;padding:9px 11px;font-size:14px;font-family:inherit;color:#1a1a1a}
+  .edit-routine-row input[type=text]:focus{outline:none;border-color:#1D9E75}
+  .del-btn{width:34px;height:34px;border:1.5px solid #f0d0d0;background:#fff5f5;border-radius:8px;cursor:pointer;font-size:16px;color:#d05050;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+  .target-select{border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 6px;font-size:13px;font-family:inherit;color:#1a1a1a;background:#fff;cursor:pointer;flex-shrink:0;width:104px}
+  .target-select:focus{outline:none;border-color:#1D9E75}
+  .core-btn{width:34px;height:34px;border:1.5px solid #e8e6e0;background:#fafafa;border-radius:8px;cursor:pointer;font-size:14px;flex-shrink:0;filter:grayscale(1) opacity(0.4);transition:all 0.15s}
+  .core-btn.on{border-color:#e8a0a0;background:#fdeeee;filter:none}
+  .del-btn:hover{background:#ffe5e5}
+  .add-routine-btn{width:100%;padding:10px;border:1.5px dashed #c0c0c0;border-radius:9px;background:#fafafa;cursor:pointer;font-size:13px;color:#777;font-family:inherit;margin-top:6px;transition:all 0.15s}
+  .add-routine-btn:hover{background:#f0faf5;border-color:#5DCAA5;color:#0d6b47}
+  .modal-save{width:100%;padding:12px;border:none;border-radius:11px;background:#1D9E75;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:14px;transition:all 0.15s}
+  .review-modal-manage{display:flex;justify-content:center;gap:16px;margin-top:14px;padding-top:12px;border-top:1px solid #f2f2f0}
+  .review-manage-link{font-size:12px;color:#999;cursor:pointer;padding:4px 6px}
+  .review-manage-link:hover{color:#555}
+  .review-manage-link.danger{color:#c0504d}
+  .review-manage-link.danger:hover{color:#a03a37}
+  .modal-save:hover{background:#178862}
+  /* 월간 달력 */
+  .month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+  .month-nav-btn{width:34px;height:34px;border:1.5px solid #e8e6e0;border-radius:9px;background:#fff;cursor:pointer;font-size:17px;color:#555;display:flex;align-items:center;justify-content:center;font-family:inherit}
+  .month-nav-btn:hover{background:#f5f4f0}
+  .month-nav-btn:disabled{opacity:0.3;cursor:default}
+  .month-nav-title{font-size:17px;font-weight:700;color:#1a1a1a}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .cal-head{text-align:center;font-size:11px;font-weight:600;color:#aaa;padding:4px 0}
+  .cal-cell{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;border:1px solid #f0efe9;cursor:default;transition:transform 0.1s}
+  .cal-cell.has-data{cursor:pointer}
+  .cal-cell.has-data:hover{transform:scale(1.08);z-index:2;box-shadow:0 2px 8px rgba(0,0,0,0.12)}
+  .cal-cell.empty{border:none;background:transparent}
+  .cal-cell.future{opacity:0.4}
+  .cal-daynum{font-size:12px;font-weight:600}
+  .cal-pct{font-size:9px;font-weight:600;margin-top:1px}
+  .cal-cell.today-cell{box-shadow:0 0 0 2px #1D9E75}
+  .wo-cal-cell{aspect-ratio:1;border-radius:9px;display:flex;flex-direction:column;align-items:center;position:relative;border:1px solid #f0efe9;padding-top:3px;overflow:hidden}
+  .wo-cal-cell.ran{background:#d4f5e6;border-color:#a8e6cc}
+  .wo-cal-cell.empty{border:none;background:transparent}
+  .wo-cal-cell.future{opacity:0.4}
+  .wo-cal-cell.today-cell{box-shadow:0 0 0 2px #1D9E75}
+  .wo-cal-cell.has-data{cursor:pointer}
+  .wo-cal-daynum{font-size:11px;font-weight:600;color:#888}
+  .wo-dots{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;margin-top:2px;padding:0 2px}
+  .wo-dot-sm{width:6px;height:6px;border-radius:50%}
+  .wo-legend{display:flex;align-items:center;gap:10px;margin-top:14px;justify-content:center;flex-wrap:wrap;font-size:11px;color:#888}
+  .wo-leg-item{display:flex;align-items:center;gap:4px}
+  .wo-dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .wo-square{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .wo-sum-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f2f2f0}
+  .wo-sum-row:last-child{border-bottom:none}
+  .wo-sum-name{font-size:13px;color:#1a1a1a;flex:1;display:flex;align-items:center;gap:7px}
+  .wo-sum-val{font-size:14px;font-weight:700;color:#1D9E75}
+  .wo-sum-days{font-size:11px;color:#aaa}
+  .month-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+  .ms-card{background:#f8f7f3;border-radius:10px;padding:12px 10px;text-align:center}
+  .ms-card-clickable{cursor:pointer;transition:all 0.15s;border:1.5px solid transparent}
+  .ms-card-clickable:hover{background:#f0efe9}
+  .ms-card-clickable.ms-card-active{background:#eef8f2;border-color:#1D9E75}
+  .cal-mode-hint{font-size:11px;color:#888;text-align:center;margin-top:10px;padding:8px;background:#f8f7f3;border-radius:8px}
+  .ms-num{font-size:22px;font-weight:700;color:#1a1a1a}
+  .ms-lbl{font-size:11px;color:#999;margin-top:3px}
+  .cal-legend{display:flex;align-items:center;gap:6px;margin-top:14px;justify-content:center;font-size:11px;color:#aaa}
+  .cal-legend-box{width:16px;height:16px;border-radius:4px;border:1px solid #f0efe9}
+  @media(max-width:480px){.week-stat-grid,.month-summary{grid-template-columns:repeat(3,1fr)}.stat-num,.ms-num{font-size:18px}.heatmap-table td.routine-name{max-width:80px;font-size:10px}.cal-daynum{font-size:10px}.cal-pct{font-size:8px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top-row">
+    <h1>루틴 기록기</h1>
+    <div style="display:flex;gap:8px">
+      <button class="cal-badge" id="sync-badge" onclick="syncNow(true)" title="동기화" style="display:none;font-size:18px">☁️</button>
+      <button class="cal-badge" id="workout-badge" onclick="toggleWorkout()" title="운동 기록">💪</button>
+      <button class="cal-badge" id="book-badge" onclick="toggleBooks()" title="책장">📚</button>
+      <button class="cal-badge" id="goal-badge" onclick="toggleGoals()" title="올해 목표">🎯</button>
+    </div>
+  </div>
+
+  <div class="tabs" id="main-tabs">
+    <button class="tab active" onclick="switchTab('daily')">일간 리뷰</button>
+    <button class="tab" onclick="switchTab('weekly')">주간 리뷰</button>
+    <button class="tab" onclick="switchTab('monthly')">월간 리뷰</button>
+  </div>
+
+  <!-- 날짜 네비게이터 -->
+  <div class="date-nav" id="date-nav">
+    <button class="date-nav-btn" id="btn-prev" onclick="moveDate(-1)">‹</button>
+    <div class="date-nav-center">
+      <div class="date-nav-main" id="nav-main-label"></div>
+      <div class="date-nav-sub" id="nav-sub-label"></div>
+      <div id="nav-today-btn" onclick="goToday()" class="date-nav-today" style="display:none">오늘로</div>
+    </div>
+    <button class="date-nav-btn" id="btn-next" onclick="moveDate(1)">›</button>
+  </div>
+
+  <!-- 일간 -->
+  <div id="daily-view">
+    <div class="section">
+      <div class="mode-row">
+        <button class="mode-toggle" id="mode-toggle" onclick="toggleMode()">💼 평일 모드</button>
+        <button class="mini-toggle" id="mini-toggle" onclick="toggleMini()">📌 약속</button>
+      </div>
+      <div class="section-title">
+        ✅ 루틴 체크
+        <span class="edit-link" onclick="openRoutineEditor()">✏️ 편집</span>
+        <span class="done-count" id="done-count">0 / 0</span>
+      </div>
+      <div id="routine-list"></div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">루틴 달성률 0%</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📝 블로그 포스팅</div>
+      <div class="counter-row">
+        <button class="counter-btn" onclick="changeCount(-1)">−</button>
+        <span class="counter-num" id="post-count">0</span>
+        <button class="counter-btn" onclick="changeCount(1)">+</button>
+        <span class="counter-label">편 발행</span>
+      </div>
+      <div class="idea-block">
+        <div class="idea-head">💡 글감 메모 <span class="edit-link" onclick="openAllIdeasView('blog')">📋 글감 관리</span></div>
+        <div id="idea-chips" class="idea-chips"></div>
+        <div class="idea-actions">
+          <span class="idea-chip add" onclick="openIdeaEditor(-1,'blog')">＋ 글감</span>
+          <span class="idea-more" id="idea-more" onclick="toggleIdeaExpand('blog')" style="display:none">더보기 ▼</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🧵 스레드</div>
+      <div class="idea-block" style="margin-top:0;padding-top:0;border-top:none">
+        <div class="idea-head">💡 스레드 글감 <span class="edit-link" onclick="openAllIdeasView('thread')">📋 글감 관리</span></div>
+        <div id="thread-idea-chips" class="idea-chips"></div>
+        <div class="idea-actions">
+          <span class="idea-chip add" onclick="openIdeaEditor(-1,'thread')">＋ 글감</span>
+          <span class="idea-more" id="thread-idea-more" onclick="toggleIdeaExpand('thread')" style="display:none">더보기 ▼</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💪 운동 기록</div>
+      <div id="workout-prev-hint" class="workout-prev-hint"></div>
+      <table class="workout-table">
+        <thead>
+          <tr><th></th><th class="wt-wcol">무게</th><th>1SET</th><th>2SET</th><th>3SET</th><th>4SET</th><th class="wt-sum">합계</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="wt-name">🦵 스쿼트</td>
+            <td class="wt-wcol"><input type="number" inputmode="decimal" step="any" min="0" id="wo_squat_weight" class="wt-input wt-winput" oninput="onWorkoutInput()" placeholder="kg"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_squat_0" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_squat_1" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_squat_2" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_squat_3" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td class="wt-sum" id="wo_squat_sum">0</td>
+          </tr>
+          <tr>
+            <td class="wt-name">💪 푸쉬업</td>
+            <td class="wt-wcol"><span class="wt-dash">–</span></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_pushup_0" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_pushup_1" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_pushup_2" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_pushup_3" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td class="wt-sum" id="wo_pushup_sum">0</td>
+          </tr>
+          <tr>
+            <td class="wt-name">💪 이두</td>
+            <td class="wt-wcol"><input type="number" inputmode="decimal" step="any" min="0" id="wo_bicep_weight" class="wt-input wt-winput" oninput="onWorkoutInput()" placeholder="kg"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_bicep_0" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_bicep_1" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_bicep_2" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_bicep_3" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td class="wt-sum" id="wo_bicep_sum">0</td>
+          </tr>
+          <tr>
+            <td class="wt-name">💪 등</td>
+            <td class="wt-wcol"><input type="number" inputmode="decimal" step="any" min="0" id="wo_tricep_weight" class="wt-input wt-winput" oninput="onWorkoutInput()" placeholder="kg"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_tricep_0" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_tricep_1" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_tricep_2" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td><input type="number" inputmode="numeric" min="0" id="wo_tricep_3" class="wt-input" oninput="onWorkoutInput()"></td>
+            <td class="wt-sum" id="wo_tricep_sum">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        📖 독서 기록
+        <span class="edit-link" onclick="openBookManager()">📚 책 관리</span>
+      </div>
+      <div class="reading-row">
+        <select id="rd_book_select" class="rd-book-select" onchange="onReadingInput()"></select>
+      </div>
+      <div class="rd-pageinfo" id="rd-pageinfo"></div>
+      <div class="reading-row" style="margin-top:8px">
+        <span class="rd-cur-label">현재</span>
+        <input type="number" inputmode="numeric" min="0" id="rd_curpage" class="rd-pages" placeholder="0" oninput="onReadingInput()">
+        <span class="rd-unit" id="rd-total-label">p</span>
+      </div>
+      <div class="rd-result" id="rd-result"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💚 컨디션</div>
+      <div class="mood-row">
+        <button class="mood-btn" onclick="setMood('최고')">최고 😄</button>
+        <button class="mood-btn" onclick="setMood('좋음')">좋음 🙂</button>
+        <button class="mood-btn" onclick="setMood('보통')">보통 😐</button>
+        <button class="mood-btn" onclick="setMood('피곤')">피곤 😪</button>
+        <button class="mood-btn" onclick="setMood('힘듦')">힘듦 😞</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💭 메모</div>
+      <textarea id="daily-memo" rows="3" placeholder="잘된 것, 아쉬운 것, 개선할 것..." oninput="autosaveDailyDebounced()"></textarea>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🎯 다음날 목표</div>
+      <textarea id="tomorrow-goal" rows="2" placeholder="내일 꼭 하고 싶은 것 한 가지..." oninput="autosaveDailyDebounced()"></textarea>
+    </div>
+
+    <div class="quote-card" id="quote-card" onclick="openQuoteEditor()">
+      <div class="quote-text" id="quote-text"></div>
+      <div class="quote-edit-hint">탭하여 수정</div>
+    </div>
+
+    <div class="identity-card" id="identity-card" onclick="openIdentityEditor()">
+      <div class="identity-head">
+        <span class="identity-label">나의 정체성</span>
+        <span class="identity-edit">✏️</span>
+      </div>
+      <div id="identity-list"></div>
+    </div>
+  </div>
+
+  <!-- 주간 -->
+  <div id="weekly-view" style="display:none">
+    <div class="month-nav" style="margin-bottom:14px">
+      <button class="month-nav-btn" onclick="moveWeek(-1)">‹</button>
+      <div class="month-nav-title" id="week-nav-title"></div>
+      <button class="month-nav-btn" id="week-next-btn" onclick="moveWeek(1)">›</button>
+    </div>
+    <div class="section">
+      <div class="section-title">📊 주간 통계</div>
+      <div class="week-stat-grid">
+        <div class="stat-card"><div class="stat-num" id="w-posts">0</div><div class="stat-lbl">블로그 포스팅</div></div>
+        <div class="stat-card"><div class="stat-num" id="w-days">0</div><div class="stat-lbl">회고한 날</div></div>
+        <div class="stat-card"><div class="stat-num" id="w-routine">0%</div><div class="stat-lbl">루틴 달성률</div></div>
+      </div>
+      <div class="week-stat-grid">
+        <div class="stat-card"><div class="stat-num" id="w-exercise-days">0</div><div class="stat-lbl">운동한 날</div></div>
+        <div class="stat-card"><div class="stat-num" id="w-read-days">0</div><div class="stat-lbl">책 읽은 날</div></div>
+        <div class="stat-card"><div class="stat-num" id="w-perfect-days">0</div><div class="stat-lbl">완벽한 날</div></div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="w-progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="w-progress-label">주간 루틴 달성률 0%</div>
+      <div style="font-size:12px;color:#aaa;margin:16px 0 4px;font-weight:500">요일별 실천 체크</div>
+      <div id="week-check-strips"></div>
+      <div style="font-size:12px;color:#aaa;margin:14px 0 8px;font-weight:500">날짜별 달성률 (탭하면 해당일로 이동)</div>
+      <div class="day-pills" id="week-day-pills"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🟩 루틴별 달성 현황</div>
+      <div style="overflow-x:auto">
+        <table class="heatmap-table" id="heatmap-table">
+          <thead><tr id="heatmap-head">
+            <th style="text-align:left;min-width:100px"></th>
+            <th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th><th>일</th>
+          </tr></thead>
+          <tbody id="heatmap-body"></tbody>
+        </table>
+      </div>
+      <div class="heatmap-legend">
+        <span class="legend-dot" style="background:#d4f0e4"></span> 완료
+        <span class="legend-dot" style="background:#f5f4f0;border:1px solid #e0e0e0"></span> 미완료
+        <span class="legend-dot" style="background:#f5f4f0;opacity:0.4;border:1px solid #eee"></span> 기록없음
+        <span class="legend-dot" style="box-shadow:0 0 0 2px #1D9E75;background:#f5f4f0"></span> 오늘
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">💪 주간 운동 횟수</div>
+      <div id="weekly-workout"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📖 주간 독서</div>
+      <div id="weekly-reading"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🗒️ 이번 주 메모</div>
+      <div id="week-log-list"><div class="empty-msg">이번 주 저장된 회고가 없어요</div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🔍 이번 주 돌아보기</div>
+      <textarea id="weekly-memo" rows="3" placeholder="잘된 것, 아쉬운 것, 다음 주에 개선할 것..." oninput="autosaveWeeklyDebounced()"></textarea>
+    </div>
+
+    <div class="section">
+      <div class="section-title">🚀 다음 주 목표</div>
+      <textarea id="next-week-goal" rows="2" placeholder="다음 주 핵심 목표 한두 가지..." oninput="autosaveWeeklyDebounced()"></textarea>
+    </div>
+
+    <div id="save-status-week" style="text-align:center;font-size:12px;color:#1D9E75;font-weight:600;opacity:0.4;padding:8px;transition:opacity 0.3s">자동 저장</div>
+  </div>
+
+  <!-- 월간 -->
+  <div id="monthly-view" style="display:none">
+    <div class="section">
+      <div class="month-nav">
+        <button class="month-nav-btn" id="m-prev" onclick="moveMonth(-1)">‹</button>
+        <div class="month-nav-title" id="month-title"></div>
+        <button class="month-nav-btn" id="m-next" onclick="moveMonth(1)">›</button>
+      </div>
+      <div class="cal-grid" id="cal-head-row">
+        <div class="cal-head">월</div><div class="cal-head">화</div><div class="cal-head">수</div>
+        <div class="cal-head">목</div><div class="cal-head">금</div><div class="cal-head">토</div><div class="cal-head">일</div>
+      </div>
+      <div class="cal-grid" id="cal-grid" style="margin-top:5px"></div>
+      <div class="cal-legend">
+        <span>0%</span>
+        <span style="display:inline-block;width:120px;height:14px;border-radius:4px;background:linear-gradient(to right,#f0efe9,#dcf0e6,#7fc9a8,#0d7a57);border:1px solid #e8e6e0"></span>
+        <span>100%</span>
+      </div>
+      <div class="month-summary">
+        <div class="ms-card"><div class="ms-num" id="m-avg">0%</div><div class="ms-lbl">평균 달성률</div></div>
+        <div class="ms-card"><div class="ms-num" id="m-perfect">0</div><div class="ms-lbl">완벽한 날</div></div>
+        <div class="ms-card ms-card-clickable" onclick="setMonthCalMode('posts')"><div class="ms-num" id="m-posts">0</div><div class="ms-lbl">총 포스팅</div></div>
+        <div class="ms-card ms-card-clickable" onclick="setMonthCalMode('workout')"><div class="ms-num" id="m-workoutdays">0</div><div class="ms-lbl">운동한 날</div></div>
+        <div class="ms-card ms-card-clickable" onclick="setMonthCalMode('read')"><div class="ms-num" id="m-readdays">0</div><div class="ms-lbl">책 읽은 날</div></div>
+        <div class="ms-card"><div class="ms-num" id="m-booksdone">0</div><div class="ms-lbl">완독한 책</div></div>
+      </div>
+      <div class="cal-mode-hint" id="cal-mode-hint" style="display:none"></div>
+    </div>
+    <div class="section">
+      <div class="section-title">🔥 연속 기록</div>
+      <div style="display:flex;gap:20px">
+        <div><span style="font-size:26px;font-weight:700;color:#1D9E75" id="m-streak">0</span><span style="font-size:13px;color:#888;margin-left:5px">일 연속 기록</span></div>
+        <div><span style="font-size:26px;font-weight:700;color:#1a1a1a" id="m-logged">0</span><span style="font-size:13px;color:#888;margin-left:5px">일 기록</span></div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">💪 월간 운동 추이</div>
+      <div id="monthly-workout"></div>
+    </div>
+  </div>
+
+  <!-- 책장 -->
+  <div id="books-view" style="display:none">
+    <div class="section">
+      <div class="section-title">
+        📊 월별 완독
+        <span class="edit-link" onclick="openBookManager()">📚 책 관리</span>
+      </div>
+      <div id="book-monthly-chart"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">
+        📖 읽는 중
+        <span class="edit-link" onclick="openBookManager()">＋ 책 추가</span>
+      </div>
+      <div id="shelf-reading"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">📚 읽을 책</div>
+      <div id="shelf-toread"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">✅ 완독</div>
+      <div id="shelf-done"></div>
+    </div>
+
+    <button class="all-books-btn" onclick="openAllBooksView()">📚 모든 책 보기</button>
+  </div>
+
+  <!-- 모든 책 (격자 뷰) -->
+  <div id="all-books-view" style="display:none">
+    <div class="all-books-header">
+      <button class="ab-back" onclick="closeAllBooksView()">←</button>
+      <div>
+        <div class="ab-title">모든 책</div>
+        <div class="ab-count" id="ab-count">0권의 책이 있어요.</div>
+      </div>
+    </div>
+    <div class="ab-sort-row">
+      <select id="ab-sort" class="ab-sort-select" onchange="renderAllBooksGrid()">
+        <option value="updated">수정 날짜</option>
+        <option value="title">제목순</option>
+        <option value="rating">별점순</option>
+        <option value="status">상태별</option>
+      </select>
+    </div>
+    <div class="ab-grid" id="ab-grid"></div>
+  </div>
+
+  <!-- 전체 글감 (완료 포함) -->
+  <div id="all-ideas-view" style="display:none">
+    <div class="all-books-header">
+      <button class="ab-back" onclick="closeAllIdeasView()">←</button>
+      <div>
+        <div class="ab-title" id="ai-title">글감 모아보기</div>
+        <div class="ab-count" id="ai-count">0개의 글감이 있어요.</div>
+      </div>
+    </div>
+    <div class="ab-sort-row">
+      <select id="ai-filter" class="ab-sort-select" onchange="renderAllIdeasList()">
+        <option value="all">전체</option>
+        <option value="todo">작성 예정</option>
+        <option value="done">작성 완료</option>
+      </select>
+    </div>
+    <div id="ai-list"></div>
+  </div>
+
+  <!-- 운동 -->
+  <div id="workout-view" style="display:none">
+    <div class="section">
+      <div class="month-nav">
+        <button class="month-nav-btn" id="wo-prev" onclick="moveWorkoutMonth(-1)">‹</button>
+        <div class="month-nav-title" id="workout-month-title"></div>
+        <button class="month-nav-btn" id="wo-next" onclick="moveWorkoutMonth(1)">›</button>
+      </div>
+      <div class="cal-grid" id="wo-head-row">
+        <div class="cal-head">월</div><div class="cal-head">화</div><div class="cal-head">수</div>
+        <div class="cal-head">목</div><div class="cal-head">금</div><div class="cal-head">토</div><div class="cal-head">일</div>
+      </div>
+      <div class="cal-grid" id="wo-cal-grid" style="margin-top:5px"></div>
+      <div class="wo-legend">
+        <span class="wo-leg-item"><span class="wo-dot" style="background:#1D9E75"></span>스쿼트</span>
+        <span class="wo-leg-item"><span class="wo-dot" style="background:#4d96ff"></span>푸쉬업</span>
+        <span class="wo-leg-item"><span class="wo-dot" style="background:#9b5de5"></span>이두(덤벨 컬)</span>
+        <span class="wo-leg-item"><span class="wo-dot" style="background:#f15bb5"></span>등(덤벨 로우)</span>
+        <span class="wo-leg-item"><span class="wo-square" style="background:#d4f5e6;border:1px solid #a8e6cc"></span>러닝 (칸 채움)</span>
+      </div>
+    </div>
+    <div class="section">
+      <div class="section-title">💪 이번 달 운동 요약</div>
+      <div id="wo-month-summary"></div>
+    </div>
+  </div>
+
+  <!-- 올해 목표 -->
+  <div id="goals-view" style="display:none">
+    <div class="goal-card" id="goal-card" onclick="openGoalEditor()">
+      <div class="identity-head">
+        <span class="identity-label" id="goal-year-label">올해 목표</span>
+        <span class="identity-edit">✏️</span>
+      </div>
+      <div id="goal-list"></div>
+    </div>
+
+    <div class="section" style="margin-top:4px">
+      <div class="section-title">
+        💰 조기은퇴 달성 현황
+        <span class="edit-link" onclick="openRetireEditor()">✏️ 편집</span>
+      </div>
+      <div id="retire-list"></div>
+    </div>
+
+    <div class="section" style="margin-top:4px">
+      <div class="section-title">
+        🗺️ 조기은퇴 5년 로드맵
+        <span class="edit-link" onclick="openRoadmapEditor()">✏️ 편집</span>
+      </div>
+      <div id="roadmap-list"></div>
+    </div>
+
+    <div class="section" style="margin-top:4px">
+      <div class="section-title">📦 데이터 백업</div>
+      <div style="font-size:12px;color:#999;line-height:1.6;margin-bottom:12px">
+        모든 회고 기록은 이 브라우저에만 저장돼요. 방문기록 삭제(쿠키·사이트 데이터 포함)나 기기 변경 시 사라질 수 있으니, 가끔 내보내서 보관해두세요.
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="backup-btn" onclick="exportBackup()">⬇️ 내보내기</button>
+        <button class="backup-btn" onclick="document.getElementById('import-file-input').click()">⬆️ 불러오기</button>
+      </div>
+      <input type="file" id="import-file-input" accept="application/json,.json" style="display:none" onchange="importBackup(event)">
+      <div id="backup-status" style="font-size:11px;color:#1D9E75;font-weight:600;margin-top:8px;text-align:center;opacity:0;transition:opacity 0.3s"></div>
+    </div>
+
+    <div class="section" style="margin-top:4px">
+      <div class="section-title">☁️ 기기 간 동기화</div>
+      <div style="font-size:12px;color:#999;line-height:1.6;margin-bottom:12px">
+        구글 Apps Script 웹 앱 주소와 비밀번호를 넣으면 폰·PC 기록이 구글 드라이브를 통해 자동으로 맞춰져요. 두 기기에 똑같이 입력하세요.
+      </div>
+      <input type="url" id="sync-url" class="bec-input" placeholder="웹 앱 URL (https://script.google.com/macros/s/.../exec)" style="width:100%;box-sizing:border-box;margin-bottom:8px">
+      <input type="password" id="sync-token" class="bec-input" placeholder="동기화 비밀번호" style="width:100%;box-sizing:border-box;margin-bottom:10px">
+      <div style="display:flex;gap:8px">
+        <button class="backup-btn" onclick="saveSyncConfig()">💾 설정 저장</button>
+        <button class="backup-btn" onclick="syncNow(true)">🔄 지금 동기화</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="backup-btn" onclick="clearSyncConfig()" style="color:#999">연결 해제</button>
+      </div>
+      <div id="sync-status" style="font-size:11px;color:#888;font-weight:600;margin-top:10px;text-align:center"></div>
+    </div>
+
+    <div style="text-align:center;font-size:12px;color:#bbb;line-height:1.7;padding:8px 12px">
+      목표는 매일 쫓는 게 아니라 가끔 확인하는 나침반이에요.<br>방향은 목표가, 매일의 동력은 정체성과 루틴이 만듭니다.
+    </div>
+  </div>
+</div>
+
+<!-- 루틴 편집 모달 -->
+<div class="modal-overlay" id="routine-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="routine-modal-title">루틴 편집</span>
+      <button class="modal-close" onclick="closeRoutineEditor()">×</button>
+    </div>
+    <div id="edit-routine-list"></div>
+    <button class="add-routine-btn" onclick="addEditRow()">+ 루틴 추가</button>
+    <button class="modal-save" onclick="saveRoutines()">저장</button>
+    <div style="font-size:11px;color:#bbb;margin-top:10px;line-height:1.5">※ 📌을 켜면 '약속 모드'에서 보일 핵심 루틴이 돼요. 주간 목표 횟수는 달성률 계산에 쓰여요 (예: 운동 주 3회 → 3번 하면 100%). 루틴 삭제해도 과거 기록은 보존됩니다.</div>
+  </div>
+</div>
+
+<div id="toast" class="toast">저장됐어요 ✓</div>
+
+<!-- 완독 리뷰 모달 -->
+<div class="modal-overlay" id="review-modal">
+  <div class="modal">
+    <div class="modal-title">
+      완독 기록 🎉
+      <button class="modal-close" onclick="closeDoneReview()">×</button>
+    </div>
+    <div style="font-size:15px;font-weight:600;color:#1a1a1a;margin-bottom:14px" id="review-book-title"></div>
+    <div style="font-size:12px;color:#999;margin-bottom:6px">별점</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div id="review-stars" class="review-stars"></div>
+      <span id="review-rating-num" style="font-size:13px;font-weight:700;color:#f0a500"></span>
+    </div>
+    <div style="font-size:12px;color:#999;margin:14px 0 6px">읽은 기간</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <input type="date" id="review-start-date" class="bec-input" style="flex:1;box-sizing:border-box">
+      <span style="color:#bbb;font-size:13px;flex-shrink:0">~</span>
+      <input type="date" id="review-done-date" class="bec-input" style="flex:1;box-sizing:border-box">
+    </div>
+    <div style="font-size:12px;color:#999;margin:14px 0 6px">한 줄 코멘트</div>
+    <textarea id="review-comment" rows="3" placeholder="이 책에 대한 생각, 기억하고 싶은 문장 등" style="width:100%;border:1.5px solid #e8e6e0;border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;color:#1a1a1a;resize:none;line-height:1.6"></textarea>
+    <button class="modal-save" onclick="saveDoneReview()">완독 저장</button>
+    <div class="review-modal-manage" id="review-modal-manage" style="display:none">
+      <span class="review-manage-link" onclick="reviewModalSetStatus('reading')">📖 읽는 중으로</span>
+      <span class="review-manage-link" onclick="reviewModalSetStatus('toread')">📚 읽을 책으로</span>
+      <span class="review-manage-link danger" onclick="reviewModalDelete()">🗑 삭제</span>
+    </div>
+  </div>
+</div>
+
+<!-- 독서 기록 팝업 (루틴 '기상 후 독서' 체크 시) -->
+<div class="modal-overlay" id="reading-modal">
+  <div class="modal">
+    <div class="modal-title">
+      📖 오늘의 독서 기록
+      <button class="modal-close" onclick="closeReadingModal()">×</button>
+    </div>
+    <div id="rdm-body">
+      <div style="font-size:12px;color:#999;margin-bottom:6px">읽은 책</div>
+      <select id="rdm_book_select" class="rd-book-select" style="width:100%" onchange="updateReadingModalInfo()"></select>
+      <div class="rd-pageinfo" id="rdm-pageinfo"></div>
+      <div style="font-size:12px;color:#999;margin:14px 0 6px">오늘 어디까지 읽었나요?</div>
+      <div class="reading-row">
+        <span class="rd-cur-label">현재</span>
+        <input type="number" inputmode="numeric" min="0" id="rdm_curpage" class="rd-pages" placeholder="0" oninput="updateReadingModalInfo()">
+        <span class="rd-unit" id="rdm-total-label">p</span>
+      </div>
+      <div class="rd-result" id="rdm-result"></div>
+      <button class="modal-save" onclick="saveReadingModal()">독서 기록 저장</button>
+    </div>
+    <div id="rdm-nobook" style="display:none">
+      <div class="rdm-empty">'읽는 중'인 책이 없어요. 책을 먼저 등록하면 페이지를 기록할 수 있어요.<br>루틴 체크는 그대로 저장돼요.</div>
+      <button class="modal-save" onclick="closeReadingModal();openBookManager()">📚 책 등록하러 가기</button>
+    </div>
+    <div style="text-align:center;margin-top:10px"><span class="review-manage-link" onclick="closeReadingModal()">나중에 기록할게요</span></div>
+  </div>
+</div>
+
+<!-- 월별 완독 책 팝업 -->
+<div class="modal-overlay" id="month-books-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="month-books-title">완독 책</span>
+      <button class="modal-close" onclick="closeMonthBooks()">×</button>
+    </div>
+    <div id="month-books-body"></div>
+  </div>
+</div>
+
+<!-- 책 관리 모달 -->
+<div class="modal-overlay" id="book-modal">
+  <div class="modal">
+    <div class="modal-title">
+      읽는 책 관리
+      <button class="modal-close" onclick="closeBookManager()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:14px;line-height:1.6">책 제목과 총 페이지수를 등록해두면, 일간 리뷰에서 책을 고르고 현재 페이지만 입력하면 읽은 양이 자동 계산돼요.</div>
+    <div id="edit-book-list"></div>
+    <button class="add-routine-btn" onclick="addBookRow()">+ 책 추가</button>
+    <button class="modal-save" onclick="saveBooks()">저장</button>
+  </div>
+</div>
+
+<!-- 글감 메모 모달 -->
+<div class="modal-overlay" id="idea-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="idea-modal-title">글감 메모</span>
+      <button class="modal-close" onclick="closeIdeaEditor()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:10px">키워드와 떠오른 생각을 적어두세요. 나중에 글 쓸 때 꺼내 쓸 수 있어요.</div>
+    <input type="text" id="idea-keyword" class="bec-input" placeholder="키워드 (예: JEPQ 비교)" style="margin-bottom:8px;width:100%;box-sizing:border-box">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:13px;color:#888;flex-shrink:0">📅 예정일</span>
+      <input type="date" id="idea-date" class="bec-input" style="flex:1;box-sizing:border-box">
+      <button class="backup-btn" onclick="clearIdeaDate()" style="flex:0 0 auto;padding:8px 12px">지우기</button>
+    </div>
+    <textarea id="idea-note" rows="5" placeholder="이 글감에 대한 메모, 목차, 참고 링크 등" style="width:100%;box-sizing:border-box;border:1.5px solid #e8e6e0;border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;color:#1a1a1a;resize:none;line-height:1.6"></textarea>
+    <button class="modal-save" id="idea-done-btn" onclick="toggleIdeaDone()" style="display:none;background:#1D9E75;margin-top:12px">✍️ 작성 완료로 표시</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="modal-save" onclick="saveIdea()" style="flex:1;margin-top:0">저장</button>
+      <button class="backup-btn" id="idea-delete-btn" onclick="deleteIdea()" style="flex:0 0 auto;display:none">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- 명언 편집 모달 -->
+<div class="modal-overlay" id="quote-modal">
+  <div class="modal">
+    <div class="modal-title">
+      오늘의 문구 편집
+      <button class="modal-close" onclick="closeQuoteEditor()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:14px;line-height:1.6">매일 일간 리뷰 화면에 보일 문구예요. 좋아하는 명언이나 스스로에게 하는 다짐을 적어보세요.</div>
+    <textarea id="edit-quote-text" rows="3" placeholder="문구를 입력하세요" style="width:100%;border:1.5px solid #e8e6e0;border-radius:10px;padding:11px 13px;font-size:14px;font-family:inherit;color:#1a1a1a;resize:none;line-height:1.6"></textarea>
+    <button class="modal-save" onclick="saveQuote()">저장</button>
+  </div>
+</div>
+
+<!-- 정체성 편집 모달 -->
+<div class="modal-overlay" id="identity-modal">
+  <div class="modal">
+    <div class="modal-title">
+      정체성 편집
+      <button class="modal-close" onclick="closeIdentityEditor()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:14px;line-height:1.6">"나는 ~다" 형태의 현재형 선언으로 적어보세요. 되고 싶은 모습이 아니라, 이미 그런 사람이라는 선언이 습관을 만듭니다.</div>
+    <div id="edit-identity-list"></div>
+    <button class="add-routine-btn" onclick="addIdentityRow()">+ 문구 추가</button>
+    <button class="modal-save" onclick="saveIdentity()">저장</button>
+  </div>
+</div>
+
+<!-- 올해 목표 편집 모달 -->
+<div class="modal-overlay" id="goal-modal">
+  <div class="modal">
+    <div class="modal-title">
+      올해 목표 편집
+      <button class="modal-close" onclick="closeGoalEditor()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:14px;line-height:1.6">결과(어디까지)와 시스템(어떻게 꾸준히)을 함께 적으면 매일의 실천과 연결돼요. 시스템은 비워둬도 됩니다.</div>
+    <div id="edit-goal-list"></div>
+    <button class="add-routine-btn" onclick="addGoalRow()">+ 목표 추가</button>
+    <button class="modal-save" onclick="saveGoals()">저장</button>
+  </div>
+</div>
+
+<!-- 로드맵 편집 모달 -->
+<div class="modal-overlay" id="roadmap-modal">
+  <div class="modal">
+    <div class="modal-title">
+      5년 로드맵 편집
+      <button class="modal-close" onclick="closeRoadmapEditor()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:14px;line-height:1.6">연차별 이정표를 적어보세요. 연도와 핵심 목표, 간단한 설명을 넣을 수 있어요.</div>
+    <div id="edit-roadmap-list"></div>
+    <button class="add-routine-btn" onclick="addRoadmapRow()">+ 단계 추가</button>
+    <button class="modal-save" onclick="saveRoadmap()">저장</button>
+  </div>
+</div>
+
+<!-- 조기은퇴 현황 편집 모달 -->
+<div class="modal-overlay" id="retire-modal">
+  <div class="modal">
+    <div class="modal-title">
+      조기은퇴 현황 편집
+      <button class="modal-close" onclick="closeRetireEditor()">×</button>
+    </div>
+    <div style="font-size:12px;color:#999;margin-bottom:14px;line-height:1.6">목표값과 현재값을 입력하면 진행률이 자동 계산돼요. 단위(예: 억, 만원)는 이름에 함께 적으면 깔끔해요.</div>
+    <div id="edit-retire-list"></div>
+    <button class="add-routine-btn" onclick="addRetireRow()">+ 지표 추가</button>
+    <button class="modal-save" onclick="saveRetire()">저장</button>
+  </div>
+</div>
+
+<script>
+const DAY_NAMES = ['일','월','화','수','목','금','토'];
+const DAY_NAMES_MON = ['월','화','수','목','금','토','일'];
+const DEFAULT_ROUTINES = [
+  {id:'r_read',   name:'📖 기상 후 독서 30분', target:7, core:false, skipDays:[]},
+  {id:'r_amwrite',name:'✍️ 오전 블로그 글쓰기 (뽀모도로 3타임)', target:5, core:true, skipDays:[]},
+  {id:'r_workout',name:'💪 1타임 후 스쿼트 · 2타임 후 푸쉬업', target:5, core:false, skipDays:[]},
+  {id:'r_comment',name:'💬 출근길 블로그 이웃 댓글', target:5, core:false, skipDays:[]},
+  {id:'r_run',    name:'🏃 점심 러닝 30분 (화·금)', target:2, core:false, skipDays:[0,1,3,4,6]}, // 화(2)·금(5)만 대상, 나머지 요일은 목록에서 제외
+  {id:'r_pmnote', name:'📝 내일 쓸 주제 한 줄 메모', target:5, core:false, skipDays:[]},
+  {id:'r_offlaptop',name:'💻 9시반 노트북 치우기', target:5, core:true, skipDays:[]},
+  {id:'r_sleep',  name:'🌙 10시반 눕기', target:7, core:true, skipDays:[]}
+];
+// 주말 모드 기본 루틴 (어제 설계한 내용)
+const DEFAULT_ROUTINES_WEEKEND = [
+  {id:'w_wake',   name:'⏰ 7시반 기상 + 챌린저스 인증', target:2, core:true, skipDays:[]},
+  {id:'w_morning',name:'🍳 아침식사 + 좋아하는 차', target:2, core:false, skipDays:[]},
+  {id:'w_pomo',   name:'✍️ 뽀모도로 2타임 (최소 1타임)', target:2, core:true, skipDays:[]},
+  {id:'w_publish',name:'📤 블로그 발행 (토·일 중 1회)', target:1, core:false, skipDays:[]},
+  {id:'w_cafe',   name:'☕ 카페 — 독서/글감/자동화 (3h)', target:2, core:false, skipDays:[]},
+  {id:'w_sleep',  name:'🌙 12시 전 취침', target:2, core:true, skipDays:[]}
+];
+
+let routines = loadRoutines();          // 평일 루틴
+let routinesWeekend = loadRoutinesWeekend(); // 주말 루틴
+let currentDate = new Date(); currentDate.setHours(0,0,0,0);
+let currentMode = 'weekday';            // 현재 보고 있는 날짜의 모드
+let monthCursor = new Date(); monthCursor.setDate(1); monthCursor.setHours(0,0,0,0);
+let state = {};
+let currentTab = 'daily';
+let monthlyOpen = false;
+
+// 특정 날짜의 모드 판정: 저장된 override가 있으면 그걸, 없으면 요일로(토·일=weekend)
+function modeForDate(d, dd){
+  if(dd && (dd.mode==='weekday'||dd.mode==='weekend'))return dd.mode;
+  const day=d.getDay();
+  return (day===0||day===6)?'weekend':'weekday';
+}
+// 모드에 맞는 루틴 세트 반환
+function routinesFor(mode){ return mode==='weekend'?routinesWeekend:routines; }
+
+/* ── 루틴 정의 저장/로드 ── */
+function loadRoutines() {
+  try {
+    const v = localStorage.getItem('retro_routines');
+    if (v) {
+      const arr = JSON.parse(v);
+      if (Array.isArray(arr) && arr.length) {
+        return arr.map(r=>({id:r.id,name:r.name,target:(typeof r.target==='number'&&r.target>=1&&r.target<=7)?r.target:7,core:!!r.core,skipDays:Array.isArray(r.skipDays)?r.skipDays:[]}));
+      }
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_ROUTINES));
+}
+function loadRoutinesWeekend() {
+  try {
+    const v = localStorage.getItem('retro_routines_weekend');
+    if (v) {
+      const arr = JSON.parse(v);
+      if (Array.isArray(arr) && arr.length) {
+        return arr.map(r=>({id:r.id,name:r.name,target:(typeof r.target==='number'&&r.target>=1&&r.target<=7)?r.target:2,core:!!r.core,skipDays:Array.isArray(r.skipDays)?r.skipDays:[]}));
+      }
+    }
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_ROUTINES_WEEKEND));
+}
+function persistRoutinesWeekend() {
+  try { localStorage.setItem('retro_routines_weekend', JSON.stringify(routinesWeekend)); } catch(e) {}
+}
+function persistRoutines() {
+  try { localStorage.setItem('retro_routines', JSON.stringify(routines)); } catch(e) {}
+}
+
+/* ── 정체성 선언 ── */
+const DEFAULT_IDENTITY = [
+  '나는 매일 글을 쓰는 컨텐츠 제작자다',
+  '나는 건강 관리를 꾸준히 한다',
+  '나는 조기은퇴를 위해 매일 성장하는 삶을 산다'
+];
+function loadIdentity(){
+  try{
+    const v=localStorage.getItem('retro_identity');
+    if(v){const arr=JSON.parse(v);if(Array.isArray(arr))return arr;}
+  }catch(e){}
+  return DEFAULT_IDENTITY.slice();
+}
+let identity=loadIdentity();
+function persistIdentity(){try{localStorage.setItem('retro_identity',JSON.stringify(identity));}catch(e){}}
+
+/* ── 오늘의 문구 (명언/다짐) ── */
+const DEFAULT_QUOTE = '만족 = 좋아함 − 원함. 결과를 더 원할수록 지금의 즐거움은 줄어든다. 오늘의 한 걸음 자체를 좋아하자.';
+function loadQuote(){
+  try{
+    const v=localStorage.getItem('retro_quote');
+    if(v!=null)return v;
+  }catch(e){}
+  return DEFAULT_QUOTE;
+}
+let quoteText=loadQuote();
+function persistQuote(){try{localStorage.setItem('retro_quote',quoteText);}catch(e){}}
+function renderQuote(){
+  const el=document.getElementById('quote-text');
+  if(el)el.textContent=quoteText;
+}
+function openQuoteEditor(){
+  document.getElementById('edit-quote-text').value=quoteText;
+  document.getElementById('quote-modal').classList.add('show');
+}
+function closeQuoteEditor(){document.getElementById('quote-modal').classList.remove('show');}
+function saveQuote(){
+  const v=document.getElementById('edit-quote-text').value.trim();
+  quoteText=v||DEFAULT_QUOTE;
+  persistQuote();
+  renderQuote();
+  closeQuoteEditor();
+  showToast('문구가 저장됐어요 ✓');
+}
+
+/* ── 글감 메모 (날짜 무관 누적 목록, 예정일 선택 가능) ──
+   ctx: 'blog' = 블로그 글감 / 'thread' = 스레드 글감 */
+const IDEA_STORE_KEYS={blog:'retro_ideas',thread:'retro_thread_ideas'};
+const IDEA_EL_IDS={
+  blog:{chips:'idea-chips',more:'idea-more'},
+  thread:{chips:'thread-idea-chips',more:'thread-idea-more'}
+};
+function loadIdeasBy(ctx){
+  try{const v=localStorage.getItem(IDEA_STORE_KEYS[ctx]||IDEA_STORE_KEYS.blog);if(v){const a=JSON.parse(v);if(Array.isArray(a))return a;}}catch(e){}
+  return [];
+}
+function loadIdeas(){return loadIdeasBy('blog');}
+function loadThreadIdeas(){return loadIdeasBy('thread');}
+let ideas=loadIdeas();
+let threadIdeas=loadThreadIdeas();
+function ideaListOf(ctx){return ctx==='thread'?threadIdeas:ideas;}
+function persistIdeasCtx(ctx){try{localStorage.setItem(IDEA_STORE_KEYS[ctx]||IDEA_STORE_KEYS.blog,JSON.stringify(ideaListOf(ctx)));}catch(e){}}
+function persistIdeas(){persistIdeasCtx('blog');}
+function formatIdeaDate(d){
+  const parts=d.split('-');
+  if(parts.length===3)return parseInt(parts[1],10)+'/'+parseInt(parts[2],10);
+  return d;
+}
+/* 접기/펼치기 상태 (기본: 접힘) */
+let ideaExpanded={blog:false,thread:false};
+function updateIdeaFold(ctx){
+  const ids=IDEA_EL_IDS[ctx]||IDEA_EL_IDS.blog;
+  const el=document.getElementById(ids.chips);
+  const btn=document.getElementById(ids.more);
+  if(!el||!btn)return;
+  el.classList.remove('folded');
+  el.style.maxHeight='';
+  // 화면에 안 보이는 상태면 높이 측정이 불가 → 탭 전환 시 다시 계산
+  if(el.offsetParent===null){btn.style.display='none';return;}
+  const first=el.querySelector('.idea-chip');
+  const chipH=first?first.offsetHeight:28;
+  const maxH=chipH*3+6*2; // 3줄 + gap 2개
+  if(el.scrollHeight>maxH+2){
+    // 펼친 상태에서 미리 측정 → 3줄 밖으로 밀려나는 글감 개수
+    const boxTop=el.getBoundingClientRect().top;
+    const hidden=Array.from(el.querySelectorAll('.idea-chip'))
+      .filter(c=>(c.getBoundingClientRect().top-boxTop)>=maxH-4).length;
+    btn.style.display='inline-flex';
+    if(ideaExpanded[ctx]){
+      btn.textContent='접기 ▲';
+    }else{
+      el.classList.add('folded');
+      el.style.maxHeight=maxH+'px';
+      btn.textContent='＋'+hidden+'개 더보기 ▼';
+    }
+  }else{
+    btn.style.display='none';
+  }
+}
+function toggleIdeaExpand(ctx){
+  ideaExpanded[ctx]=!ideaExpanded[ctx];
+  updateIdeaFold(ctx);
+}
+function refreshIdeaFolds(){updateIdeaFold('blog');updateIdeaFold('thread');}
+function renderIdeaChipsFor(ctx){
+  const ids=IDEA_EL_IDS[ctx]||IDEA_EL_IDS.blog;
+  const el=document.getElementById(ids.chips);
+  if(!el)return;
+  const list=ideaListOf(ctx);
+  // 작성 완료 안 된 글감만 표시. 정렬: 날짜 있는 것 먼저(오름차순), 날짜 없는 것은 뒤(원래 순서 유지)
+  const indexed=list.map((it,i)=>({it,i})).filter(x=>!x.it.done);
+  indexed.sort((a,b)=>{
+    const ad=a.it.date||'', bd=b.it.date||'';
+    if(ad&&bd)return ad<bd?-1:ad>bd?1:0;
+    if(ad&&!bd)return -1;
+    if(!ad&&bd)return 1;
+    return a.i-b.i;
+  });
+  const extraCls=ctx==='thread'?' thread':'';
+  let html=indexed.map(({it,i})=>{
+    const dateLabel=it.date?`<span class="idea-date-tag">${formatIdeaDate(it.date)}</span>`:'';
+    return `<span class="idea-chip${extraCls}${it.note?' has-note':''}" onclick="openIdeaEditor(${i},'${ctx}')">${dateLabel}${escapeHtml(it.keyword)}${it.note?' <span class="idea-dot">●</span>':''}</span>`;
+  }).join('');
+  if(!indexed.length)html=`<span class="idea-empty">아직 ${ctx==='thread'?'스레드 ':''}글감이 없어요</span>`;
+  el.innerHTML=html;
+  updateIdeaFold(ctx);
+}
+function renderIdeaChips(){renderIdeaChipsFor('blog');renderIdeaChipsFor('thread');}
+let editingIdeaIdx=-1;
+let editingIdeaCtx='blog';
+let deleteIdeaArmed=false;
+function openIdeaEditor(idx,ctx){
+  editingIdeaIdx=idx;
+  editingIdeaCtx=ctx||'blog';
+  const ideas=ideaListOf(editingIdeaCtx); // 아래 로직에서 현재 목록을 가리키도록
+  const isThread=editingIdeaCtx==='thread';
+  deleteIdeaArmed=false;
+  const kw=document.getElementById('idea-keyword');
+  const note=document.getElementById('idea-note');
+  const dateEl=document.getElementById('idea-date');
+  const delBtn=document.getElementById('idea-delete-btn');
+  const title=document.getElementById('idea-modal-title');
+  if(delBtn){delBtn.textContent='삭제';delBtn.style.background='';delBtn.style.borderColor='';delBtn.style.color='';}
+  const doneBtn=document.getElementById('idea-done-btn');
+  if(idx>=0&&ideas[idx]){
+    kw.value=ideas[idx].keyword||'';
+    note.value=ideas[idx].note||'';
+    dateEl.value=ideas[idx].date||'';
+    delBtn.style.display='block';
+    title.textContent=isThread?'🧵 스레드 글감 메모':'글감 메모';
+    if(doneBtn){
+      doneBtn.style.display='block';
+      if(ideas[idx].done){doneBtn.textContent='↩️ 작성 완료 취소';doneBtn.style.background='#888';}
+      else{doneBtn.textContent='✍️ 작성 완료로 표시';doneBtn.style.background='#1D9E75';}
+    }
+  }else{
+    kw.value='';note.value='';dateEl.value='';
+    delBtn.style.display='none';
+    title.textContent=isThread?'🧵 새 스레드 글감 추가':'새 글감 추가';
+    if(doneBtn)doneBtn.style.display='none';
+  }
+  document.getElementById('idea-modal').classList.add('show');
+  setTimeout(()=>kw.focus(),100);
+}
+function toggleIdeaDone(){
+  const ideas=ideaListOf(editingIdeaCtx);
+  if(editingIdeaIdx<0||!ideas[editingIdeaIdx])return;
+  // 편집 중이던 키워드/메모/날짜도 함께 저장
+  ideas[editingIdeaIdx].keyword=document.getElementById('idea-keyword').value.trim()||ideas[editingIdeaIdx].keyword;
+  ideas[editingIdeaIdx].note=document.getElementById('idea-note').value;
+  ideas[editingIdeaIdx].date=document.getElementById('idea-date').value||'';
+  const nowDone=!ideas[editingIdeaIdx].done;
+  ideas[editingIdeaIdx].done=nowDone;
+  ideas[editingIdeaIdx].doneDate=nowDone?dateToKey(todayDate()):null;
+  persistIdeasCtx(editingIdeaCtx);
+  closeIdeaEditor();
+  renderIdeaChips();
+  if(typeof renderAllIdeasList==='function'){const v=document.getElementById('all-ideas-view');if(v&&v.style.display!=='none')renderAllIdeasList();}
+  showToast(nowDone?'작성 완료로 표시했어요 ✍️':'작성 완료를 취소했어요');
+}
+function clearIdeaDate(){const el=document.getElementById('idea-date');if(el)el.value='';}
+function closeIdeaEditor(){document.getElementById('idea-modal').classList.remove('show');}
+function saveIdea(){
+  const kw=document.getElementById('idea-keyword').value.trim();
+  const note=document.getElementById('idea-note').value;
+  const date=document.getElementById('idea-date').value||'';
+  if(!kw){showToast('키워드를 입력해주세요');return;}
+  const obj={keyword:kw,note:note,date:date};
+  const ideas=ideaListOf(editingIdeaCtx);
+  if(editingIdeaIdx>=0&&ideas[editingIdeaIdx]){
+    obj.done=!!ideas[editingIdeaIdx].done;
+    obj.doneDate=ideas[editingIdeaIdx].doneDate||null;
+    ideas[editingIdeaIdx]=obj;
+  }else{
+    ideas.unshift(obj);
+  }
+  persistIdeasCtx(editingIdeaCtx);
+  renderIdeaChips();
+  const aiv=document.getElementById('all-ideas-view');
+  if(aiv&&aiv.style.display!=='none')renderAllIdeasList();
+  closeIdeaEditor();
+  showToast('글감이 저장됐어요 ✓');
+}
+function deleteIdea(){
+  const ideas=ideaListOf(editingIdeaCtx);
+  if(editingIdeaIdx<0||!ideas[editingIdeaIdx])return;
+  const btn=document.getElementById('idea-delete-btn');
+  if(!deleteIdeaArmed){
+    deleteIdeaArmed=true;
+    if(btn){btn.textContent='정말 삭제?';btn.style.background='#fdeeee';btn.style.borderColor='#f0c4c0';btn.style.color='#c0504d';}
+    setTimeout(()=>{ // 3초 내 재클릭 없으면 원상복구
+      if(deleteIdeaArmed){
+        deleteIdeaArmed=false;
+        if(btn){btn.textContent='삭제';btn.style.background='';btn.style.borderColor='';btn.style.color='';}
+      }
+    },3000);
+    return;
+  }
+  deleteIdeaArmed=false;
+  ideas.splice(editingIdeaIdx,1);
+  editingIdeaIdx=-1;
+  persistIdeasCtx(editingIdeaCtx);
+  closeIdeaEditor();
+  renderIdeaChips();
+  const v=document.getElementById('all-ideas-view');
+  if(v&&v.style.display!=='none')renderAllIdeasList();
+  showToast('글감이 삭제됐어요');
+}
+/* ── 전체 글감 화면 (작성 완료 포함) ── */
+let allIdeasCtx='blog';
+function openAllIdeasView(ctx){
+  allIdeasCtx=ctx||'blog';
+  const t=document.getElementById('ai-title');
+  if(t)t.textContent=allIdeasCtx==='thread'?'🧵 스레드 글감 모아보기':'📝 블로그 글감 모아보기';
+  document.getElementById('daily-view').style.display='none';
+  document.getElementById('weekly-view').style.display='none';
+  document.getElementById('date-nav').style.display='none';
+  document.getElementById('main-tabs').style.display='none';
+  document.getElementById('all-ideas-view').style.display='block';
+  renderAllIdeasList();
+}
+function closeAllIdeasView(){
+  document.getElementById('all-ideas-view').style.display='none';
+  document.getElementById('main-tabs').style.display='flex';
+  switchTab('daily');
+}
+function renderAllIdeasList(){
+  const ideas=ideaListOf(allIdeasCtx);
+  const filter=document.getElementById('ai-filter').value;
+  const cntEl=document.getElementById('ai-count');
+  const listEl=document.getElementById('ai-list');
+  // 원본 인덱스 유지하며 필터
+  let items=ideas.map((it,i)=>({it,i}));
+  if(filter==='todo')items=items.filter(x=>!x.it.done);
+  else if(filter==='done')items=items.filter(x=>x.it.done);
+  // 정렬: 미완료(날짜순) 먼저, 완료는 완료일 최신순 뒤로
+  items.sort((a,b)=>{
+    if(!!a.it.done!==!!b.it.done)return a.it.done?1:-1;
+    if(a.it.done&&b.it.done)return (b.it.doneDate||'').localeCompare(a.it.doneDate||'');
+    const ad=a.it.date||'', bd=b.it.date||'';
+    if(ad&&bd)return ad<bd?-1:ad>bd?1:0;
+    if(ad&&!bd)return -1;
+    if(!ad&&bd)return 1;
+    return a.i-b.i;
+  });
+  const total=ideas.length, doneCnt=ideas.filter(x=>x.done).length;
+  cntEl.textContent=`전체 ${total}개 · 예정 ${total-doneCnt}개 · 완료 ${doneCnt}개`;
+  if(!items.length){listEl.innerHTML='<div class="empty-msg">글감이 없어요</div>';return;}
+  listEl.innerHTML=items.map(({it,i})=>{
+    const dateLabel=it.date?`<span class="ai-date">📅 ${formatIdeaDate(it.date)}</span>`:'';
+    const doneLabel=it.done?`<span class="ai-done-badge">✍️ 완료${it.doneDate?' '+formatIdeaDate(it.doneDate):''}</span>`:'';
+    return `<div class="ai-card${it.done?' done':''}" onclick="openIdeaEditor(${i},'${allIdeasCtx}')">
+       <div class="ai-card-head">
+         <span class="ai-keyword">${escapeHtml(it.keyword)}</span>
+         ${doneLabel}
+       </div>
+       ${dateLabel?`<div class="ai-meta">${dateLabel}</div>`:''}
+       ${it.note?`<div class="ai-note">${escapeHtml(it.note)}</div>`:''}
+     </div>`;
+  }).join('');
+}
+function renderIdentity(){
+  const el=document.getElementById('identity-list');
+  if(!el)return;
+  if(!identity.length){el.innerHTML='<div class="identity-empty">정체성 문구를 추가해보세요 ✏️</div>';return;}
+  el.innerHTML=identity.map(t=>`<div class="identity-line"><span class="ic-bullet">●</span><span>${escapeHtml(t)}</span></div>`).join('');
+}
+let identityBuffer=[];
+function openIdentityEditor(){
+  identityBuffer=identity.slice();
+  renderIdentityEditList();
+  document.getElementById('identity-modal').classList.add('show');
+}
+function closeIdentityEditor(){document.getElementById('identity-modal').classList.remove('show');}
+function renderIdentityEditList(){
+  const el=document.getElementById('edit-identity-list');
+  el.innerHTML=identityBuffer.map((t,i)=>
+    `<div class="edit-routine-row">
+       <input type="text" value="${escapeAttr(t)}" oninput="updateIdentityLine(${i},this.value)" placeholder="나는 ~다">
+       <button class="del-btn" onclick="removeIdentityRow(${i})" title="삭제">🗑</button>
+     </div>`).join('');
+}
+function updateIdentityLine(i,v){identityBuffer[i]=v;}
+function removeIdentityRow(i){identityBuffer.splice(i,1);renderIdentityEditList();}
+function addIdentityRow(){identityBuffer.push('');renderIdentityEditList();}
+function saveIdentity(){
+  identity=identityBuffer.map(t=>t.trim()).filter(t=>t);
+  persistIdentity();
+  renderIdentity();
+  closeIdentityEditor();
+  showToast('정체성이 저장됐어요 ✓');
+}
+
+/* ── 올해 목표 (결과 + 시스템) ── */
+const DEFAULT_GOALS = [
+  {result:'블로그 구독자 1만 명', system:'매주 5편씩 꾸준히 발행'},
+  {result:'주 3회 운동 습관 정착', system:'러닝 + 맨몸운동 빠짐없이'},
+  {result:'블로그 수익 월 100만원', system:'매일 글쓰기로 콘텐츠 자산 축적'}
+];
+function loadGoals(){
+  try{
+    const v=localStorage.getItem('retro_goals');
+    if(v){const arr=JSON.parse(v);if(Array.isArray(arr))return arr;}
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_GOALS));
+}
+let goals=loadGoals();
+function persistGoals(){try{localStorage.setItem('retro_goals',JSON.stringify(goals));}catch(e){}}
+function renderGoals(){
+  const lbl=document.getElementById('goal-year-label');
+  if(lbl)lbl.textContent=(new Date().getFullYear())+'년 목표';
+  const el=document.getElementById('goal-list');
+  if(!el)return;
+  if(!goals.length){el.innerHTML='<div class="goal-empty">올해 목표를 추가해보세요 ✏️</div>';return;}
+  el.innerHTML=goals.map((g,i)=>
+    `<div class="goal-line">
+       <span class="g-num">${i+1}</span>
+       <div class="goal-text">
+         <div class="goal-result">${escapeHtml(g.result)}</div>
+         ${g.system?`<div class="goal-system">→ ${escapeHtml(g.system)}</div>`:''}
+       </div>
+     </div>`).join('');
+}
+let goalBuffer=[];
+function openGoalEditor(){
+  goalBuffer=goals.map(g=>({result:g.result,system:g.system||''}));
+  renderGoalEditList();
+  document.getElementById('goal-modal').classList.add('show');
+}
+function closeGoalEditor(){document.getElementById('goal-modal').classList.remove('show');}
+function renderGoalEditList(){
+  const el=document.getElementById('edit-goal-list');
+  el.innerHTML=goalBuffer.map((g,i)=>
+    `<div style="border:1.5px solid #e8e6e0;border-radius:10px;padding:10px;margin-bottom:10px">
+       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+         <input type="text" value="${escapeAttr(g.result)}" oninput="updateGoalResult(${i},this.value)" placeholder="결과 (예: 구독자 1만 명)" style="flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:#1a1a1a">
+         <button class="del-btn" onclick="removeGoalRow(${i})" title="삭제">🗑</button>
+       </div>
+       <input type="text" value="${escapeAttr(g.system)}" oninput="updateGoalSystem(${i},this.value)" placeholder="시스템 (예: 매주 5편씩 발행) — 선택" style="width:100%;border:1.5px solid #eee;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:#666">
+     </div>`).join('');
+}
+function updateGoalResult(i,v){goalBuffer[i].result=v;}
+function updateGoalSystem(i,v){goalBuffer[i].system=v;}
+function removeGoalRow(i){goalBuffer.splice(i,1);renderGoalEditList();}
+function addGoalRow(){goalBuffer.push({result:'',system:''});renderGoalEditList();}
+function saveGoals(){
+  goals=goalBuffer.map(g=>({result:(g.result||'').trim(),system:(g.system||'').trim()})).filter(g=>g.result);
+  persistGoals();
+  renderGoals();
+  closeGoalEditor();
+  showToast('올해 목표가 저장됐어요 ✓');
+}
+
+/* ── 조기은퇴 5년 로드맵 ── */
+const Y0=new Date().getFullYear();
+const DEFAULT_ROADMAP=[
+  {year:Y0,   title:'기반 다지기', desc:'블로그 루틴 정착 + 콘텐츠 100편 축적'},
+  {year:Y0+1, title:'수익화 시작', desc:'애드센스·제휴 수익 월 50만원 돌파'},
+  {year:Y0+2, title:'수익 다각화', desc:'전자책·강의 등 디지털 자산 확장'},
+  {year:Y0+3, title:'시스템화', desc:'수익 월 300만원, 자동화 구조 구축'},
+  {year:Y0+4, title:'조기은퇴 전환', desc:'근로소득 외 생활비 충당 달성'}
+];
+function loadRoadmap(){
+  try{
+    const v=localStorage.getItem('retro_roadmap');
+    if(v){const arr=JSON.parse(v);if(Array.isArray(arr))return arr;}
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_ROADMAP));
+}
+let roadmap=loadRoadmap();
+function persistRoadmap(){try{localStorage.setItem('retro_roadmap',JSON.stringify(roadmap));}catch(e){}}
+function renderRoadmap(){
+  const el=document.getElementById('roadmap-list');
+  if(!el)return;
+  if(!roadmap.length){el.innerHTML='<div class="rm-empty">로드맵을 추가해보세요 ✏️</div>';return;}
+  const nowY=new Date().getFullYear();
+  el.innerHTML=roadmap.map((r,i)=>{
+    const dleft=r.year-nowY;
+    const dtxt=dleft<=0?'올해':('D-'+dleft+'년');
+    return `<div class="rm-item">
+       <div class="rm-year">
+         <div class="rm-year-y">${escapeHtml(String(r.year))}</div>
+         <div class="rm-year-d">${dtxt}</div>
+       </div>
+       <div class="rm-body">
+         <div class="rm-title">${escapeHtml(r.title)}</div>
+         ${r.desc?`<div class="rm-desc">${escapeHtml(r.desc)}</div>`:''}
+       </div>
+     </div>`;
+  }).join('');
+}
+let roadmapBuffer=[];
+function openRoadmapEditor(){
+  roadmapBuffer=roadmap.map(r=>({year:r.year,title:r.title,desc:r.desc||''}));
+  renderRoadmapEditList();
+  document.getElementById('roadmap-modal').classList.add('show');
+}
+function closeRoadmapEditor(){document.getElementById('roadmap-modal').classList.remove('show');}
+function renderRoadmapEditList(){
+  const el=document.getElementById('edit-roadmap-list');
+  el.innerHTML=roadmapBuffer.map((r,i)=>
+    `<div style="border:1.5px solid #e8e6e0;border-radius:10px;padding:10px;margin-bottom:10px">
+       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+         <input type="number" value="${r.year}" oninput="updateRmYear(${i},this.value)" placeholder="연도" style="width:80px;border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:#1a1a1a">
+         <input type="text" value="${escapeAttr(r.title)}" oninput="updateRmTitle(${i},this.value)" placeholder="핵심 목표" style="flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:#1a1a1a">
+         <button class="del-btn" onclick="removeRoadmapRow(${i})" title="삭제">🗑</button>
+       </div>
+       <input type="text" value="${escapeAttr(r.desc)}" oninput="updateRmDesc(${i},this.value)" placeholder="설명 (선택)" style="width:100%;border:1.5px solid #eee;border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit;color:#666">
+     </div>`).join('');
+}
+function updateRmYear(i,v){roadmapBuffer[i].year=parseInt(v,10)||new Date().getFullYear();}
+function updateRmTitle(i,v){roadmapBuffer[i].title=v;}
+function updateRmDesc(i,v){roadmapBuffer[i].desc=v;}
+function removeRoadmapRow(i){roadmapBuffer.splice(i,1);renderRoadmapEditList();}
+function addRoadmapRow(){
+  const lastY=roadmapBuffer.length?roadmapBuffer[roadmapBuffer.length-1].year+1:new Date().getFullYear();
+  roadmapBuffer.push({year:lastY,title:'',desc:''});renderRoadmapEditList();
+}
+function saveRoadmap(){
+  roadmap=roadmapBuffer.map(r=>({year:r.year,title:(r.title||'').trim(),desc:(r.desc||'').trim()})).filter(r=>r.title).sort((a,b)=>a.year-b.year);
+  persistRoadmap();
+  renderRoadmap();
+  closeRoadmapEditor();
+  showToast('로드맵이 저장됐어요 ✓');
+}
+
+/* ── 조기은퇴 달성 현황 ── */
+const DEFAULT_RETIRE=[
+  {name:'목표 자산 (억원)', current:0.5, target:10}
+];
+function loadRetire(){
+  try{
+    const v=localStorage.getItem('retro_retire');
+    if(v){const arr=JSON.parse(v);if(Array.isArray(arr))return arr;}
+  }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_RETIRE));
+}
+let retire=loadRetire();
+function persistRetire(){try{localStorage.setItem('retro_retire',JSON.stringify(retire));}catch(e){}}
+function fmtNum(n){
+  if(n===''||n===null||n===undefined||isNaN(n))return '0';
+  // 정수면 콤마, 소수 있으면 그대로 + 콤마
+  const parts=String(n).split('.');
+  parts[0]=parts[0].replace(/\B(?=(\d{3})+(?!\d))/g,',');
+  return parts.join('.');
+}
+function renderRetire(){
+  const el=document.getElementById('retire-list');
+  if(!el)return;
+  if(!retire.length){el.innerHTML='<div class="ret-empty">지표를 추가해보세요 ✏️</div>';return;}
+  el.innerHTML=retire.map(m=>{
+    const cur=Number(m.current)||0, tgt=Number(m.target)||0;
+    const pct=tgt>0?Math.min(100,Math.round(cur/tgt*1000)/10):0;
+    const pctInt=tgt>0?Math.min(100,Math.round(cur/tgt*100)):0;
+    return `<div class="ret-item">
+       <div class="ret-head">
+         <span class="ret-name">${escapeHtml(m.name)}</span>
+         <span class="ret-pct">${pct}%</span>
+       </div>
+       <div class="ret-bar"><div class="ret-fill" style="width:${pctInt}%"></div></div>
+       <div class="ret-vals"><span>현재 <b>${fmtNum(cur)}</b></span><span>목표 <b>${fmtNum(tgt)}</b></span></div>
+     </div>`;
+  }).join('');
+}
+let retireBuffer=[];
+function openRetireEditor(){
+  retireBuffer=retire.map(m=>({name:m.name,current:m.current,target:m.target}));
+  renderRetireEditList();
+  document.getElementById('retire-modal').classList.add('show');
+}
+function closeRetireEditor(){document.getElementById('retire-modal').classList.remove('show');}
+function renderRetireEditList(){
+  const el=document.getElementById('edit-retire-list');
+  el.innerHTML=retireBuffer.map((m,i)=>
+    `<div style="border:1.5px solid #e8e6e0;border-radius:10px;padding:10px;margin-bottom:10px">
+       <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+         <input type="text" value="${escapeAttr(m.name)}" oninput="updateRetName(${i},this.value)" placeholder="지표 이름 (예: 목표 자산 (억원))" style="flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:#1a1a1a">
+         <button class="del-btn" onclick="removeRetireRow(${i})" title="삭제">🗑</button>
+       </div>
+       <div style="display:flex;gap:8px">
+         <input type="number" step="any" value="${m.current}" oninput="updateRetCur(${i},this.value)" placeholder="현재값" style="flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:#1a1a1a">
+         <input type="number" step="any" value="${m.target}" oninput="updateRetTgt(${i},this.value)" placeholder="목표값" style="flex:1;border:1.5px solid #e8e6e0;border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:#1a1a1a">
+       </div>
+     </div>`).join('');
+}
+function updateRetName(i,v){retireBuffer[i].name=v;}
+function updateRetCur(i,v){retireBuffer[i].current=v===''?0:parseFloat(v);}
+function updateRetTgt(i,v){retireBuffer[i].target=v===''?0:parseFloat(v);}
+function removeRetireRow(i){retireBuffer.splice(i,1);renderRetireEditList();}
+function addRetireRow(){retireBuffer.push({name:'',current:0,target:0});renderRetireEditList();}
+function saveRetire(){
+  retire=retireBuffer.map(m=>({name:(m.name||'').trim(),current:Number(m.current)||0,target:Number(m.target)||0})).filter(m=>m.name);
+  persistRetire();
+  renderRetire();
+  closeRetireEditor();
+  showToast('조기은퇴 현황이 저장됐어요 ✓');
+}
+
+/* ── 날짜 유틸 ── */
+function dateToKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function todayDate(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function isToday(d){const t=todayDate();return d.getFullYear()===t.getFullYear()&&d.getMonth()===t.getMonth()&&d.getDate()===t.getDate();}
+function weekStartKey(d){const day=d.getDay();const diff=d.getDate()-day+(day===0?-6:1);return dateToKey(new Date(d.getFullYear(),d.getMonth(),diff));}
+
+/* ── localStorage 데이터 ── */
+function getDailyData(key){try{const v=localStorage.getItem('retro_daily_'+key);return v?JSON.parse(v):null;}catch(e){return null;}}
+function saveDailyData(key,data){try{localStorage.setItem('retro_daily_'+key,JSON.stringify(data));}catch(e){}}
+function getWeeklyData(key){try{const v=localStorage.getItem('retro_weekly_'+key);return v?JSON.parse(v):null;}catch(e){return null;}}
+function saveWeeklyData(key,data){try{localStorage.setItem('retro_weekly_'+key,JSON.stringify(data));}catch(e){}}
+
+// 하루 데이터의 체크맵 정규화 (id 기반)
+function getChecksMap(dd){
+  if(!dd) return {};
+  if(dd.checkMap) return dd.checkMap;
+  // 구버전(checks 배열) 호환: 기본 루틴 순서로 매핑
+  if(Array.isArray(dd.checks)){
+    const m={};
+    DEFAULT_ROUTINES.forEach((r,i)=>{ if(dd.checks[i]) m[r.id]=true; });
+    return m;
+  }
+  return {};
+}
+// 하루 달성률 (그 날짜의 모드에 맞는 루틴 세트 기준)
+// 그 날짜에 실제로 적용되는 루틴만 남기기: 요일 고정 제외(skipDays)
+function filterRoutinesForDate(rs,d,dd){
+  const dow=d.getDay(); // 0=일 ... 6=토
+  return rs.filter(r=>!(Array.isArray(r.skipDays)&&r.skipDays.includes(dow)));
+}
+function routinesForDay(d,dd){
+  const mode=modeForDate(d,dd);
+  let rs=routinesFor(mode);
+  if(dd&&dd.mini){
+    const core=rs.filter(r=>r.core);
+    rs=core.length?core:rs;
+  }
+  return filterRoutinesForDate(rs,d,dd);
+}
+function dayPct(dd,d){
+  const rs=routinesForDay(d||currentDate,dd);
+  if(!rs.length) return 0;
+  const m=getChecksMap(dd);
+  let done=0;
+  rs.forEach(r=>{ if(m[r.id]) done++; });
+  return Math.round(done/rs.length*100);
+}
+
+/* ── 날짜 네비게이터 ── */
+// 이동 가능한 최대 날짜: 이번 주 일요일(주 마지막) 또는 내일 중 더 먼 쪽
+function maxNavDate(){
+  const today=todayDate();
+  const tomorrow=new Date(today);tomorrow.setDate(today.getDate()+1);
+  // 이번 주 일요일 (월요일 시작 기준)
+  const day=today.getDay(); // 0=일
+  const daysToSun=(day===0)?0:(7-day);
+  const sunday=new Date(today);sunday.setDate(today.getDate()+daysToSun);
+  return (sunday>tomorrow)?sunday:tomorrow;
+}
+function updateDateNav(){
+  const today=todayDate();
+  const isPast=currentDate<today, isFuture=currentDate>today;
+  const main=currentDate.getFullYear()+'년 '+(currentDate.getMonth()+1)+'월 '+currentDate.getDate()+'일 ('+DAY_NAMES[currentDate.getDay()]+'요일)';
+  let badge='';
+  if(isToday(currentDate))badge=' <span style="font-size:11px;color:#1D9E75;font-weight:600">오늘</span>';
+  else if(isPast)badge=' <span class="past-badge">과거</span>';
+  else badge=' <span class="future-badge">예정</span>';
+  document.getElementById('nav-main-label').innerHTML=main+badge;
+  const diffDays=Math.round((today-currentDate)/(1000*60*60*24));
+  document.getElementById('nav-sub-label').textContent=diffDays===0?'':diffDays>0?diffDays+'일 전':Math.abs(diffDays)+'일 후';
+  document.getElementById('nav-today-btn').style.display=isToday(currentDate)?'none':'inline-block';
+  // 이번 주 끝(또는 내일)까지 이동 허용
+  document.getElementById('btn-next').disabled=(currentDate>=maxNavDate());
+}
+function moveDate(dir){const d=new Date(currentDate);d.setDate(d.getDate()+dir);if(d>maxNavDate())return;currentDate=d;loadDaily();updateDateNav();}
+function goToday(){currentDate=todayDate();loadDaily();updateDateNav();}
+
+/* ── 일간 렌더 ── */
+let currentMini=false; // 약속(미니) 모드 여부
+function activeRoutines(){
+  const dow=currentDate.getDay();
+  let rs=routinesFor(currentMode);
+  if(currentMini){
+    const core=rs.filter(r=>r.core);
+    rs=core.length?core:rs; // 핵심 지정이 없으면 전체 (안전장치)
+  }
+  // 요일 고정 제외(skipDays): 그 요일엔 목록에서 아예 빠짐 (예: 매주 수요일 점심 약속 → 러닝 제외)
+  return rs.filter(r=>!(Array.isArray(r.skipDays)&&r.skipDays.includes(dow)));
+}
+function buildRoutineList(){
+  const el=document.getElementById('routine-list');
+  el.innerHTML=activeRoutines().map(r=>
+    `<div class="routine-item">
+       <input type="checkbox" id="chk_${r.id}" onchange="toggleRoutine('${r.id}')">
+       <label for="chk_${r.id}" id="lbl_${r.id}">${escapeHtml(r.name)}</label>
+     </div>`).join('');
+}
+function loadDaily(){
+  const dd=getDailyData(dateToKey(currentDate));
+  currentMode=modeForDate(currentDate,dd);
+  currentMini=!!(dd&&dd.mini);
+  state={checkMap:getChecksMap(dd),posts:dd?dd.posts||0:0,mood:dd?dd.mood||'':'',memo:dd?dd.memo||'':'',tmr:dd?dd.tmr||'':'',mode:currentMode,mini:currentMini,workout:(dd&&dd.workout)?dd.workout:{},reading:(dd&&dd.reading)?dd.reading:{}};
+  syncModeToggle();
+  renderDaily();
+}
+function renderDaily(){
+  buildRoutineList();
+  let done=0;
+  activeRoutines().forEach(r=>{
+    const chk=document.getElementById('chk_'+r.id);
+    const lbl=document.getElementById('lbl_'+r.id);
+    if(chk){chk.checked=!!state.checkMap[r.id];lbl.className=state.checkMap[r.id]?'checked':'';}
+    if(state.checkMap[r.id])done++;
+  });
+  updateDailyProgress(done);
+  document.getElementById('post-count').textContent=state.posts;
+  document.querySelectorAll('.mood-btn').forEach(b=>{b.className='mood-btn'+(state.mood&&b.textContent.includes(state.mood)?' selected':'');});
+  document.getElementById('daily-memo').value=state.memo||'';
+  document.getElementById('tomorrow-goal').value=state.tmr||'';
+  renderWorkout();
+  renderReading();
+}
+// 책 목록 관리
+function loadBooks(){
+  try{const v=localStorage.getItem('retro_books');if(v){const a=JSON.parse(v);if(Array.isArray(a))return a.map(b=>({id:b.id,title:b.title,author:b.author||'',total:b.total||0,status:b.status||'reading',startDate:b.startDate||null,doneDate:b.doneDate||null,rating:b.rating||0,comment:b.comment||'',planMonth:b.planMonth||null,purpose:b.purpose||'',cover:b.cover||null}));}}catch(e){}
+  return [];
+}
+let books=loadBooks();
+function persistBooks(){try{localStorage.setItem('retro_books',JSON.stringify(books));}catch(e){}}
+
+/* ── 모든 책 (격자 뷰) ── */
+function openAllBooksView(){
+  document.getElementById('books-view').style.display='none';
+  document.getElementById('all-books-view').style.display='block';
+  renderAllBooksGrid();
+}
+function closeAllBooksView(){
+  document.getElementById('all-books-view').style.display='none';
+  document.getElementById('books-view').style.display='block';
+}
+function renderAllBooksGrid(){
+  const countEl=document.getElementById('ab-count');
+  if(countEl)countEl.textContent=books.length+'권의 책이 있어요.';
+  const sortBy=document.getElementById('ab-sort').value;
+  let list=books.slice();
+  if(sortBy==='title'){
+    list.sort((a,b)=>a.title.localeCompare(b.title,'ko'));
+  }else if(sortBy==='rating'){
+    list.sort((a,b)=>(b.rating||0)-(a.rating||0));
+  }else if(sortBy==='status'){
+    const order={reading:0,toread:1,done:2};
+    list.sort((a,b)=>(order[a.status]??3)-(order[b.status]??3));
+  }else{
+    // 수정 날짜: 배열 뒤에서부터(최근 추가/수정된 책이 앞으로 오도록) 뒤집어서 표시
+    list=list.slice().reverse();
+  }
+  const statusIcon={reading:'📖',toread:'📚',done:'✅'};
+  const starStr=n=>{let s='';for(let i=1;i<=5;i++)s+=(i<=Math.round(n)?'★':'☆');return s;};
+  const grid=document.getElementById('ab-grid');
+  let html=`<div class="ab-card ab-add" onclick="openBookManager()">
+     <div class="ab-add-inner"><span class="ab-plus">＋</span></div>
+   </div>`;
+  html+=list.map(b=>{
+    const cover=b.cover?`<img src="${b.cover}" class="ab-cover" alt="표지">`:`<div class="ab-cover ab-cover-empty">📖</div>`;
+    const stars=b.rating?`<div class="ab-stars">${starStr(b.rating)}</div>`:'';
+    return `<div class="ab-card" onclick="openBookFromAllView('${b.id}')">
+       <div class="ab-cover-wrap">
+         ${cover}
+         <span class="ab-status-badge">${statusIcon[b.status]||'📖'}</span>
+       </div>
+       ${stars}
+       <div class="ab-book-title">${escapeHtml(b.title)}</div>
+     </div>`;
+  }).join('');
+  grid.innerHTML=html;
+}
+function openBookFromAllView(id){
+  const b=bookById(id);if(!b)return;
+  if(b.status==='done'){
+    openDoneReview(id);
+  }else{
+    // 읽는 중/읽을 책은 책 관리 편집 화면을 열어서 바로 수정 가능하게
+    openBookManager();
+  }
+}
+function bookById(id){return books.find(b=>b.id===id)||null;}
+function setBookStatus(id,status){
+  const b=bookById(id);if(!b)return;
+  b.status=status;
+  if(status==='reading'&&!b.startDate)b.startDate=dateToKey(todayDate());
+  b.doneDate=(status==='done')?(b.doneDate||dateToKey(todayDate())):null;
+  persistBooks();
+  renderBookShelf();
+  renderReading();
+  if(status==='reading')showToast('읽는 중으로 옮겼어요');
+  else if(status==='toread')showToast('읽을 책으로 옮겼어요');
+}
+
+// 특정 책의 '직전 기록일 현재페이지' 찾기 (currentDate 이전 날짜 중 가장 최근)
+function prevCurPage(bookId,beforeKey){
+  // 최대 400일 역산
+  let d=new Date(beforeKey+'T00:00:00');
+  for(let i=0;i<400;i++){
+    d.setDate(d.getDate()-1);
+    const dd=getDailyData(dateToKey(d));
+    if(dd&&dd.reading&&dd.reading.bookId===bookId&&dd.reading.cur!=null&&dd.reading.cur!==''){
+      return Number(dd.reading.cur)||0;
+    }
+  }
+  return 0; // 직전 기록 없으면 0부터 시작한 것으로
+}
+
+function renderReading(){
+  const sel=document.getElementById('rd_book_select');
+  if(sel){
+    const cur=(state.reading&&state.reading.bookId)?state.reading.bookId:'';
+    let opts='<option value="">책 선택…</option>';
+    // 읽는 중인 책 + (혹시 현재 선택된 책이 다른 상태여도 표시)
+    books.filter(b=>b.status==='reading'||b.id===cur).forEach(b=>{opts+=`<option value="${b.id}" ${b.id===cur?'selected':''}>${escapeHtml(b.title)}</option>`;});
+    sel.innerHTML=opts;
+  }
+  const curEl=document.getElementById('rd_curpage');
+  if(curEl)curEl.value=(state.reading&&state.reading.cur!=null&&state.reading.cur!=='')?state.reading.cur:'';
+  updateReadingResult();
+}
+function updateReadingResult(){
+  const totalLabel=document.getElementById('rd-total-label');
+  const resultEl=document.getElementById('rd-result');
+  const bookId=(state.reading&&state.reading.bookId)?state.reading.bookId:'';
+  const book=bookById(bookId);
+  if(totalLabel)totalLabel.textContent=book?('/ '+book.total+'p'):'p';
+  const prevForInfo=book?prevCurPage(bookId,dateToKey(currentDate)):0;
+  renderPageInfo('rd-pageinfo',book,prevForInfo);
+  const curInput=document.getElementById('rd_curpage');
+  if(curInput)curInput.placeholder=book&&prevForInfo?String(prevForInfo):'0';
+  if(!resultEl)return;
+  if(!book||state.reading.cur==null||state.reading.cur===''){resultEl.innerHTML='';return;}
+  const cur=Number(state.reading.cur)||0;
+  const prev=prevForInfo;
+  const readToday=Math.max(0,cur-prev);
+  const prog=book.total>0?Math.min(100,Math.round(cur/book.total*100)):0;
+  let msg=`오늘 읽은 양 ${readToday}p <span class="rd-prog">· 진도 ${cur}/${book.total}p (${prog}%)</span>`;
+  if(book.total>0&&cur>=book.total&&book.status!=='done')msg+=` <span class="rd-done-hint" onclick="markBookDone('${bookId}')">✅ 완독 처리</span>`;
+  resultEl.innerHTML=msg;
+}
+function markBookDone(id){openDoneReview(id);}
+
+// 어제까지 읽은 페이지 · 남은 페이지 · 전체 페이지 표시
+function renderPageInfo(elId,book,prev){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  if(!book){el.innerHTML='';return;}
+  const total=Number(book.total)||0;
+  const left=total>0?Math.max(0,total-prev):null;
+  el.innerHTML=
+    `<div class="rd-pill"><div class="rd-pill-num accent">${prev}p</div><div class="rd-pill-lbl">어제까지</div></div>`+
+    `<div class="rd-pill"><div class="rd-pill-num">${left===null?'-':left+'p'}</div><div class="rd-pill-lbl">남은 페이지</div></div>`+
+    `<div class="rd-pill"><div class="rd-pill-num">${total?total+'p':'미정'}</div><div class="rd-pill-lbl">전체</div></div>`;
+}
+
+/* ── 루틴 연동: '기상 후 독서' → 독서한 날 / '러닝'·'맨몸운동' → 운동한 날 ── */
+function allRoutineDefs(){return routines.concat(routinesWeekend);}
+function isReadingRoutine(r){return !!r&&(r.id==='r_read'||/기상.*독서|독서\s*\d+\s*분/.test(r.name||''));}
+function isRunRoutine(r){return !!r&&(r.id==='r_run'||/러닝/.test(r.name||''));}
+function isStrengthRoutine(r){return !!r&&(r.id==='r_workout'||/맨몸\s*운동/.test(r.name||''));}
+function isExerciseRoutine(r){return !!r&&(r.id==='r_run'||r.id==='r_workout'||/러닝|맨몸\s*운동/.test(r.name||''));}
+function dayCheckedBy(dd,pred){
+  if(!dd)return false;
+  const m=getChecksMap(dd);
+  return allRoutineDefs().some(r=>pred(r)&&m[r.id]);
+}
+function dayReadByRoutine(dd){return dayCheckedBy(dd,isReadingRoutine);}
+function dayExerciseByRoutine(dd){return dayCheckedBy(dd,isExerciseRoutine);}
+// 그날 실제로 읽은 페이지가 있는지 (페이지 기록 기준)
+function dayReadByPages(dd,dk){
+  if(!(dd&&dd.reading&&dd.reading.bookId&&dd.reading.cur!=null&&dd.reading.cur!==''))return false;
+  return (Number(dd.reading.cur)||0)-prevCurPage(dd.reading.bookId,dk)>0;
+}
+function dayDidRead(dd,dk){return dayReadByRoutine(dd)||dayReadByPages(dd,dk);}
+function dayDidStrength(dd){
+  return !!dd&&WORKOUT_KEYS.some(k=>dd.workout&&dd.workout[k]&&dd.workout[k].some(s=>Number(s)>0));
+}
+function dayDidExercise(dd){return dayExerciseByRoutine(dd)||dayDidStrength(dd);}
+
+/* ── 독서 기록 팝업 ── */
+function openReadingModal(){
+  const readingBooks=books.filter(b=>b.status==='reading');
+  const hasBooks=readingBooks.length>0;
+  document.getElementById('rdm-body').style.display=hasBooks?'block':'none';
+  document.getElementById('rdm-nobook').style.display=hasBooks?'none':'block';
+  if(hasBooks){
+    let cur=(state.reading&&state.reading.bookId)?state.reading.bookId:'';
+    if(!cur||!bookById(cur))cur=readingBooks.length===1?readingBooks[0].id:'';
+    let opts='<option value="">책 선택…</option>';
+    books.filter(b=>b.status==='reading'||b.id===cur).forEach(b=>{opts+=`<option value="${b.id}" ${b.id===cur?'selected':''}>${escapeHtml(b.title)}</option>`;});
+    document.getElementById('rdm_book_select').innerHTML=opts;
+    const sameBook=state.reading&&state.reading.bookId===cur;
+    document.getElementById('rdm_curpage').value=(sameBook&&state.reading.cur!=null&&state.reading.cur!=='')?state.reading.cur:'';
+    updateReadingModalInfo();
+  }
+  document.getElementById('reading-modal').classList.add('show');
+  if(hasBooks)setTimeout(()=>{const el=document.getElementById('rdm_curpage');if(el)el.focus();},150);
+}
+function closeReadingModal(){document.getElementById('reading-modal').classList.remove('show');}
+function updateReadingModalInfo(){
+  const bookId=document.getElementById('rdm_book_select').value;
+  const book=bookById(bookId);
+  const prev=book?prevCurPage(bookId,dateToKey(currentDate)):0;
+  renderPageInfo('rdm-pageinfo',book,prev);
+  document.getElementById('rdm-total-label').textContent=book?('/ '+book.total+'p'):'p';
+  const curEl=document.getElementById('rdm_curpage');
+  curEl.placeholder=book&&prev?String(prev):'0';
+  const resEl=document.getElementById('rdm-result');
+  if(!book||curEl.value===''){resEl.innerHTML='';return;}
+  const cur=Math.max(0,parseInt(curEl.value,10)||0);
+  const prog=book.total>0?Math.min(100,Math.round(cur/book.total*100)):0;
+  resEl.innerHTML=`오늘 읽은 양 ${Math.max(0,cur-prev)}p <span class="rd-prog">· 진도 ${prog}%</span>`;
+}
+function saveReadingModal(){
+  const bookId=document.getElementById('rdm_book_select').value;
+  const raw=document.getElementById('rdm_curpage').value;
+  if(!bookId){showToast('읽은 책을 골라주세요');return;}
+  if(raw===''){showToast('현재 페이지를 입력해주세요');return;}
+  const book=bookById(bookId);
+  const cur=Math.max(0,parseInt(raw,10)||0);
+  state.reading={bookId,cur};
+  autosaveDaily();
+  renderReading();
+  closeReadingModal();
+  showToast('독서 기록이 저장됐어요 📖');
+  if(book&&book.total>0&&cur>=book.total&&book.status!=='done')setTimeout(()=>openDoneReview(bookId),300);
+}
+
+// 완독 리뷰(별점+코멘트+기간) 모달
+let reviewBookId=null, reviewRating=0;
+function openDoneReview(id){
+  const b=bookById(id);if(!b)return;
+  reviewBookId=id;
+  reviewRating=b.rating||0;
+  document.getElementById('review-book-title').textContent=b.title;
+  document.getElementById('review-comment').value=b.comment||'';
+  document.getElementById('review-start-date').value=b.startDate||'';
+  document.getElementById('review-done-date').value=b.doneDate||dateToKey(todayDate());
+  renderReviewStars();
+  const manageEl=document.getElementById('review-modal-manage');
+  if(manageEl)manageEl.style.display=(b.status==='done')?'flex':'none';
+  document.getElementById('review-modal').classList.add('show');
+}
+function closeDoneReview(){document.getElementById('review-modal').classList.remove('show');}
+function setReviewRating(n){reviewRating=n;renderReviewStars();}
+function onStarClick(e,starIndex){
+  const rect=e.currentTarget.getBoundingClientRect();
+  const clickX=e.clientX-rect.left;
+  const isLeftHalf=clickX<rect.width/2;
+  reviewRating=isLeftHalf?(starIndex-0.5):starIndex;
+  renderReviewStars();
+}
+function renderReviewStars(){
+  const el=document.getElementById('review-stars');
+  if(!el)return;
+  let html='';
+  for(let i=1;i<=5;i++){
+    // 이 별의 채움 비율: 0%, 50%, 100%
+    let fillPct=0;
+    if(reviewRating>=i)fillPct=100;
+    else if(reviewRating>=i-0.5)fillPct=50;
+    html+=`<span class="rv-star-wrap" onclick="onStarClick(event,${i})">
+       <span class="rv-star-bg">★</span>
+       <span class="rv-star-fill" style="width:${fillPct}%">★</span>
+     </span>`;
+  }
+  el.innerHTML=html;
+  const numEl=document.getElementById('review-rating-num');
+  if(numEl)numEl.textContent=reviewRating>0?(reviewRating+'점'):'';
+}
+function saveDoneReview(){
+  const b=bookById(reviewBookId);if(!b)return;
+  const startVal=document.getElementById('review-start-date').value;
+  const doneVal=document.getElementById('review-done-date').value;
+  b.rating=reviewRating;
+  b.comment=document.getElementById('review-comment').value.trim();
+  b.status='done';
+  b.startDate=startVal||null;
+  b.doneDate=doneVal||dateToKey(todayDate());
+  persistBooks();
+  closeDoneReview();
+  renderBookShelf();
+  renderReading();
+  showToast('완독 기록이 저장됐어요 🎉');
+}
+// 리뷰 모달 하단: 상태 되돌리기 / 삭제 (완독이 아닌 책을 리뷰 모달에서 열었을 땐 노출 안 됨)
+function reviewModalSetStatus(status){
+  const b=bookById(reviewBookId);if(!b)return;
+  const label=status==='reading'?'읽는 중':'읽을 책';
+  if(!confirm(`"${b.title}"을(를) "${label}"(으)로 되돌릴까요?\n별점·코멘트는 유지되고 완독 처리만 취소돼요.`))return;
+  setBookStatus(reviewBookId,status);
+  closeDoneReview();
+}
+function reviewModalDelete(){
+  const b=bookById(reviewBookId);if(!b)return;
+  if(!confirm(`"${b.title}"을(를) 완전히 삭제할까요?\n별점·코멘트·기록이 모두 사라지고 되돌릴 수 없어요.`))return;
+  deleteBookRaw(reviewBookId);
+  closeDoneReview();
+}
+function onReadingInput(){
+  const bookId=document.getElementById('rd_book_select').value;
+  const curRaw=document.getElementById('rd_curpage').value;
+  const cur=curRaw===''?'':Math.max(0,parseInt(curRaw,10)||0);
+  const rd={};
+  if(bookId)rd.bookId=bookId;
+  if(cur!=='')rd.cur=cur;
+  state.reading=rd;
+  updateReadingResult();
+  autosaveDailyDebounced();
+}
+
+// 책 관리 모달
+let bookBuffer=[];
+function openBookManager(){
+  bookBuffer=books.map(b=>({id:b.id,title:b.title,author:b.author||'',total:b.total,status:b.status||'reading',startDate:b.startDate||null,doneDate:b.doneDate||null,rating:b.rating||0,comment:b.comment||'',planMonth:b.planMonth||null,purpose:b.purpose||'',cover:b.cover||null}));
+  renderBookEditList();
+  document.getElementById('book-modal').classList.add('show');
+}
+function closeBookManager(){document.getElementById('book-modal').classList.remove('show');}
+function renderBookEditList(){
+  const el=document.getElementById('edit-book-list');
+  const statusOpts=s=>['toread','reading','done'].map(v=>`<option value="${v}" ${s===v?'selected':''}>${v==='toread'?'읽을 책':v==='reading'?'읽는 중':'완독'}</option>`).join('');
+  const monthOpts=m=>{
+    let o='<option value="">읽을 시기 (선택)</option>';
+    for(let mm=1;mm<=12;mm++)o+=`<option value="${mm}" ${Number(m)===mm?'selected':''}>${mm}월에 읽기</option>`;
+    return o;
+  };
+  el.innerHTML=bookBuffer.map((b,i)=>
+    `<div class="book-edit-card">
+       <div class="bec-row" style="align-items:flex-start">
+         <div class="bec-cover" onclick="document.getElementById('bec-cover-input-${i}').click()">
+           ${b.cover?`<img src="${b.cover}" alt="표지">`:'<span class="bec-cover-plus">📷</span>'}
+         </div>
+         <input type="file" accept="image/*" id="bec-cover-input-${i}" style="display:none" onchange="onBookCoverSelected(${i},this)">
+         <div style="flex:1;min-width:0">
+           <div class="bec-row" style="margin-bottom:6px">
+             <input type="text" value="${escapeAttr(b.title)}" oninput="updateBookTitle(${i},this.value)" placeholder="책 제목" class="bec-input">
+             <button class="del-btn" onclick="removeBookRow(${i})" title="삭제">🗑</button>
+           </div>
+           <input type="text" value="${escapeAttr(b.author||'')}" oninput="updateBookAuthor(${i},this.value)" placeholder="작가명 (선택)" class="bec-input">
+         </div>
+       </div>
+       <input type="text" value="${escapeAttr(b.purpose||'')}" oninput="updateBookPurpose(${i},this.value)" placeholder="독서 목적 (예: 투자 마인드, 자기계발)" class="bec-input" id="bec-purpose-${i}" style="margin:8px 0 6px">
+       <div class="bec-chips">
+         ${['투자 마인드','자기계발','글쓰기','사업/마케팅','교양','동기부여'].map(p=>`<span class="bec-chip" onclick="setBookPurpose(${i},'${p}')">${p}</span>`).join('')}
+       </div>
+       <div class="bec-row">
+         <input type="number" inputmode="numeric" min="0" value="${b.total||''}" oninput="updateBookTotal(${i},this.value)" placeholder="총 페이지" class="bec-input">
+         <select onchange="updateBookStatus(${i},this.value)" class="bec-input bec-select">${statusOpts(b.status)}</select>
+       </div>
+       ${b.status==='toread'?`<select onchange="updateBookPlanMonth(${i},this.value)" class="bec-input" style="margin-top:6px;cursor:pointer">${monthOpts(b.planMonth)}</select>`:''}
+       ${(b.status==='reading'||b.status==='done')?`<div class="bec-row" style="margin-top:6px"><span style="font-size:12px;color:#888;flex-shrink:0">📖 읽기 시작일</span><input type="date" value="${b.startDate||''}" onchange="updateBookStartDate(${i},this.value)" class="bec-input"></div>`:''}
+     </div>`).join('');
+}
+// 표지 이미지 선택 → 리사이즈·압축 → base64 저장 (localStorage 용량 보호를 위해 작게)
+function onBookCoverSelected(i,inputEl){
+  const file=inputEl.files&&inputEl.files[0];
+  if(!file)return;
+  if(!file.type.startsWith('image/')){showToast('이미지 파일만 가능해요');return;}
+  resizeImageFile(file,dataUrl=>{
+    bookBuffer[i].cover=dataUrl;
+    renderBookEditList();
+  });
+}
+// 이미지 파일 → 표지 크기로 리사이즈·압축 → base64 콜백 (localStorage 용량 보호)
+function resizeImageFile(file,callback){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=new Image();
+    img.onload=()=>{
+      const maxW=160, maxH=220;
+      let w=img.width, h=img.height;
+      const scale=Math.min(maxW/w, maxH/h, 1);
+      w=Math.round(w*scale); h=Math.round(h*scale);
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,w,h);
+      callback(canvas.toDataURL('image/jpeg',0.75));
+    };
+    img.onerror=()=>showToast('이미지를 불러오지 못했어요');
+    img.src=e.target.result;
+  };
+  reader.onerror=()=>showToast('파일을 읽지 못했어요');
+  reader.readAsDataURL(file);
+}
+// 책장 카드에서 표지를 바로 탭해 수정 (숨은 input 재사용)
+let coverPickerBookId=null;
+function openCoverPicker(bookId){
+  coverPickerBookId=bookId;
+  let input=document.getElementById('shelf-cover-input');
+  if(!input){
+    input=document.createElement('input');
+    input.type='file';
+    input.accept='image/*';
+    input.id='shelf-cover-input';
+    input.style.display='none';
+    input.onchange=onShelfCoverSelected;
+    document.body.appendChild(input);
+  }
+  input.value='';
+  input.click();
+}
+function onShelfCoverSelected(e){
+  const file=e.target.files&&e.target.files[0];
+  if(!file||!coverPickerBookId)return;
+  if(!file.type.startsWith('image/')){showToast('이미지 파일만 가능해요');return;}
+  const b=bookById(coverPickerBookId);
+  if(!b)return;
+  resizeImageFile(file,dataUrl=>{
+    b.cover=dataUrl;
+    persistBooks();
+    renderBookShelf();
+    showToast('표지가 변경됐어요 ✓');
+  });
+}
+function removeBookCover(i){bookBuffer[i].cover=null;renderBookEditList();}
+function updateBookStartDate(i,v){bookBuffer[i].startDate=v||null;}
+function updateBookTitle(i,v){bookBuffer[i].title=v;}
+function updateBookAuthor(i,v){bookBuffer[i].author=v;}
+function updateBookPurpose(i,v){bookBuffer[i].purpose=v;}
+function setBookPurpose(i,v){
+  bookBuffer[i].purpose=v;
+  const el=document.getElementById('bec-purpose-'+i);
+  if(el)el.value=v;
+}
+function updateBookTotal(i,v){bookBuffer[i].total=Math.max(0,parseInt(v,10)||0);}
+function updateBookPlanMonth(i,v){bookBuffer[i].planMonth=v?parseInt(v,10):null;}
+function updateBookStatus(i,v){
+  bookBuffer[i].status=v;
+  if((v==='reading'||v==='done')&&!bookBuffer[i].startDate)bookBuffer[i].startDate=dateToKey(todayDate());
+  if(v==='done'&&!bookBuffer[i].doneDate)bookBuffer[i].doneDate=dateToKey(todayDate());
+  if(v!=='done')bookBuffer[i].doneDate=null;
+  renderBookEditList(); // 상태에 따라 계획 칸 표시/숨김
+}
+function removeBookRow(i){bookBuffer.splice(i,1);renderBookEditList();}
+function addBookRow(){bookBuffer.push({id:'bk_'+Date.now()+'_'+Math.floor(Math.random()*1000),title:'',author:'',total:0,status:'toread',startDate:null,doneDate:null,planMonth:null,purpose:'',cover:null});renderBookEditList();}
+function saveBooks(){
+  books=bookBuffer.map(b=>({id:b.id,title:(b.title||'').trim(),author:(b.author||'').trim(),total:Number(b.total)||0,status:b.status||'reading',startDate:b.startDate||null,doneDate:b.doneDate||null,rating:b.rating||0,comment:b.comment||'',planMonth:(b.status==='toread'?(b.planMonth||null):null),purpose:(b.purpose||'').trim(),cover:b.cover||null})).filter(b=>b.title);
+  persistBooks();
+  closeBookManager();
+  renderReading();
+  renderBookShelf();
+  showToast('책 목록이 저장됐어요 ✓');
+}
+
+// 책장 렌더
+function renderBookShelf(){
+  const groups={reading:[],toread:[],done:[]};
+  books.forEach(b=>{(groups[b.status]||groups.reading).push(b);});
+  const starStr=n=>{let s='';for(let i=1;i<=5;i++)s+=(i<=Math.round(n)?'★':'☆');return s;};
+  const card=(b,extra,review)=>{
+    const coverHtml=`<div class="shelf-cover-wrap" onclick="event.stopPropagation();openCoverPicker('${b.id}')" title="표지 이미지 수정">
+        ${b.cover?`<img src="${b.cover}" class="shelf-cover" alt="표지">`:`<div class="shelf-cover shelf-cover-empty">📖</div>`}
+        <span class="shelf-cover-edit">✎</span>
+      </div>`;
+    if(review&&(b.rating||b.comment)){
+      // 완독 카드: 탭하면 리뷰 편집 모달이 열림. 상태 변경/삭제는 그 모달 하단에서 처리.
+      const formatMD=d=>{if(!d)return'';const p=d.split('-');return p.length===3?p[0]+'.'+parseInt(p[1],10)+'.'+parseInt(p[2],10):d;};
+      const periodStr=b.startDate&&b.doneDate?(formatMD(b.startDate)+' ~ '+formatMD(b.doneDate)):(b.doneDate?'완독 '+formatMD(b.doneDate):'');
+      const metaLine=`${b.author?escapeHtml(b.author)+' · ':''}${b.total?b.total+'p':'페이지 미정'}${periodStr?' · '+periodStr:''}`;
+      return `<div class="shelf-book shelf-book-done">
+         <div class="shelf-done-clickable" onclick="openDoneReview('${b.id}')">
+           <div class="shelf-done-head">
+             ${coverHtml}
+             <div style="flex:1;min-width:0">
+               <div class="shelf-book-title">${escapeHtml(b.title)}</div>
+               <div class="shelf-book-sub">${metaLine}</div>
+               ${b.purpose?`<span class="shelf-purpose">🎯 ${escapeHtml(b.purpose)}</span>`:''}
+             </div>
+           </div>
+           <div class="shelf-review">
+             ${b.rating?`<span class="shelf-stars">${starStr(b.rating)}</span> <span class="shelf-rating-num">${b.rating}</span>`:''}
+             ${b.comment?`<div class="shelf-comment">${escapeHtml(b.comment)}</div>`:''}
+           </div>
+         </div>
+       </div>`;
+    }
+    return `<div class="shelf-book">
+       <div class="shelf-book-row">
+         ${coverHtml}
+         <div class="shelf-book-main">
+           <div class="shelf-book-title">${escapeHtml(b.title)}</div>
+           <div class="shelf-book-sub">${b.author?escapeHtml(b.author)+' · ':''}${b.total?b.total+'p':'페이지 미정'}${b.doneDate?' · 완독 '+b.doneDate:''}</div>
+           ${b.purpose?`<span class="shelf-purpose">🎯 ${escapeHtml(b.purpose)}</span>`:''}
+         </div>
+         <div class="shelf-actions">${extra}</div>
+       </div>
+     </div>`;
+  };
+  const rEl=document.getElementById('shelf-reading');
+  rEl.innerHTML=groups.reading.length?groups.reading.map(b=>card(b,
+    `<button class="shelf-btn" onclick="openDoneReview('${b.id}')">완독✓</button>`
+  )).join(''):'<div class="empty-msg">읽는 중인 책이 없어요</div>';
+  const tEl=document.getElementById('shelf-toread');
+  if(!groups.toread.length){
+    tEl.innerHTML='<div class="empty-msg">읽을 책이 없어요</div>';
+  }else{
+    // 월별 그룹핑
+    const byMonth={};
+    const noPlan=[];
+    groups.toread.forEach(b=>{
+      if(b.planMonth&&b.planMonth>=1&&b.planMonth<=12){(byMonth[b.planMonth]=byMonth[b.planMonth]||[]).push(b);}
+      else noPlan.push(b);
+    });
+    let html='<div class="month-scroll">';
+    for(let mm=1;mm<=12;mm++){
+      if(!byMonth[mm])continue;
+      html+=`<div class="month-col">
+         <div class="month-group-head">${mm}월 <span class="mg-count">${byMonth[mm].length}권</span></div>
+         ${byMonth[mm].map(b=>card(b,`<button class="shelf-btn" onclick="setBookStatus('${b.id}','reading')">읽기 시작</button>`)).join('')}
+       </div>`;
+    }
+    if(noPlan.length){
+      html+=`<div class="month-col">
+         <div class="month-group-head muted">시기 미정 <span class="mg-count">${noPlan.length}권</span></div>
+         ${noPlan.map(b=>card(b,`<button class="shelf-btn" onclick="setBookStatus('${b.id}','reading')">읽기 시작</button>`)).join('')}
+       </div>`;
+    }
+    html+='</div>';
+    tEl.innerHTML=html;
+  }
+  const dEl=document.getElementById('shelf-done');
+  if(!groups.done.length){
+    dEl.innerHTML='<div class="empty-msg">완독한 책이 없어요</div>';
+  }else{
+    // 완독일(doneDate) 기준 최신순 정렬 후 월별 그룹핑
+    const sorted=groups.done.slice().sort((a,b)=>{
+      const ad=a.doneDate||'', bd=b.doneDate||'';
+      return bd<ad?-1:bd>ad?1:0;
+    });
+    const monthGroups=[]; // [{label, items:[]}]
+    const noDate=[];
+    sorted.forEach(b=>{
+      if(!b.doneDate){noDate.push(b);return;}
+      const ym=b.doneDate.slice(0,7); // 'YYYY-MM'
+      let g=monthGroups.find(g=>g.ym===ym);
+      if(!g){
+        const [y,m]=ym.split('-');
+        g={ym,label:y+'년 '+parseInt(m,10)+'월',items:[]};
+        monthGroups.push(g);
+      }
+      g.items.push(b);
+    });
+    let html='';
+    monthGroups.forEach(g=>{
+      html+=`<div class="month-group">
+         <div class="month-group-head">${g.label} <span class="mg-count">${g.items.length}권</span></div>
+         ${g.items.map(b=>card(b,null,true)).join('')}
+       </div>`;
+    });
+    if(noDate.length){
+      html+=`<div class="month-group">
+         <div class="month-group-head muted">날짜 미상 <span class="mg-count">${noDate.length}권</span></div>
+         ${noDate.map(b=>card(b,null,true)).join('')}
+       </div>`;
+    }
+    dEl.innerHTML=html;
+  }
+  renderBookMonthlyChart();
+  const abView=document.getElementById('all-books-view');
+  if(abView&&abView.style.display!=='none')renderAllBooksGrid();
+}
+function deleteBook(id){
+  const b=bookById(id);if(!b)return;
+  if(!confirm(`"${b.title}"을(를) 완전히 삭제할까요?\n별점·코멘트·기록이 모두 사라지고 되돌릴 수 없어요.`))return;
+  deleteBookRaw(id);
+}
+function deleteBookRaw(id){
+  books=books.filter(bk=>bk.id!==id);
+  persistBooks();
+  renderBookShelf();
+  renderReading();
+  showToast('책이 삭제됐어요');
+}
+
+// 월별 완독 권수 막대그래프 (최근 6개월)
+function renderBookMonthlyChart(){
+  const el=document.getElementById('book-monthly-chart');
+  if(!el)return;
+  const now=todayDate();
+  const months=[];
+  for(let i=5;i>=0;i--){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    months.push({y:d.getFullYear(),m:d.getMonth(),count:0});
+  }
+  books.forEach(b=>{
+    if(b.status==='done'&&b.doneDate){
+      const d=new Date(b.doneDate+'T00:00:00');
+      const hit=months.find(mm=>mm.y===d.getFullYear()&&mm.m===d.getMonth());
+      if(hit)hit.count++;
+    }
+  });
+  const totalDone=books.filter(b=>b.status==='done').length;
+  const maxC=Math.max(1,...months.map(mm=>mm.count));
+  let bars='<div class="rdw-bars" style="height:80px">';
+  months.forEach(mm=>{
+    const h=Math.round(mm.count/maxC*100);
+    const clickable=mm.count>0;
+    bars+=`<div class="rdw-bar-col${clickable?' rdw-clickable':''}"${clickable?` onclick="showMonthBooks(${mm.y},${mm.m})" title="완독 책 보기"`:''}>
+       <div class="rdw-bar-val"${mm.count===0?' style="color:#ccc"':''}>${mm.count}</div>
+       <div class="rdw-bar-track"><div class="rdw-bar-fill" style="height:${h}%"></div></div>
+       <div class="rdw-bar-day">${mm.m+1}월</div>
+     </div>`;
+  });
+  bars+='</div>';
+  el.innerHTML=`<div style="font-size:13px;color:#888;margin-bottom:10px">완독 누적 <b style="color:#1D9E75">${totalDone}권</b></div>`+bars+`<div class="rdw-edit-hint">완독한 달을 탭하면 읽은 책을 볼 수 있어요</div>`;
+}
+// 특정 월 완독 책 팝업
+function showMonthBooks(year,month){
+  const mPrefix=year+'-'+String(month+1).padStart(2,'0');
+  const list=books.filter(b=>b.status==='done'&&b.doneDate&&b.doneDate.indexOf(mPrefix)===0);
+  const starStr=n=>{let s='';for(let i=1;i<=5;i++)s+=(i<=Math.round(n)?'★':'☆');return s;};
+  document.getElementById('month-books-title').textContent=year+'년 '+(month+1)+'월 완독 ('+list.length+'권)';
+  const body=document.getElementById('month-books-body');
+  if(!list.length){body.innerHTML='<div class="empty-msg">이 달에 완독한 책이 없어요</div>';}
+  else{
+    body.innerHTML=list.map(b=>
+      `<div class="mb-item">
+         <div class="mb-title">${escapeHtml(b.title)}</div>
+         <div class="mb-sub">${b.author?escapeHtml(b.author)+' · ':''}${b.total?b.total+'p':''}${b.purpose?' · 🎯 '+escapeHtml(b.purpose):''}</div>
+         ${b.rating?`<div class="mb-stars">${starStr(b.rating)} <span class="shelf-rating-num">${b.rating}</span></div>`:''}
+         ${b.comment?`<div class="mb-comment">${escapeHtml(b.comment)}</div>`:''}
+       </div>`).join('');
+  }
+  document.getElementById('month-books-modal').classList.add('show');
+}
+function closeMonthBooks(){document.getElementById('month-books-modal').classList.remove('show');}
+const WORKOUT_KEYS=['squat','pushup','bicep','tricep'];
+const WORKOUT_WEIGHTED=['squat','bicep','tricep']; // 무게 입력칸이 있는 종목
+const WORKOUT_SETS=4;
+// 직전(이전 날짜 중 가장 최근) 운동 기록 찾기
+// 종목별로 각각 가장 최근 기록을 찾음 (종목마다 마지막 운동일이 다를 수 있으므로)
+function prevWorkoutByExercise(beforeKey){
+  const result={sets:{},weights:{},dates:{}};
+  const needSets=WORKOUT_KEYS.slice();
+  const needWeights=WORKOUT_WEIGHTED.slice();
+  let d=new Date(beforeKey+'T00:00:00');
+  for(let i=0;i<180 && (needSets.length||needWeights.length);i++){
+    d.setDate(d.getDate()-1);
+    const dd=getDailyData(dateToKey(d));
+    if(!dd||!dd.workout)continue;
+    // 세트 기록
+    for(let j=needSets.length-1;j>=0;j--){
+      const k=needSets[j];
+      const sets=dd.workout[k];
+      if(sets&&sets.some(s=>Number(s)>0)){
+        result.sets[k]=sets;
+        result.dates[k]=dateToKey(d);
+        needSets.splice(j,1);
+      }
+    }
+    // 무게 기록
+    const w=dd.workout.weights||{};
+    for(let j=needWeights.length-1;j>=0;j--){
+      const k=needWeights[j];
+      if(w[k]!=null&&w[k]!==''){
+        result.weights[k]=w[k];
+        needWeights.splice(j,1);
+      }
+    }
+  }
+  return result;
+}
+// (구버전 호환용) 가장 최근에 운동한 하루
+function prevWorkoutRecord(beforeKey){
+  let d=new Date(beforeKey+'T00:00:00');
+  for(let i=0;i<180;i++){
+    d.setDate(d.getDate()-1);
+    const dd=getDailyData(dateToKey(d));
+    if(dd&&dd.workout){
+      const hasAny=WORKOUT_KEYS.some(k=>dd.workout[k]&&dd.workout[k].some(s=>Number(s)>0));
+      if(hasAny)return {workout:dd.workout,date:dateToKey(d)};
+    }
+  }
+  return null;
+}
+function renderWorkout(){
+  const prev=prevWorkoutByExercise(dateToKey(currentDate));
+  WORKOUT_KEYS.forEach(k=>{
+    const sets=(state.workout&&state.workout[k])?state.workout[k]:[];
+    const prevSets=prev.sets[k]||[];
+    let sum=0;
+    for(let i=0;i<WORKOUT_SETS;i++){
+      const el=document.getElementById('wo_'+k+'_'+i);
+      const v=(sets[i]!=null&&sets[i]!=='')?sets[i]:'';
+      if(el){
+        el.value=v;
+        // 그 종목의 직전 기록을 흐린 placeholder로
+        const pv=(prevSets[i]!=null&&prevSets[i]!=='')?prevSets[i]:'';
+        el.placeholder=(pv!==''&&Number(pv)>0)?String(pv):'';
+      }
+      sum+=Number(v)||0;
+    }
+    const sumEl=document.getElementById('wo_'+k+'_sum');
+    if(sumEl)sumEl.textContent=sum;
+  });
+  // 종목별 무게
+  const weights=(state.workout&&state.workout.weights)?state.workout.weights:{};
+  WORKOUT_WEIGHTED.forEach(k=>{
+    const wEl=document.getElementById('wo_'+k+'_weight');
+    if(wEl){
+      wEl.value=(weights[k]!=null&&weights[k]!=='')?weights[k]:'';
+      const pw=prev.weights[k];
+      wEl.placeholder=(pw!=null&&pw!=='')?String(pw):'kg';
+    }
+  });
+  // 직전 기록 안내 문구 (가장 최근 운동일 기준)
+  const hintEl=document.getElementById('workout-prev-hint');
+  if(hintEl){
+    const dates=Object.values(prev.dates);
+    if(dates.length){
+      dates.sort();
+      const latest=dates[dates.length-1];
+      hintEl.textContent='흐린 숫자는 직전 기록이에요 (가장 최근 '+latest+') · 그날보다 더!';
+    }else{
+      hintEl.textContent='';
+    }
+  }
+}
+function onWorkoutInput(){
+  const wo={};
+  WORKOUT_KEYS.forEach(k=>{
+    const sets=[];
+    let sum=0;
+    for(let i=0;i<WORKOUT_SETS;i++){
+      const el=document.getElementById('wo_'+k+'_'+i);
+      const raw=el?el.value:'';
+      const num=(raw===''?'':Math.max(0,parseInt(raw,10)||0));
+      sets[i]=num;
+      sum+=Number(num)||0;
+    }
+    const sumEl=document.getElementById('wo_'+k+'_sum');
+    if(sumEl)sumEl.textContent=sum;
+    if(sets.some(s=>s!=='' && s!=null))wo[k]=sets;
+  });
+  // 종목별 무게
+  const weights={};
+  WORKOUT_WEIGHTED.forEach(k=>{
+    const wEl=document.getElementById('wo_'+k+'_weight');
+    const wRaw=wEl?wEl.value:'';
+    if(wRaw!=='')weights[k]=Math.max(0,parseFloat(wRaw)||0);
+  });
+  if(Object.keys(weights).length)wo.weights=weights;
+  state.workout=wo;
+  autosaveDailyDebounced();
+}
+function updateDailyProgress(done,allowCelebrate){
+  const rs=activeRoutines();
+  const n=rs.length||1;
+  document.getElementById('done-count').textContent=done+' / '+rs.length;
+  const pct=Math.round(done/n*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('progress-label').textContent='루틴 달성률 '+pct+'%';
+  // 사용자가 방금 100% 달성한 순간에만 폭죽
+  if(allowCelebrate && pct===100 && !prevWasFull){ launchConfetti(); }
+  prevWasFull = (pct===100);
+}
+let prevWasFull=false;
+function toggleRoutine(id){
+  const chk=document.getElementById('chk_'+id);
+  state.checkMap[id]=chk.checked;
+  if(!chk.checked)delete state.checkMap[id];
+  document.getElementById('lbl_'+id).className=chk.checked?'checked':'';
+  let done=activeRoutines().filter(r=>state.checkMap[r.id]).length;
+  updateDailyProgress(done,true);
+  autosaveDaily();
+  if(chk.checked){
+    const r=routinesFor(currentMode).find(x=>x.id===id);
+    if(isReadingRoutine(r))setTimeout(openReadingModal,250);
+  }
+}
+function changeCount(d){state.posts=Math.max(0,state.posts+d);document.getElementById('post-count').textContent=state.posts;autosaveDaily();}
+function setMood(m){
+  // 같은 항목 다시 누르면 해제
+  state.mood=(state.mood===m)?'':m;
+  document.querySelectorAll('.mood-btn').forEach(b=>{b.className='mood-btn'+(state.mood&&b.textContent.includes(state.mood)?' selected':'');});
+  autosaveDaily();
+}
+
+// 주말/평일 모드 토글
+function syncModeToggle(){
+  const el=document.getElementById('mode-toggle');
+  if(!el)return;
+  const isWeekend=currentMode==='weekend';
+  el.classList.toggle('weekend',isWeekend);
+  el.textContent=isWeekend?'🌴 주말 모드':'💼 평일 모드';
+  const miniEl=document.getElementById('mini-toggle');
+  if(miniEl){
+    miniEl.classList.toggle('on',currentMini);
+    miniEl.textContent=currentMini?'📌 약속 모드 ON':'📌 약속';
+  }
+}
+function toggleMode(){
+  currentMode=(currentMode==='weekend')?'weekday':'weekend';
+  state.mode=currentMode;
+  saveDailyData(dateToKey(currentDate),state);
+  syncModeToggle();
+  renderDaily();
+  flashSaved();
+}
+function toggleMini(){
+  currentMini=!currentMini;
+  state.mini=currentMini;
+  saveDailyData(dateToKey(currentDate),state);
+  syncModeToggle();
+  renderDaily();
+  flashSaved();
+}
+
+// 자동 저장 (체크/카운터/컨디션은 즉시, 텍스트는 디바운스)
+let saveTimer=null;
+function autosaveDaily(){
+  saveTimer=null;
+  state.memo=document.getElementById('daily-memo').value;
+  state.tmr=document.getElementById('tomorrow-goal').value;
+  state.mode=currentMode;
+  state.mini=currentMini;
+  if(state.checks)delete state.checks;
+  saveDailyData(dateToKey(currentDate),state);
+  flashSaved();
+}
+function autosaveDailyDebounced(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(autosaveDaily,600);
+}
+// 저장됨 표시 (현재는 별도 UI 없음 — 토스트로 충분한 피드백 제공)
+function flashSaved(){}
+
+/* ── 루틴 편집 모달 ── */
+let editBuffer=[];
+let editingMode='weekday';
+function openRoutineEditor(){
+  editingMode=currentMode;
+  const rs=routinesFor(editingMode);
+  editBuffer=rs.map(r=>({id:r.id,name:r.name,target:r.target||7,core:!!r.core,skipDays:Array.isArray(r.skipDays)?r.skipDays.slice():[]}));
+  const titleEl=document.getElementById('routine-modal-title');
+  if(titleEl)titleEl.textContent=(editingMode==='weekend'?'🌴 주말':'💼 평일')+' 루틴 편집';
+  renderEditList();
+  document.getElementById('routine-modal').classList.add('show');
+}
+function closeRoutineEditor(){document.getElementById('routine-modal').classList.remove('show');}
+function renderEditList(){
+  const el=document.getElementById('edit-routine-list');
+  const DOW=['일','월','화','수','목','금','토'];
+  el.innerHTML=editBuffer.map((r,i)=>{
+    const opts=[1,2,3,4,5,6,7].map(n=>`<option value="${n}" ${r.target===n?'selected':''}>주 ${n}회${n===7?' (매일)':''}</option>`).join('');
+    const skipDays=Array.isArray(r.skipDays)?r.skipDays:[];
+    const dowButtons=DOW.map((label,dow)=>
+      `<span class="dow-btn${skipDays.includes(dow)?' off':''}" onclick="toggleEditSkipDay(${i},${dow})">${label}</span>`
+    ).join('');
+    return `<div class="edit-routine-row" data-idx="${i}">
+       <button class="drag-handle" title="꾹 눌러 순서 이동" onpointerdown="startRowDrag(event,${i})">≡</button>
+       <button class="core-btn${r.core?' on':''}" onclick="toggleEditCore(${i})" title="약속(미니) 모드 핵심 루틴">📌</button>
+       <input type="text" value="${escapeAttr(r.name)}" oninput="updateEditName(${i},this.value)" placeholder="루틴 이름">
+       <select class="target-select" onchange="updateEditTarget(${i},this.value)">${opts}</select>
+       <button class="del-btn" onclick="removeEditRow(${i})" title="삭제">🗑</button>
+     </div>
+     <div class="edit-dow-row">
+       <span class="edit-dow-label">쉬는 요일</span>
+       <div class="dow-btns">${dowButtons}</div>
+     </div>`;
+  }).join('');
+}
+function toggleEditSkipDay(i,dow){
+  if(!Array.isArray(editBuffer[i].skipDays))editBuffer[i].skipDays=[];
+  const arr=editBuffer[i].skipDays;
+  const idx=arr.indexOf(dow);
+  if(idx>=0)arr.splice(idx,1);
+  else arr.push(dow);
+  renderEditList();
+}
+function updateEditName(i,v){editBuffer[i].name=v;}
+function updateEditTarget(i,v){editBuffer[i].target=parseInt(v,10);}
+function toggleEditCore(i){editBuffer[i].core=!editBuffer[i].core;renderEditList();}
+function removeEditRow(i){editBuffer.splice(i,1);renderEditList();}
+function addEditRow(){editBuffer.push({id:'r_'+Date.now()+'_'+Math.floor(Math.random()*1000),name:'',target:7,core:false,skipDays:[]});renderEditList();}
+
+/* ── 루틴 순서 드래그(터치/마우스 공용) ── */
+let dragState=null;
+function startRowDrag(e,idx){
+  e.preventDefault();
+  const listEl=document.getElementById('edit-routine-list');
+  const rows=Array.from(listEl.querySelectorAll('.edit-routine-row'));
+  const rowEl=rows[idx];
+  if(!rowEl)return;
+  dragState={idx,startY:e.clientY,listEl,rowEl,moved:false};
+  rowEl.classList.add('dragging');
+  rowEl.setPointerCapture&&rowEl.setPointerCapture(e.pointerId);
+  document.addEventListener('pointermove',onRowDragMove);
+  document.addEventListener('pointerup',endRowDrag,{once:true});
+}
+function onRowDragMove(e){
+  if(!dragState)return;
+  e.preventDefault();
+  dragState.moved=true;
+  const {listEl,rowEl}=dragState;
+  const rows=Array.from(listEl.querySelectorAll('.edit-routine-row'));
+  const y=e.clientY;
+  // 현재 포인터 위치에 해당하는 행 찾기
+  let targetIdx=dragState.idx;
+  rows.forEach((row,j)=>{
+    const rect=row.getBoundingClientRect();
+    const mid=rect.top+rect.height/2;
+    if(j<dragState.idx && y<mid){targetIdx=Math.min(targetIdx,j);}
+    if(j>dragState.idx && y>mid){targetIdx=Math.max(targetIdx,j);}
+  });
+  if(targetIdx!==dragState.idx){
+    const item=editBuffer.splice(dragState.idx,1)[0];
+    editBuffer.splice(targetIdx,0,item);
+    dragState.idx=targetIdx;
+    renderEditList();
+    // 재렌더 후 드래그 중인 행 다시 표시
+    const newRows=Array.from(listEl.querySelectorAll('.edit-routine-row'));
+    if(newRows[targetIdx]){newRows[targetIdx].classList.add('dragging');dragState.rowEl=newRows[targetIdx];}
+  }
+}
+function endRowDrag(e){
+  document.removeEventListener('pointermove',onRowDragMove);
+  if(dragState&&dragState.rowEl)dragState.rowEl.classList.remove('dragging');
+  dragState=null;
+}
+function saveRoutines(){
+  const cleaned=editBuffer.map(r=>({id:r.id,name:r.name.trim(),target:r.target||7,core:!!r.core,skipDays:Array.isArray(r.skipDays)?r.skipDays.slice():[]})).filter(r=>r.name);
+  if(!cleaned.length){showToast('최소 1개의 루틴이 필요해요');return;}
+  if(editingMode==='weekend'){routinesWeekend=cleaned;persistRoutinesWeekend();}
+  else{routines=cleaned;persistRoutines();}
+  closeRoutineEditor();
+  loadDaily();
+  showToast('루틴이 저장됐어요 ✓');
+}
+
+/* ── 주간 ── */
+function updateWeekNavTitle(){
+  const wk=weekStartKey(currentDate);
+  const mon=new Date(wk+'T00:00:00');
+  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+  const fmt=d=>(d.getMonth()+1)+'/'+(d.getDate());
+  const thisWkStart=weekStartKey(todayDate());
+  const isThisWeek=(wk>=thisWkStart);
+  const el=document.getElementById('week-nav-title');
+  const nextBtn=document.getElementById('week-next-btn');
+  if(el)el.textContent=mon.getFullYear()+'년 '+(mon.getMonth()+1)+'월 '+fmt(mon)+' ~ '+fmt(sun);
+  if(nextBtn)nextBtn.disabled=isThisWeek;
+}
+function moveWeek(dir){
+  const d=new Date(currentDate);
+  d.setDate(d.getDate()+dir*7);
+  const thisWkStart=weekStartKey(todayDate());
+  const nextWkStart=weekStartKey(d);
+  if(dir>0&&nextWkStart>thisWkStart)return;
+  currentDate=d;
+  loadWeekly();
+}
+function loadWeekly(){
+  updateWeekNavTitle();
+  const wk=weekStartKey(currentDate);
+  const wData=getWeeklyData(wk)||{memo:'',next:''};
+  document.getElementById('weekly-memo').value=wData.memo||'';
+  document.getElementById('next-week-goal').value=wData.next||'';
+  renderWeekHeatmap();
+  renderWeeklyWorkout();
+  renderWeeklyReading();
+  renderWeekLogs();
+}
+
+// 주간 운동 횟수 선그래프
+function renderWeeklyWorkout(){
+  const weekDays=getWeekDays();
+  const labels={squat:'🦵 스쿼트',pushup:'💪 푸쉬업',bicep:'💪 이두(덤벨 컬)',tricep:'💪 등(덤벨 로우)'};
+  const colors={squat:'#1D9E75',pushup:'#4d96ff',bicep:'#9b5de5',tricep:'#f15bb5'};
+  // 요일별 합계 시계열
+  const series={},totals={},daysActive={};
+  WORKOUT_KEYS.forEach(k=>{series[k]=[];totals[k]=0;daysActive[k]=0;});
+  // 러닝: 횟수가 아닌 했는지 여부라 선그래프 대신 요일별 띠로 별도 표시
+  const runDays=[]; let runTotal=0;
+  // 근력: 스쿼트·푸쉬업·이두·등 중 하나라도 한 날 체크
+  const strengthDays=[]; let strengthTotal=0;
+  let exercisedTotal=0; // 러닝 또는 근력 중 하나라도 한 날 (운동한 날, 합집합)
+  weekDays.forEach(({dd})=>{
+    WORKOUT_KEYS.forEach(k=>{
+      let daySum=0;
+      if(dd&&dd.workout&&dd.workout[k])daySum=dd.workout[k].reduce((a,b)=>a+(Number(b)||0),0);
+      series[k].push(daySum);
+      totals[k]+=daySum;
+      if(daySum>0)daysActive[k]++;
+    });
+    const ran=dayCheckedBy(dd,isRunRoutine);
+    runDays.push(ran);
+    if(ran)runTotal++;
+    const didStrength=dayDidStrength(dd)||dayCheckedBy(dd,isStrengthRoutine);
+    strengthDays.push(didStrength);
+    if(didStrength)strengthTotal++;
+    if(ran||didStrength||dayDidExercise(dd))exercisedTotal++;
+  });
+  const el=document.getElementById('weekly-workout');
+  const grandTotal=WORKOUT_KEYS.reduce((a,k)=>a+totals[k],0);
+  if(grandTotal===0&&runTotal===0&&strengthTotal===0){el.innerHTML='<div class="empty-msg">이번 주 운동 기록이 없어요</div>';return;}
+
+  // SVG 차트 영역
+  const W=320,H=160,padL=28,padR=10,padT=14,padB=22;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const maxY=Math.max(1,...WORKOUT_KEYS.flatMap(k=>series[k]));
+  // y눈금(0, 중간, 최대) 적당히
+  const yTicks=[0,Math.round(maxY/2),maxY].filter((v,i,a)=>a.indexOf(v)===i);
+  const xFor=i=>padL+(plotW*(i/6));
+  const yFor=v=>padT+plotH-(plotH*(v/maxY));
+
+  let grid='';
+  yTicks.forEach(t=>{
+    const y=yFor(t);
+    grid+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#eee" stroke-width="1"/>`;
+    grid+=`<text x="${padL-5}" y="${y+3}" text-anchor="end" font-size="9" fill="#bbb">${t}</text>`;
+  });
+  const dayLabels=['월','화','수','목','금','토','일'];
+  let xlabels='';
+  dayLabels.forEach((d,i)=>{
+    xlabels+=`<text x="${xFor(i)}" y="${H-6}" text-anchor="middle" font-size="9" fill="#aaa">${d}</text>`;
+  });
+  let lines='';
+  WORKOUT_KEYS.forEach(k=>{
+    const pts=series[k].map((v,i)=>`${xFor(i)},${yFor(v)}`).join(' ');
+    lines+=`<polyline points="${pts}" fill="none" stroke="${colors[k]}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+    series[k].forEach((v,i)=>{
+      lines+=`<circle cx="${xFor(i)}" cy="${yFor(v)}" r="${v>0?3:2}" fill="${v>0?colors[k]:'#fff'}" stroke="${colors[k]}" stroke-width="1.5"/>`;
+      if(v>0){
+        lines+=`<text x="${xFor(i)}" y="${yFor(v)-7}" text-anchor="middle" font-size="9" font-weight="600" fill="${colors[k]}">${v}</text>`;
+      }
+    });
+  });
+  const svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;height:auto">${grid}${lines}${xlabels}</svg>`;
+
+  // 러닝 띠: 요일별로 한 날만 밝은 녹색으로 채움 (횟수 그래프와 스케일이 달라 별도 표시)
+  let runRow='<div class="run-strip"><span class="run-strip-label">🏃 러닝</span><div class="run-strip-cells">';
+  dayLabels.forEach((d,i)=>{
+    runRow+=`<div class="run-cell${runDays[i]?' ran':''}" title="${d}">${runDays[i]?'✓':''}</div>`;
+  });
+  runRow+='</div></div>';
+
+  // 근력 띠: 스쿼트·푸쉬업·이두·등 중 하나라도 한 날 체크
+  let strengthRow='<div class="run-strip run-strip-week-last"><span class="run-strip-label">💪 근력</span><div class="run-strip-cells">';
+  dayLabels.forEach((d,i)=>{
+    strengthRow+=`<div class="run-cell strength${strengthDays[i]?' ran':''}" title="${d}">${strengthDays[i]?'✓':''}</div>`;
+  });
+  strengthRow+='</div></div>';
+
+  // 범례 + 총합
+  const legend=WORKOUT_KEYS.map(k=>
+    `<div class="wwl-item">
+       <span class="wwl-dot" style="background:${colors[k]}"></span>
+       <span class="wwl-name">${labels[k]}</span>
+       <span class="wwl-total">${totals[k]}회</span>
+       <span class="wwl-days">· 주 ${daysActive[k]}일</span>
+     </div>`).join('')+
+    `<div class="wwl-divider"></div>
+     <div class="wwl-item">
+       <span class="wwl-dot" style="background:#5DCAA5"></span>
+       <span class="wwl-name">🏃 러닝</span>
+       <span class="wwl-total">주 ${runTotal}일</span>
+     </div>
+     <div class="wwl-item">
+       <span class="wwl-dot" style="background:#4d96ff"></span>
+       <span class="wwl-name">💪 근력</span>
+       <span class="wwl-total">주 ${strengthTotal}일</span>
+     </div>
+     <div class="wwl-divider"></div>
+     <div class="wwl-item">
+       <span class="wwl-dot" style="background:#333"></span>
+       <span class="wwl-name">🏋️ 운동한 날</span>
+       <span class="wwl-total">주 ${exercisedTotal}일</span>
+     </div>`;
+
+  el.innerHTML=`<div class="ww-chart">${svg}</div>${runRow}${strengthRow}<div class="ww-legend">${legend}</div>`;
+}
+
+// 주간 독서 (일별 페이지 막대 + 책별 합계)
+function renderWeeklyReading(){
+  const weekDays=getWeekDays();
+  const dayNames=['월','화','수','목','금','토','일'];
+  let totalPages=0, daysRead=0;
+  const perDay=[];
+  const perDayKeys=[];
+  const byBook={};
+  weekDays.forEach(({dk,dd})=>{
+    let p=0;
+    if(dd&&dd.reading&&dd.reading.bookId&&dd.reading.cur!=null&&dd.reading.cur!==''){
+      const bookId=dd.reading.bookId;
+      const cur=Number(dd.reading.cur)||0;
+      const prev=prevCurPage(bookId,dk);
+      p=Math.max(0,cur-prev);
+      const bk=bookById(bookId);
+      const title=bk?bk.title:'(삭제된 책)';
+      if(p>0)byBook[title]=(byBook[title]||0)+p;
+    }
+    perDay.push(p);
+    perDayKeys.push(dk);
+    totalPages+=p;
+    if(p>0||dayReadByRoutine(dd))daysRead++;
+  });
+  const el=document.getElementById('weekly-reading');
+
+  // 이번 주에 완독한 책 수 (완독일이 이번 주 범위)
+  const weekKeys=weekDays.map(w=>w.dk);
+  const firstKey=weekKeys[0], lastKey=weekKeys[weekKeys.length-1];
+  const finishedThisWeek=books.filter(b=>b.status==='done'&&b.doneDate&&b.doneDate>=firstKey&&b.doneDate<=lastKey).length;
+
+  if(totalPages===0&&finishedThisWeek===0&&daysRead===0){el.innerHTML='<div class="empty-msg">이번 주 독서 기록이 없어요</div>';return;}
+
+  const summary=`<div class="rdw-summary">
+     <div class="rdw-stat"><div class="rdw-num">${totalPages}</div><div class="rdw-lbl">총 페이지</div></div>
+     <div class="rdw-stat"><div class="rdw-num">${daysRead}</div><div class="rdw-lbl">읽은 날</div></div>
+     <div class="rdw-stat"><div class="rdw-num">${finishedThisWeek}</div><div class="rdw-lbl">완독한 책</div></div>
+   </div>`;
+
+  const maxP=Math.max(1,...perDay);
+  let bars='<div class="rdw-bars">';
+  perDay.forEach((p,i)=>{
+    const h=Math.round(p/maxP*100);
+    bars+=`<div class="rdw-bar-col rdw-clickable" onclick="goToReadingDay('${perDayKeys[i]}')" title="탭하여 수정">
+       <div class="rdw-bar-val"${p===0?' style="color:#ccc"':''}>${p}</div>
+       <div class="rdw-bar-track"><div class="rdw-bar-fill" style="height:${h}%"></div></div>
+       <div class="rdw-bar-day">${dayNames[i]}</div>
+     </div>`;
+  });
+  bars+='</div>';
+  bars+='<div class="rdw-edit-hint">막대를 탭하면 해당 날짜로 이동해 수정할 수 있어요</div>';
+
+  const bookTitles=Object.keys(byBook).sort((a,b)=>byBook[b]-byBook[a]);
+  const bookList=bookTitles.map(t=>
+    `<div class="rdw-book"><span class="rdw-book-name">${escapeHtml(t)}</span><span class="rdw-book-pages">${byBook[t]}p</span></div>`
+  ).join('');
+
+  el.innerHTML=summary+bars+`<div class="rdw-booklist">${bookList}</div>`;
+}
+function goToReadingDay(dk){
+  currentDate=new Date(dk+'T00:00:00');currentDate.setHours(0,0,0,0);
+  currentTab='daily';
+  showTabsView();
+  loadDaily();updateDateNav();
+  // 독서 입력칸으로 스크롤
+  setTimeout(()=>{const el=document.getElementById('rd_curpage');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.focus();}},100);
+}
+
+// 이번 주 7일치 데이터 수집
+function getWeekDays(){
+  const wk=weekStartKey(currentDate);
+  const monDate=new Date(wk+'T00:00:00');
+  const tKey=dateToKey(todayDate());
+  const today=todayDate();
+  const arr=[];
+  for(let i=0;i<7;i++){
+    const d=new Date(monDate);d.setDate(monDate.getDate()+i);
+    const dk=dateToKey(d);
+    const dd=getDailyData(dk);
+    arr.push({dk,d:new Date(d),dd,mode:modeForDate(d,dd),isToday:dk===tKey,isFuture:d>today,dayLabel:DAY_NAMES_MON[i]});
+  }
+  return arr;
+}
+
+// 주간 통계(상단 카드 + 막대 + 완료일 pill) 갱신
+function updateWeekStats(){
+  const weekDays=getWeekDays();
+  let posts=0,loggedDays=0;
+  let exerciseDays=0,readDays=0,perfectDays=0;
+  // 루틴별 주간 실천 횟수 집계 (평일+주말 루틴 전체)
+  const doneCountByRoutine={};
+  routines.concat(routinesWeekend).forEach(r=>doneCountByRoutine[r.id]=0);
+  const pillsEl=document.getElementById('week-day-pills');pillsEl.innerHTML='';
+  const tKey=dateToKey(todayDate());
+  // 요일별 체크바용 (블로그 / 운동 / 독서)
+  const blogFlags=[],exFlags=[],readFlags=[],stripLabels=[];
+  weekDays.forEach(({dk,d,dd,dayLabel,isFuture,mode})=>{
+    const m=getChecksMap(dd);
+    const rs=routinesFor(mode);
+    let blogOn=false,exOn=false,readOn=false;
+    if(dd){
+      loggedDays++;posts+=dd.posts||0;
+      rs.forEach(r=>{ if(m[r.id])doneCountByRoutine[r.id]=(doneCountByRoutine[r.id]||0)+1; });
+      // 블로그 쓴 날: 그날 발행한 포스팅이 1편 이상
+      blogOn=(dd.posts||0)>0;
+      // 운동한 날: 러닝·맨몸운동 루틴 체크 또는 근력 종목 기록
+      exOn=dayDidExercise(dd);
+      if(exOn)exerciseDays++;
+      // 책 읽은 날: '기상 후 독서' 체크 또는 그날 읽은 페이지가 있는 경우
+      if(dayDidRead(dd,dk)){readOn=true;readDays++;}
+    }
+    blogFlags.push(blogOn);exFlags.push(exOn);readFlags.push(readOn);stripLabels.push(dayLabel);
+    const pct=dd?dayPct(dd,d):0;
+    if(dd&&pct===100)perfectDays++;
+    const cell=document.createElement('div');
+    cell.className='week-grass'+(dk===tKey?' today':'')+(dd?' has-data':'');
+    if(isFuture&&!dd)cell.classList.add('future');
+    cell.style.background=dd?pctColor(pct):(isFuture?'transparent':'#fafaf8');
+    const txtColor=dd?pctTextColor(pct):'#ccc';
+    const modeIcon=(mode==='weekend')?'🌴':'';
+    cell.innerHTML=`<div class="wg-day" style="color:${txtColor}">${dayLabel}${modeIcon}</div>`+(dd?`<div class="wg-pct" style="color:${txtColor}">${pct}%</div>`:'');
+    cell.title=dk+(dd?' · 달성률 '+pct+'%':' · 기록 없음')+(mode==='weekend'?' · 주말모드':'');
+    cell.onclick=()=>{currentDate=new Date(dk+'T00:00:00');currentDate.setHours(0,0,0,0);showTabsView();switchTab('daily');loadDaily();updateDateNav();};
+    pillsEl.appendChild(cell);
+  });
+  // 주간 목표 달성률: 그 주에 등장한 모드별 루틴 목표 합산
+  const modesPresent={};
+  weekDays.forEach(w=>{modesPresent[w.mode]=true;});
+  let totalDoneCapped=0,totalTarget=0;
+  Object.keys(modesPresent).forEach(mode=>{
+    routinesFor(mode).forEach(r=>{
+      const t=r.target||7;
+      totalTarget+=t;
+      totalDoneCapped+=Math.min(doneCountByRoutine[r.id]||0,t);
+    });
+  });
+  document.getElementById('w-posts').textContent=posts;
+  document.getElementById('w-days').textContent=loggedDays;
+  const wpct=totalTarget>0?Math.round(totalDoneCapped/totalTarget*100):0;
+  document.getElementById('w-routine').textContent=wpct+'%';
+  document.getElementById('w-progress-fill').style.width=wpct+'%';
+  document.getElementById('w-progress-label').textContent='주간 목표 달성률 '+wpct+'% (목표 '+totalTarget+'회 중 '+totalDoneCapped+'회)';
+  document.getElementById('w-exercise-days').textContent=exerciseDays;
+  document.getElementById('w-read-days').textContent=readDays;
+  document.getElementById('w-perfect-days').textContent=perfectDays;
+
+  // 요일별 체크바 (블로그 / 운동 / 독서)
+  const stripsEl=document.getElementById('week-check-strips');
+  if(stripsEl){
+    const mkStrip=(label,flags,cls,total,last)=>{
+      let h=`<div class="run-strip run-strip-stat${last?' run-strip-stat-last':''}"><span class="run-strip-label">${label}</span><div class="run-strip-cells">`;
+      flags.forEach((v,i)=>{
+        h+=`<div class="run-cell ${cls}${v?' ran':''}" title="${stripLabels[i]}">${v?'✓':''}</div>`;
+      });
+      h+=`</div><span style="font-size:11px;color:#888;font-weight:600;flex-shrink:0;width:34px;text-align:right">${total}일</span></div>`;
+      return h;
+    };
+    const blogDays=blogFlags.filter(Boolean).length;
+    stripsEl.innerHTML=
+      mkStrip('📝 블로그',blogFlags,'blogc',blogDays,false)+
+      mkStrip('🏋️ 운동',exFlags,'exc',exerciseDays,false)+
+      mkStrip('📖 독서',readFlags,'readc',readDays,true);
+  }
+}
+
+// 히트맵(체크 가능) 렌더
+function renderWeekHeatmap(){
+  const weekDays=getWeekDays();
+  // 헤더 today 강조 + 주말 표시
+  const thEls=document.querySelectorAll('#heatmap-head th');
+  weekDays.forEach((wd,i)=>{
+    if(thEls[i+1]){
+      thEls[i+1].className=wd.isToday?'today-col':'';
+      thEls[i+1].innerHTML=wd.dayLabel+(wd.mode==='weekend'?'<br><span style="font-size:9px">🌴</span>':'');
+    }
+  });
+
+  // 그 주에 등장한 모드 파악
+  const hasWeekday=weekDays.some(w=>w.mode==='weekday');
+  const hasWeekend=weekDays.some(w=>w.mode==='weekend');
+
+  function renderRows(rs,mode){
+    return rs.map(r=>{
+      let weekDone=0;
+      const cells=weekDays.map(({dk,dd,isToday,isFuture,mode:dmode})=>{
+        // 이 루틴이 이 날에 해당하는지: 같은 모드 + (미니인 날이면 핵심만) + (쉬는 요일 아님)
+        let applies=(dmode===mode);
+        if(applies && dd && dd.mini && !r.core)applies=false;
+        if(applies && Array.isArray(r.skipDays)){
+          const dow=new Date(dk+'T00:00:00').getDay();
+          if(r.skipDays.includes(dow))applies=false;
+        }
+        const m=getChecksMap(dd);
+        const checked=applies && !!m[r.id];
+        if(checked)weekDone++;
+        let cls='heatmap-dot';
+        let inner='';
+        if(!applies){cls+=' na';}            // 해당 없음(다른 모드의 날)
+        else if(checked){cls+=' done';inner='✓';}
+        else if(dd){cls+=' miss';}
+        else{cls+=' none';}
+        if(isToday)cls+=' today-dot';
+        if(applies&&!isFuture)cls+=' clickable';
+        const onclick=(applies&&!isFuture)?`onclick="toggleHeatmapCell('${dk}','${r.id}')"`:'';
+        return `<td style="text-align:center"><div class="${cls}" ${onclick}>${inner}</div></td>`;
+      }).join('');
+      const t=r.target||7;
+      const met=weekDone>=t;
+      const badge=`<span class="target-badge${met?' met':''}">${weekDone}/${t}</span>`;
+      const nameCls='routine-name'+(met?' rn-met':'');
+      const check=met?'<span class="rn-check">✓</span>':'';
+      return `<tr><td class="${nameCls}">${badge} ${check}${escapeHtml(r.name)}</td>${cells}</tr>`;
+    }).join('');
+  }
+
+  let html='';
+  if(hasWeekday) html+=renderRows(routines,'weekday');
+  if(hasWeekend){
+    html+=`<tr><td colspan="8" class="hm-section">🌴 주말 모드</td></tr>`;
+    html+=renderRows(routinesWeekend,'weekend');
+  }
+  document.getElementById('heatmap-body').innerHTML=html;
+  updateWeekStats();
+}
+
+// 히트맵 셀 클릭 → 해당 날짜 루틴 토글 (양방향 저장)
+function toggleHeatmapCell(dk,routineId){
+  let dd=getDailyData(dk);
+  const dObj=new Date(dk+'T00:00:00');
+  if(!dd)dd={checkMap:{},posts:0,mood:'',memo:'',tmr:'',mode:modeForDate(dObj,null)};
+  if(!dd.mode)dd.mode=modeForDate(dObj,dd);
+  const m=dd.checkMap||getChecksMap(dd);
+  if(m[routineId])delete m[routineId];
+  else m[routineId]=true;
+  dd.checkMap=m;
+  if(dd.checks)delete dd.checks;
+  saveDailyData(dk,dd);
+  if(dk===dateToKey(currentDate))loadDaily();
+  renderWeekHeatmap();
+}
+
+function renderWeekLogs(){
+  const weekDays=getWeekDays();
+  const logs=[];
+  weekDays.forEach(({dk,dd,dayLabel})=>{
+    if(dd&&dd.memo)logs.push({date:dayLabel+'요일 · '+dk,note:dd.memo,posts:dd.posts||0});
+  });
+  const logEl=document.getElementById('week-log-list');
+  logEl.innerHTML=logs.length===0?'<div class="empty-msg">이번 주 저장된 회고가 없어요</div>':
+    logs.map(l=>`<div class="week-log-item"><div class="week-log-date">${l.date}</div><div class="week-log-note">${escapeHtml(l.note)}</div>${l.posts>0?`<div class="week-log-posts">📝 포스팅 ${l.posts}편</div>`:''}</div>`).join('');
+}
+let weekSaveTimer=null,weekFlashTimer=null;
+function autosaveWeeklyDebounced(){
+  clearTimeout(weekSaveTimer);
+  weekSaveTimer=setTimeout(saveWeekly,600);
+}
+function saveWeekly(){
+  weekSaveTimer=null;
+  saveWeeklyData(weekStartKey(currentDate),{memo:document.getElementById('weekly-memo').value,next:document.getElementById('next-week-goal').value});
+  const el=document.getElementById('save-status-week');
+  if(el){el.textContent='✓ 저장됨';el.style.opacity='1';clearTimeout(weekFlashTimer);weekFlashTimer=setTimeout(()=>{el.style.opacity='0.4';el.textContent='자동 저장';},1500);}
+}
+
+/* ── 월간 달력 ── */
+function pctColor(pct){
+  if(pct<=0)return '#f0efe9';
+  // 연속 농도: 옅은 초록(#dcf0e6) → 진한 초록(#0d7a57) 보간
+  const t=Math.min(1,Math.max(0,pct/100));
+  // 시작색 RGB (220,240,230) → 끝색 RGB (13,122,87)
+  const r=Math.round(220+(13-220)*t);
+  const g=Math.round(240+(122-240)*t);
+  const b=Math.round(230+(87-230)*t);
+  return `rgb(${r},${g},${b})`;
+}
+function pctTextColor(pct){return pct>45?'#fff':'#2f7558';}
+let monthCalMode='pct'; // 'pct' | 'posts' | 'workout' | 'read'
+let monthCalDayData=[]; // 각 날짜의 원본 데이터 캐시 (모드 전환 시 재계산 없이 다시 그리기 위함)
+function loadMonthly(){
+  const year=monthCursor.getFullYear(),month=monthCursor.getMonth();
+  document.getElementById('month-title').textContent=year+'년 '+(month+1)+'월';
+  const today=todayDate();
+  // 다음달 이동 제한
+  const nextM=new Date(year,month+1,1);
+  document.getElementById('m-next').disabled=nextM>today;
+
+  const first=new Date(year,month,1);
+  const startDay=(first.getDay()+6)%7; // 월요일 시작 오프셋
+  const daysInMonth=new Date(year,month+1,0).getDate();
+
+  monthCalDayData=[];
+  let sumPct=0,cntLogged=0,perfect=0,totalPosts=0,workoutDays=0,readDays=0;
+  for(let day=1;day<=daysInMonth;day++){
+    const d=new Date(year,month,day);
+    const dk=dateToKey(d);
+    const dd=getDailyData(dk);
+    const isFuture=d>today;
+    let entry={day,dk,isFuture,hasData:!!dd,pct:0,posts:0,didWorkout:false,didRead:false};
+    if(dd){
+      const pct=dayPct(dd,d);
+      entry.pct=pct;
+      sumPct+=pct;cntLogged++;
+      if(pct===100)perfect++;
+      entry.posts=dd.posts||0;
+      totalPosts+=entry.posts;
+      // 운동한 날: 근력 기록 또는 러닝·맨몸운동 루틴 체크
+      const didWorkout=dayDidExercise(dd);
+      entry.didWorkout=didWorkout;
+      if(didWorkout)workoutDays++;
+      // 책 읽은 날: '기상 후 독서' 체크 또는 그날 읽은 양>0
+      if(dayDidRead(dd,dk)){entry.didRead=true;readDays++;}
+    }
+    monthCalDayData.push(entry);
+  }
+
+  // 이번 달 완독한 책
+  const mPrefix=year+'-'+String(month+1).padStart(2,'0');
+  const booksDone=books.filter(b=>b.status==='done'&&b.doneDate&&b.doneDate.indexOf(mPrefix)===0).length;
+
+  document.getElementById('m-avg').textContent=cntLogged?Math.round(sumPct/cntLogged)+'%':'0%';
+  document.getElementById('m-perfect').textContent=perfect;
+  document.getElementById('m-posts').textContent=totalPosts;
+  document.getElementById('m-logged').textContent=cntLogged;
+  document.getElementById('m-workoutdays').textContent=workoutDays;
+  document.getElementById('m-readdays').textContent=readDays;
+  document.getElementById('m-booksdone').textContent=booksDone;
+
+  renderMonthCalGrid(startDay,year,month);
+  updateMonthCardActiveState();
+
+  // 현재 연속 기록(오늘 또는 표시중인 달 마지막부터 역산) — 전체 기준 streak
+  document.getElementById('m-streak').textContent=calcStreak();
+  renderMonthlyWorkout(year,month);
+}
+
+// 월간 달력을 현재 보기 모드(monthCalMode)에 맞게 그림
+function renderMonthCalGrid(startDay,year,month){
+  const grid=document.getElementById('cal-grid');
+  grid.innerHTML='';
+  for(let i=0;i<startDay;i++){const e=document.createElement('div');e.className='cal-cell empty';grid.appendChild(e);}
+  const today=todayDate();
+  monthCalDayData.forEach(entry=>{
+    const {day,dk,isFuture,hasData}=entry;
+    const cell=document.createElement('div');
+    cell.className='cal-cell';
+    if(dk===dateToKey(today))cell.className+=' today-cell';
+    if(isFuture)cell.className+=' future';
+
+    if(hasData){
+      cell.classList.add('has-data');
+      cell.onclick=()=>{currentDate=new Date(year,month,day);currentDate.setHours(0,0,0,0);closeMonthlyToDaily();};
+
+      if(monthCalMode==='pct'){
+        const pct=entry.pct;
+        cell.style.background=pctColor(pct);
+        cell.innerHTML=`<div class="cal-daynum" style="color:${pctTextColor(pct)}">${day}</div><div class="cal-pct" style="color:${pctTextColor(pct)}">${pct}%</div>`;
+        cell.title=dk+' · 달성률 '+pct+'%';
+      }else if(monthCalMode==='posts'){
+        const on=entry.posts>0;
+        cell.style.background=on?'#1D9E75':'#fafaf8';
+        const c=on?'#fff':'#ccc';
+        cell.innerHTML=`<div class="cal-daynum" style="color:${c}">${day}</div><div class="cal-pct" style="color:${c}">${on?entry.posts+'편':''}</div>`;
+        cell.title=dk+(on?' · 포스팅 '+entry.posts+'편':' · 포스팅 없음');
+      }else if(monthCalMode==='workout'){
+        const on=entry.didWorkout;
+        cell.style.background=on?'#4d96ff':'#fafaf8';
+        const c=on?'#fff':'#ccc';
+        cell.innerHTML=`<div class="cal-daynum" style="color:${c}">${day}</div><div class="cal-pct" style="color:${c}">${on?'✓':''}</div>`;
+        cell.title=dk+(on?' · 운동함':' · 운동 안함');
+      }else if(monthCalMode==='read'){
+        const on=entry.didRead;
+        cell.style.background=on?'#a9711f':'#fafaf8';
+        const c=on?'#fff':'#ccc';
+        cell.innerHTML=`<div class="cal-daynum" style="color:${c}">${day}</div><div class="cal-pct" style="color:${c}">${on?'✓':''}</div>`;
+        cell.title=dk+(on?' · 독서함':' · 독서 안함');
+      }
+    }else{
+      cell.style.background=isFuture?'transparent':'#fafaf8';
+      cell.innerHTML=`<div class="cal-daynum" style="color:#ccc">${day}</div>`;
+    }
+    grid.appendChild(cell);
+  });
+}
+// 요약 카드를 눌러 달력 표시 기준을 바꿈 (달성률 / 포스팅 / 운동 / 독서)
+function setMonthCalMode(mode){
+  monthCalMode=(monthCalMode===mode)?'pct':mode; // 같은 카드 다시 누르면 달성률로 복귀
+  const year=monthCursor.getFullYear(),month=monthCursor.getMonth();
+  const first=new Date(year,month,1);
+  const startDay=(first.getDay()+6)%7;
+  renderMonthCalGrid(startDay,year,month);
+  updateMonthCardActiveState();
+}
+function updateMonthCardActiveState(){
+  const map={posts:'m-posts',workout:'m-workoutdays',read:'m-readdays'};
+  Object.keys(map).forEach(mode=>{
+    const el=document.getElementById(map[mode]);
+    const card=el&&el.closest('.ms-card');
+    if(card)card.classList.toggle('ms-card-active',monthCalMode===mode);
+  });
+  const hint=document.getElementById('cal-mode-hint');
+  if(hint){
+    const labels={posts:'📝 포스팅한 날이 초록색으로 표시돼요',workout:'💪 운동한 날이 파란색으로 표시돼요',read:'📖 독서한 날이 갈색으로 표시돼요'};
+    if(monthCalMode==='pct'){hint.style.display='none';}
+    else{hint.style.display='block';hint.textContent=labels[monthCalMode]+' · 카드를 다시 누르면 달성률로 돌아가요';}
+  }
+}
+
+// 월간 운동 추이 선그래프 (1일~말일)
+function renderMonthlyWorkout(year,month){
+  const labels={squat:'🦵 스쿼트',pushup:'💪 푸쉬업',bicep:'💪 이두(덤벨 컬)',tricep:'💪 등(덤벨 로우)'};
+  const colors={squat:'#1D9E75',pushup:'#4d96ff',bicep:'#9b5de5',tricep:'#f15bb5'};
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  const series={},totals={};
+  WORKOUT_KEYS.forEach(k=>{series[k]=[];totals[k]=0;});
+  const runDays=[]; let runTotal=0;
+  const strengthDays=[]; let strengthTotal=0;
+  for(let day=1;day<=daysInMonth;day++){
+    const dk=dateToKey(new Date(year,month,day));
+    const dd=getDailyData(dk);
+    WORKOUT_KEYS.forEach(k=>{
+      let s=0;
+      if(dd&&dd.workout&&dd.workout[k])s=dd.workout[k].reduce((a,b)=>a+(Number(b)||0),0);
+      series[k].push(s);
+      totals[k]+=s;
+    });
+    const ran=dayCheckedBy(dd,isRunRoutine);
+    runDays.push(ran);
+    if(ran)runTotal++;
+    const didStrength=dayDidStrength(dd)||dayCheckedBy(dd,isStrengthRoutine);
+    strengthDays.push(didStrength);
+    if(didStrength)strengthTotal++;
+  }
+  const el=document.getElementById('monthly-workout');
+  const grand=WORKOUT_KEYS.reduce((a,k)=>a+totals[k],0);
+  if(grand===0&&runTotal===0&&strengthTotal===0){el.innerHTML='<div class="empty-msg">이번 달 운동 기록이 없어요</div>';return;}
+
+  const W=320,H=170,padL=28,padR=10,padT=14,padB=24;
+  const plotW=W-padL-padR, plotH=H-padT-padB;
+  const maxY=Math.max(1,...WORKOUT_KEYS.flatMap(k=>series[k]));
+  const yTicks=[0,Math.round(maxY/2),maxY].filter((v,i,a)=>a.indexOf(v)===i);
+  const n=daysInMonth;
+  const xFor=i=>padL+(plotW*(n>1?i/(n-1):0));
+  const yFor=v=>padT+plotH-(plotH*(v/maxY));
+
+  let grid='';
+  yTicks.forEach(t=>{
+    const y=yFor(t);
+    grid+=`<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#eee" stroke-width="1"/>`;
+    grid+=`<text x="${padL-5}" y="${y+3}" text-anchor="end" font-size="9" fill="#bbb">${t}</text>`;
+  });
+  // x축 날짜 라벨 (1, 주요 구간, 말일)
+  let xlabels='';
+  const markDays=[1,Math.ceil(daysInMonth/4),Math.ceil(daysInMonth/2),Math.ceil(daysInMonth*3/4),daysInMonth];
+  [...new Set(markDays)].forEach(dm=>{
+    xlabels+=`<text x="${xFor(dm-1)}" y="${H-7}" text-anchor="middle" font-size="9" fill="#aaa">${dm}</text>`;
+  });
+  let lines='';
+  WORKOUT_KEYS.forEach(k=>{
+    const pts=series[k].map((v,i)=>`${xFor(i)},${yFor(v)}`).join(' ');
+    lines+=`<polyline points="${pts}" fill="none" stroke="${colors[k]}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>`;
+    // 0이 아닌 날만 작은 점 + 횟수 레이블 (월 단위라 겹치지 않게 아주 작은 글씨)
+    series[k].forEach((v,i)=>{
+      if(v>0){
+        lines+=`<circle cx="${xFor(i)}" cy="${yFor(v)}" r="2" fill="${colors[k]}"/>`;
+        lines+=`<text x="${xFor(i)}" y="${yFor(v)-4}" text-anchor="middle" font-size="7" font-weight="600" fill="${colors[k]}">${v}</text>`;
+      }
+    });
+  });
+  const svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;height:auto">${grid}${lines}${xlabels}</svg>`;
+
+  // 러닝/근력 띠: 월 단위라 얇게, 날짜별 작은 칸으로 표시
+  const runRow='<div class="run-strip run-strip-month"><span class="run-strip-label">🏃 러닝</span><div class="run-strip-cells">'+
+    runDays.map((v,i)=>`<div class="run-cell month${v?' ran':''}" title="${i+1}일"></div>`).join('')+
+    '</div></div>';
+  const strengthRow='<div class="run-strip run-strip-month run-strip-month-last"><span class="run-strip-label">💪 근력</span><div class="run-strip-cells">'+
+    strengthDays.map((v,i)=>`<div class="run-cell month strength${v?' ran':''}" title="${i+1}일"></div>`).join('')+
+    '</div></div>';
+
+  const legend=WORKOUT_KEYS.map(k=>
+    `<div class="wwl-item">
+       <span class="wwl-dot" style="background:${colors[k]}"></span>
+       <span class="wwl-name">${labels[k]}</span>
+       <span class="wwl-total">${totals[k]}회</span>
+     </div>`).join('')+
+    `<div class="wwl-divider"></div>
+     <div class="wwl-item">
+       <span class="wwl-dot" style="background:#5DCAA5"></span>
+       <span class="wwl-name">🏃 러닝</span>
+       <span class="wwl-total">${runTotal}일</span>
+     </div>
+     <div class="wwl-item">
+       <span class="wwl-dot" style="background:#4d96ff"></span>
+       <span class="wwl-name">💪 근력</span>
+       <span class="wwl-total">${strengthTotal}일</span>
+     </div>`;
+  el.innerHTML=`<div class="ww-chart">${svg}</div>${runRow}${strengthRow}<div class="ww-legend">${legend}</div>`;
+}
+function calcStreak(){
+  let streak=0;
+  let d=todayDate();
+  if(!getDailyData(dateToKey(d))) d.setDate(d.getDate()-1);
+  for(let i=0;i<400;i++){
+    const dd=getDailyData(dateToKey(d));
+    const rs=routinesFor(modeForDate(d,dd));
+    if(dd && rs.some(r=>getChecksMap(dd)[r.id])){streak++;d.setDate(d.getDate()-1);}
+    else break;
+  }
+  return streak;
+}
+function moveMonth(dir){
+  const m=new Date(monthCursor);m.setMonth(m.getMonth()+dir);
+  const today=todayDate();
+  if(new Date(m.getFullYear(),m.getMonth(),1)>today)return;
+  monthCursor=m;loadMonthly();
+}
+let goalsOpen=false, booksOpen=false, workoutOpen=false;
+let workoutCursor=new Date(); workoutCursor.setDate(1); workoutCursor.setHours(0,0,0,0);
+const TAB_ORDER=['daily','weekly','monthly'];
+// 현재 탭(currentTab)에 맞게 일간/주간/월간 화면 표시
+function applyTabView(){
+  document.querySelectorAll('#main-tabs .tab').forEach((t,i)=>{t.className='tab'+(TAB_ORDER[i]===currentTab?' active':'');});
+  monthlyOpen=(currentTab==='monthly');
+  document.getElementById('date-nav').style.display=currentTab==='daily'?'flex':'none';
+  document.getElementById('daily-view').style.display=currentTab==='daily'?'block':'none';
+  document.getElementById('weekly-view').style.display=currentTab==='weekly'?'block':'none';
+  document.getElementById('monthly-view').style.display=currentTab==='monthly'?'block':'none';
+}
+function showTabsView(){
+  // 일간/주간/월간 탭 화면으로 복귀
+  goalsOpen=false;booksOpen=false;workoutOpen=false;
+  document.getElementById('goal-badge').classList.remove('active');
+  document.getElementById('book-badge').classList.remove('active');
+  document.getElementById('workout-badge').classList.remove('active');
+  document.getElementById('goals-view').style.display='none';
+  document.getElementById('books-view').style.display='none';
+  document.getElementById('workout-view').style.display='none';
+  document.getElementById('all-books-view').style.display='none';
+  document.getElementById('main-tabs').style.display='flex';
+  applyTabView();
+}
+function hideTabsView(){
+  monthlyOpen=false;
+  document.getElementById('main-tabs').style.display='none';
+  document.getElementById('date-nav').style.display='none';
+  document.getElementById('daily-view').style.display='none';
+  document.getElementById('weekly-view').style.display='none';
+  document.getElementById('monthly-view').style.display='none';
+}
+function closeAllOverlays(){
+  goalsOpen=false;booksOpen=false;workoutOpen=false;
+  document.getElementById('goal-badge').classList.remove('active');
+  document.getElementById('book-badge').classList.remove('active');
+  document.getElementById('workout-badge').classList.remove('active');
+  document.getElementById('goals-view').style.display='none';
+  document.getElementById('books-view').style.display='none';
+  document.getElementById('workout-view').style.display='none';
+  document.getElementById('all-books-view').style.display='none';
+}
+function toggleGoals(){
+  if(goalsOpen){showTabsView();return;}
+  hideTabsView();closeAllOverlays();
+  goalsOpen=true;
+  document.getElementById('goal-badge').classList.add('active');
+  document.getElementById('goals-view').style.display='block';
+  renderGoals();
+  renderRoadmap();
+  renderRetire();
+}
+function toggleBooks(){
+  if(booksOpen){showTabsView();return;}
+  hideTabsView();closeAllOverlays();
+  booksOpen=true;
+  document.getElementById('book-badge').classList.add('active');
+  document.getElementById('books-view').style.display='block';
+  renderBookShelf();
+}
+function toggleWorkout(){
+  if(workoutOpen){showTabsView();return;}
+  hideTabsView();closeAllOverlays();
+  workoutOpen=true;
+  document.getElementById('workout-badge').classList.add('active');
+  document.getElementById('workout-view').style.display='block';
+  workoutCursor=new Date(currentDate.getFullYear(),currentDate.getMonth(),1);
+  loadWorkoutCalendar();
+}
+function moveWorkoutMonth(dir){
+  const m=new Date(workoutCursor);m.setMonth(m.getMonth()+dir);
+  const today=todayDate();
+  if(new Date(m.getFullYear(),m.getMonth(),1)>today)return;
+  workoutCursor=m;loadWorkoutCalendar();
+}
+// 운동 달력: 각 날짜에 운동별 색 점 표시
+function loadWorkoutCalendar(){
+  const year=workoutCursor.getFullYear(),month=workoutCursor.getMonth();
+  document.getElementById('workout-month-title').textContent=year+'년 '+(month+1)+'월';
+  const today=todayDate();
+  document.getElementById('wo-next').disabled=(new Date(year,month+1,1)>today);
+  const grid=document.getElementById('wo-cal-grid');
+  grid.innerHTML='';
+  const first=new Date(year,month,1);
+  let startDow=first.getDay(); startDow=(startDow===0)?6:startDow-1; // 월요일 시작
+  const daysInMonth=new Date(year,month+1,0).getDate();
+  for(let i=0;i<startDow;i++){
+    const e=document.createElement('div');e.className='wo-cal-cell empty';grid.appendChild(e);
+  }
+  // 운동 종류별 색
+  const woColors={squat:'#1D9E75',pushup:'#4d96ff',bicep:'#9b5de5',tricep:'#f15bb5'};
+  const totals={squat:0,pushup:0,bicep:0,tricep:0,run:0};
+  const daysActive={squat:0,pushup:0,bicep:0,tricep:0,run:0};
+  for(let day=1;day<=daysInMonth;day++){
+    const d=new Date(year,month,day);
+    const dk=dateToKey(d);
+    const dd=getDailyData(dk);
+    const isFuture=d>today;
+    const cell=document.createElement('div');
+    cell.className='wo-cal-cell';
+    if(dk===dateToKey(today))cell.className+=' today-cell';
+    if(isFuture)cell.className+=' future';
+    let dots='';
+    if(dd){
+      // 근력 운동
+      WORKOUT_KEYS.forEach(k=>{
+        const sets=dd.workout&&dd.workout[k];
+        const sum=sets?sets.reduce((a,b)=>a+(Number(b)||0),0):0;
+        if(sum>0){dots+=`<span class="wo-dot-sm" style="background:${woColors[k]}"></span>`;totals[k]+=sum;daysActive[k]++;}
+      });
+      // 러닝 (루틴 체크) — 점 대신 칸 배경을 밝은 녹색으로 채움
+      const cm=getChecksMap(dd);
+      if(cm['r_run']){cell.classList.add('ran');totals.run++;daysActive.run++;}
+      if(dots||cm['r_run'])cell.classList.add('has-data');
+    }
+    if(!isFuture){
+      cell.classList.add('has-data');
+      cell.onclick=()=>{currentDate=new Date(year,month,day);currentDate.setHours(0,0,0,0);closeWorkoutToDaily();};
+    }
+    cell.innerHTML=`<div class="wo-cal-daynum">${day}</div><div class="wo-dots">${dots}</div>`;
+    grid.appendChild(cell);
+  }
+  // 요약
+  const labels={squat:'🦵 스쿼트',pushup:'💪 푸쉬업',bicep:'💪 이두(덤벨 컬)',tricep:'💪 등(덤벨 로우)',run:'🏃 러닝'};
+  const colors={squat:'#1D9E75',pushup:'#4d96ff',bicep:'#9b5de5',tricep:'#f15bb5',run:'#5DCAA5'};
+  const order=['squat','pushup','bicep','tricep','run'];
+  let html='';
+  order.forEach(k=>{
+    const valTxt=(k==='run')?(totals.run+'회'):(totals[k]+'회');
+    html+=`<div class="wo-sum-row">
+       <span class="wo-sum-name"><span class="wo-dot" style="background:${colors[k]}"></span>${labels[k]}</span>
+       <span class="wo-sum-days">${daysActive[k]}일</span>
+       <span class="wo-sum-val">${valTxt}</span>
+     </div>`;
+  });
+  document.getElementById('wo-month-summary').innerHTML=html;
+}
+function closeWorkoutToDaily(){
+  currentTab='daily';
+  showTabsView();
+  loadDaily();updateDateNav();
+}
+function closeMonthlyToDaily(){
+  currentTab='daily';
+  showTabsView();
+  loadDaily();updateDateNav();
+}
+
+/* ── 탭 ── */
+function switchTab(tab){
+  currentTab=tab;
+  applyTabView();
+  if(tab==='weekly')loadWeekly();
+  if(tab==='monthly'){monthCursor=new Date(currentDate.getFullYear(),currentDate.getMonth(),1);loadMonthly();}
+  if(tab==='daily')setTimeout(refreshIdeaFolds,0); // 화면에 보인 뒤 3줄 여부 재계산
+}
+
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg||'저장됐어요 ✓';t.className='toast show';setTimeout(()=>{t.className='toast';},2500);}
+
+/* ── 데이터 백업 (내보내기/불러오기) ── */
+function collectAllRetroData(){
+  const data={};
+  for(let i=0;i<localStorage.length;i++){
+    const key=localStorage.key(i);
+    if(key && key.indexOf('retro_')===0){
+      try{ data[key]=localStorage.getItem(key); }catch(e){}
+    }
+  }
+  return data;
+}
+function exportBackup(){
+  const data=collectAllRetroData();
+  const payload={
+    app:'retro-note-backup',
+    version:1,
+    exportedAt:new Date().toISOString(),
+    data
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  const today=dateToKey(todayDate());
+  a.href=url;
+  a.download='retro_backup_'+today+'.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  flashBackupStatus('✓ 백업 파일이 다운로드됐어요');
+}
+function importBackup(evt){
+  const file=evt.target.files && evt.target.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const payload=JSON.parse(e.target.result);
+      const data=payload && payload.data ? payload.data : null;
+      if(!data || typeof data!=='object'){
+        flashBackupStatus('⚠️ 올바른 백업 파일이 아니에요',true);
+        return;
+      }
+      const keys=Object.keys(data).filter(k=>k.indexOf('retro_')===0);
+      if(!keys.length){
+        flashBackupStatus('⚠️ 복원할 데이터가 없어요',true);
+        return;
+      }
+      if(!confirm('현재 기기의 회고 기록을 백업 파일 내용으로 덮어씁니다. 계속할까요?')){
+        evt.target.value='';
+        return;
+      }
+      keys.forEach(k=>{
+        try{ localStorage.setItem(k, data[k]); }catch(err){}
+      });
+      // 메모리 상태 갱신
+      reloadAllFromStorage();
+      flashBackupStatus('✓ 복원 완료! '+keys.length+'개 항목 불러왔어요');
+      showToast('백업이 복원됐어요 ✓');
+    }catch(err){
+      flashBackupStatus('⚠️ 파일을 읽지 못했어요',true);
+    }
+    evt.target.value='';
+  };
+  reader.readAsText(file);
+}
+function flashBackupStatus(msg,isWarn){
+  const el=document.getElementById('backup-status');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.color=isWarn?'#c0392b':'#1D9E75';
+  el.style.opacity='1';
+  setTimeout(()=>{el.style.opacity='0';},3500);
+}
+
+// 폭죽 효과 (canvas, 라이브러리 불필요)
+function launchConfetti(){
+  let canvas=document.getElementById('confetti-canvas');
+  if(!canvas){
+    canvas=document.createElement('canvas');
+    canvas.id='confetti-canvas';
+    canvas.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';
+    document.body.appendChild(canvas);
+  }
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const colors=['#1D9E75','#5DCAA5','#ffc107','#ff6b6b','#4d96ff','#9b5de5','#f15bb5'];
+  const N=140;
+  const parts=[];
+  for(let i=0;i<N;i++){
+    parts.push({
+      x:canvas.width/2+(Math.random()-0.5)*120,
+      y:canvas.height*0.35+(Math.random()-0.5)*60,
+      vx:(Math.random()-0.5)*14,
+      vy:Math.random()*-13-4,
+      size:Math.random()*7+4,
+      color:colors[Math.floor(Math.random()*colors.length)],
+      rot:Math.random()*Math.PI,
+      vr:(Math.random()-0.5)*0.35,
+      life:1
+    });
+  }
+  let frame=0;
+  function tick(){
+    frame++;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    parts.forEach(p=>{
+      p.vy+=0.32; // 중력
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+      p.vx*=0.99;
+      if(frame>50)p.life-=0.02;
+      if(p.life>0 && p.y<canvas.height+20){
+        alive=true;
+        ctx.save();
+        ctx.globalAlpha=Math.max(0,p.life);
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle=p.color;
+        ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.6);
+        ctx.restore();
+      }
+    });
+    if(alive)requestAnimationFrame(tick);
+    else ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+  tick();
+  // 짧은 축하 메시지
+  showToast('🎉 오늘 루틴 100% 달성!');
+}
+function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function escapeAttr(s){return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+// 모달 바깥 클릭 닫기
+document.getElementById('routine-modal').addEventListener('click',e=>{if(e.target.id==='routine-modal')closeRoutineEditor();});
+document.getElementById('identity-modal').addEventListener('click',e=>{if(e.target.id==='identity-modal')closeIdentityEditor();});
+document.getElementById('goal-modal').addEventListener('click',e=>{if(e.target.id==='goal-modal')closeGoalEditor();});
+document.getElementById('roadmap-modal').addEventListener('click',e=>{if(e.target.id==='roadmap-modal')closeRoadmapEditor();});
+document.getElementById('retire-modal').addEventListener('click',e=>{if(e.target.id==='retire-modal')closeRetireEditor();});
+document.getElementById('quote-modal').addEventListener('click',e=>{if(e.target.id==='quote-modal')closeQuoteEditor();});
+document.getElementById('idea-modal').addEventListener('click',e=>{if(e.target.id==='idea-modal')closeIdeaEditor();});
+document.getElementById('book-modal').addEventListener('click',e=>{if(e.target.id==='book-modal')closeBookManager();});
+document.getElementById('review-modal').addEventListener('click',e=>{if(e.target.id==='review-modal')closeDoneReview();});
+document.getElementById('reading-modal').addEventListener('click',e=>{if(e.target.id==='reading-modal')closeReadingModal();});
+document.getElementById('month-books-modal').addEventListener('click',e=>{if(e.target.id==='month-books-modal')closeMonthBooks();});
+
+/* ── 저장소 내용을 화면에 다시 반영 (백업 복원·동기화 공용) ── */
+function reloadAllFromStorage(){
+  routines=loadRoutines();
+  routinesWeekend=loadRoutinesWeekend();
+  identity=loadIdentity();
+  goals=loadGoals();
+  roadmap=loadRoadmap();
+  retire=loadRetire();
+  quoteText=loadQuote();
+  books=loadBooks();
+  ideas=loadIdeas();
+  threadIdeas=loadThreadIdeas();
+  renderIdentity();
+  renderQuote();
+  renderIdeaChips();
+  loadDaily();
+  updateDateNav();
+  if(currentTab==='weekly'&&document.getElementById('weekly-view').style.display!=='none')loadWeekly();
+  if(monthlyOpen)loadMonthly();
+  if(booksOpen)renderBookShelf();
+  if(goalsOpen){renderGoals();renderRoadmap();renderRetire();}
+  if(workoutOpen)loadWorkoutCalendar();
+  const aiv=document.getElementById('all-ideas-view');
+  if(aiv&&aiv.style.display!=='none')renderAllIdeasList();
+}
+
+/* ── 기기 간 동기화 (Google Apps Script + 구글 드라이브) ──
+   - 'retro_'로 시작하는 키마다 수정 시각을 기록하고, 키 단위로 "나중에 고친 쪽"이 이김
+   - 동기화용 정보는 'sync_' 키에 따로 보관 (백업 파일에는 들어가지 않음) */
+const SYNC={applying:false,busy:false,again:false,timer:null};
+const _lsGet=Storage.prototype.getItem;
+const _lsSet=Storage.prototype.setItem;
+const _lsRemove=Storage.prototype.removeItem;
+function _isLS(s){try{return s===window.localStorage;}catch(e){return false;}}
+function _syncRead(k,fb){try{const v=_lsGet.call(localStorage,k);return v?JSON.parse(v):fb;}catch(e){return fb;}}
+function _syncWrite(k,v){try{_lsSet.call(localStorage,k,JSON.stringify(v));}catch(e){}}
+let syncMeta=_syncRead('sync_meta',{});    // {키: 수정시각}
+let syncDirty=_syncRead('sync_dirty',{});  // {키: 수정시각} 아직 올리지 않은 변경
+let syncConfig=_syncRead('sync_config',null); // {url, token}
+
+function markSyncDirty(k){
+  const t=Math.max(Date.now(),(syncMeta[k]||0)+1);
+  syncMeta[k]=t; syncDirty[k]=t;
+  _syncWrite('sync_meta',syncMeta); _syncWrite('sync_dirty',syncDirty);
+  scheduleSync(3000);
+}
+// 모든 저장을 가로채서 변경된 키를 표시
+Storage.prototype.setItem=function(k,v){
+  const track=_isLS(this)&&!SYNC.applying&&typeof k==='string'&&k.indexOf('retro_')===0;
+  const prev=track?_lsGet.call(this,k):null;
+  _lsSet.call(this,k,v);
+  if(track&&prev!==String(v))markSyncDirty(k);
+};
+Storage.prototype.removeItem=function(k){
+  const track=_isLS(this)&&!SYNC.applying&&typeof k==='string'&&k.indexOf('retro_')===0;
+  _lsRemove.call(this,k);
+  if(track)markSyncDirty(k);
+};
+
+function syncEnabled(){return !!(syncConfig&&syncConfig.url&&syncConfig.token);}
+function scheduleSync(ms){
+  if(!syncEnabled())return;
+  clearTimeout(SYNC.timer);
+  SYNC.timer=setTimeout(()=>syncNow(false),ms);
+}
+function setSyncStatus(msg,isWarn){
+  const el=document.getElementById('sync-status');
+  if(el){el.textContent=msg;el.style.color=isWarn?'#c0392b':'#888';}
+  const badge=document.getElementById('sync-badge');
+  if(badge){
+    badge.style.display=syncEnabled()?'flex':'none';
+    badge.title=msg;
+    badge.textContent=isWarn?'⚠️':(SYNC.busy?'⏳':'☁️');
+  }
+}
+function fmtTime(ms){
+  const d=new Date(ms);
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+// 입력 중이던 글(디바운스 대기)은 동기화 전에 먼저 저장
+function flushPendingSaves(){
+  if(saveTimer){clearTimeout(saveTimer);autosaveDaily();}
+  if(weekSaveTimer){clearTimeout(weekSaveTimer);saveWeekly();}
+}
+async function syncNow(manual){
+  if(!syncEnabled()){if(manual)showToast('동기화 주소와 비밀번호를 먼저 저장해주세요');return;}
+  if(SYNC.busy){SYNC.again=true;return;}
+  SYNC.busy=true; setSyncStatus('동기화 중…');
+  try{
+    flushPendingSaves();
+    const since=_syncRead('sync_since',0);
+    const firstSync=!since;
+    const sent=Object.assign({},syncDirty);
+    const changes={};
+    Object.keys(sent).forEach(k=>{
+      changes[k]={v:_lsGet.call(localStorage,k),t:sent[k]};
+    });
+    const res=await fetch(syncConfig.url,{
+      method:'POST',
+      body:JSON.stringify({token:syncConfig.token,since,changes}) // text/plain 전송 (CORS 사전요청 회피)
+    });
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const out=await res.json();
+    if(!out.ok)throw new Error(out.error==='unauthorized'?'비밀번호가 맞지 않아요':(out.error||'서버 오류'));
+    // 올린 변경은 대기 목록에서 제거 (전송 중에 또 고친 키는 남겨둠)
+    Object.keys(sent).forEach(k=>{if(syncDirty[k]===sent[k])delete syncDirty[k];});
+    _syncWrite('sync_dirty',syncDirty);
+    // 서버에서 받은 더 새로운 기록 반영
+    let applied=0;
+    const data=out.data||{};
+    SYNC.applying=true;
+    try{
+      Object.keys(data).forEach(k=>{
+        if(k.indexOf('retro_')!==0)return;
+        const r=data[k], local=syncMeta[k]||0;
+        if(syncDirty[k])return; // 아직 못 올린 더 최신 로컬 변경이 있으면 유지
+        if(r.t>local||(firstSync&&r.t>=local)){
+          if(_lsGet.call(localStorage,k)===(r.v===undefined?null:r.v)){syncMeta[k]=r.t;return;} // 이미 같은 내용
+          if(r.v===null||r.v===undefined)_lsRemove.call(localStorage,k);
+          else _lsSet.call(localStorage,k,r.v);
+          syncMeta[k]=r.t; applied++;
+        }
+      });
+    }finally{SYNC.applying=false;}
+    _syncWrite('sync_meta',syncMeta);
+    _syncWrite('sync_since',out.serverTime||since);
+    _syncWrite('sync_last',Date.now());
+    if(applied)reloadAllFromStorage();
+    SYNC.busy=false;
+    setSyncStatus('✓ 마지막 동기화 '+fmtTime(Date.now())+(applied?' · '+applied+'개 항목 받음':''));
+    if(manual)showToast(applied?'☁️ 다른 기기 기록을 가져왔어요':'☁️ 동기화 완료');
+  }catch(err){
+    SYNC.busy=false;
+    const msg=(err&&err.message)||'연결 실패';
+    setSyncStatus('⚠️ 동기화 실패: '+msg,true);
+    if(manual)showToast('동기화 실패: '+msg);
+  }
+  if(SYNC.again){SYNC.again=false;scheduleSync(500);}
+}
+function loadSyncConfigToForm(){
+  const u=document.getElementById('sync-url'), t=document.getElementById('sync-token');
+  if(u)u.value=(syncConfig&&syncConfig.url)||'';
+  if(t)t.value=(syncConfig&&syncConfig.token)||'';
+  const last=_syncRead('sync_last',0);
+  if(syncEnabled())setSyncStatus(last?'마지막 동기화 '+fmtTime(last):'아직 동기화하지 않았어요');
+  else setSyncStatus('연결되지 않음');
+}
+function saveSyncConfig(){
+  const url=document.getElementById('sync-url').value.trim();
+  const token=document.getElementById('sync-token').value.trim();
+  if(!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)){showToast('Apps Script 웹 앱 주소를 확인해주세요');return;}
+  if(!token){showToast('비밀번호를 입력해주세요');return;}
+  const changed=!syncConfig||syncConfig.url!==url;
+  syncConfig={url,token};
+  _syncWrite('sync_config',syncConfig);
+  if(changed){
+    // 새 저장소에 처음 연결: 이 기기의 기록을 전부 올릴 대상으로 표시
+    _syncWrite('sync_since',0);
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k&&k.indexOf('retro_')===0&&!syncDirty[k]){
+        if(!syncMeta[k])syncMeta[k]=1; // 기존 기록은 '오래된 것'으로 간주
+        syncDirty[k]=syncMeta[k];
+      }
+    }
+    _syncWrite('sync_meta',syncMeta);_syncWrite('sync_dirty',syncDirty);
+  }
+  showToast('동기화 설정이 저장됐어요 ✓');
+  syncNow(true);
+}
+function clearSyncConfig(){
+  if(!confirm('이 기기의 동기화 연결을 해제할까요?\n기록은 그대로 남고, 자동 동기화만 멈춰요.'))return;
+  syncConfig=null;
+  _lsRemove.call(localStorage,'sync_config');
+  _lsRemove.call(localStorage,'sync_since');
+  clearTimeout(SYNC.timer);
+  loadSyncConfigToForm();
+  showToast('동기화 연결을 해제했어요');
+}
+// 앱으로 돌아올 때 받아오고, 나갈 때 올리기
+document.addEventListener('visibilitychange',()=>{
+  if(!syncEnabled())return;
+  if(document.visibilityState==='visible')scheduleSync(300);
+  else{flushPendingSaves();if(Object.keys(syncDirty).length)syncNow(false);}
+});
+window.addEventListener('online',()=>scheduleSync(500));
+setInterval(()=>{if(syncEnabled()&&document.visibilityState==='visible')syncNow(false);},120000);
+
+// 초기화
+updateDateNav();
+renderIdentity();
+renderQuote();
+renderIdeaChips();
+loadDaily();
+loadSyncConfigToForm();
+if(syncEnabled())scheduleSync(800);
+</script>
+</body>
+</html>
