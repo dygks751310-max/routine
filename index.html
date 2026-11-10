@@ -9,7 +9,12 @@
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans KR',sans-serif;background:#f5f4f0;color:#1a1a1a;min-height:100vh;padding:24px 16px}
   .container{max-width:640px;margin:0 auto}
   .top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  h1{font-size:22px;font-weight:600;color:#1a1a1a}
+  h1{font-size:22px;font-weight:600;color:#1a1a1a;white-space:nowrap}
+  .title-wrap{display:flex;align-items:baseline;gap:8px;min-width:0;flex-wrap:wrap}
+  .head-sync{font-size:11px;color:#aaa;cursor:pointer;white-space:nowrap}
+  .head-sync:empty{display:none}
+  .head-sync.busy{color:#1D9E75}
+  .head-sync.warn{color:#c0392b}
   .cal-badge{width:40px;height:40px;border-radius:11px;border:1.5px solid #e0ddd5;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;transition:all 0.15s;flex-shrink:0}
   .cal-badge:hover{background:#f0faf5;border-color:#5DCAA5}
   .cal-badge.active{background:#1D9E75;border-color:#1D9E75}
@@ -63,8 +68,8 @@
   .backup-btn:hover{background:#f5f4f0;border-color:#bbb}
   .backup-btn:active{transform:scale(0.98)}
   .section-title{font-size:12px;font-weight:600;color:#999;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:6px}
-  .section-title .edit-link,.idea-head .edit-link{margin-left:auto;font-size:11px;color:#1D9E75;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;padding:3px 8px;border-radius:6px;border:1px solid #b8e8d4;background:#f0faf5;transition:all 0.15s}
-  .section-title .edit-link:hover{background:#d4f0e4}
+  .section-title .edit-link,.idea-head .edit-link,.tp-head .edit-link{margin-left:auto;font-size:11px;color:#1D9E75;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;padding:3px 8px;border-radius:6px;border:1px solid #b8e8d4;background:#f0faf5;transition:all 0.15s}
+  .section-title .edit-link:hover,.idea-head .edit-link:hover,.tp-head .edit-link:hover{background:#d4f0e4}
   .routine-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f2f2f0}
   .edit-dow-row{display:flex;align-items:center;gap:8px;padding:0 0 12px 38px;margin-top:-4px}
   .edit-dow-label{font-size:11px;color:#999;flex-shrink:0}
@@ -154,6 +159,86 @@
   .rd-pill-lbl{font-size:11px;color:#999;margin-top:2px}
   .rdm-empty{font-size:13px;color:#999;line-height:1.6;padding:6px 0 4px}
   .modal-title-actions{display:flex;align-items:center;gap:6px}
+  .tp-card{margin-top:14px;padding:14px;border-radius:12px;background:#fafaf7;border:1.5px solid #efede6}
+  .tp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .tp-title{font-size:12px;font-weight:600;color:#888}
+  .tp-badges{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+  .tp-badge,.tp-group{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+  .tp-badge.fix{background:#1a1a1a;color:#fff}
+  .tp-badge.flex{background:#eceae3;color:#666}
+  .tp-badge.free{background:#E7F6EF;color:#0d6b47}
+  .tp-msg{font-size:15px;color:#1a1a1a;line-height:1.5}
+  .tp-msg b{color:#0d6b47}
+  .tp-tip{font-size:12px;color:#999;margin-top:4px;line-height:1.5}
+  .tp-actions{display:flex;gap:8px;margin-top:12px}
+  .tp-btn{flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #e0ddd4;background:#fff;font-size:13px;font-weight:600;color:#555;cursor:pointer;font-family:inherit}
+  .tp-btn.main{background:#1D9E75;border-color:#1D9E75;color:#fff}
+  .tp-btn:hover{filter:brightness(0.97)}
+  .tp-done{margin-top:12px;padding:10px 12px;border-radius:10px;background:#E7F6EF;color:#0d6b47;font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+  .tp-done small{font-weight:500;color:#3f9a73}
+  .tp-undo{margin-left:auto;font-size:12px;font-weight:500;color:#888;cursor:pointer;text-decoration:underline}
+  .tp-others{margin-top:10px}
+  .tp-others-lbl{font-size:11px;color:#aaa;margin-bottom:4px}
+  .tp-other{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#0d6b47;background:#f0faf5;border-radius:16px;padding:4px 10px;margin:0 4px 4px 0}
+  .tp-other small{color:#7bb89c}
+  .tp-x{cursor:pointer;color:#aaa;font-size:14px;margin-left:2px}
+  .pa-lbl{font-size:12px;color:#999;margin:12px 0 4px;font-weight:600}
+  .pa-item{display:flex;align-items:center;gap:8px;padding:9px 6px;border-bottom:1px solid #f0efe9;cursor:pointer;border-radius:8px;font-size:13px}
+  .pa-item:hover{background:#f8f7f3}
+  .pa-date{color:#999;font-size:12px;width:62px;flex-shrink:0}
+  .pa-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .pa-name{color:#1a1a1a}
+  .bg-strip{display:flex;align-items:center;gap:8px}
+  .bg-strip-lbl{font-size:12px;color:#555;font-weight:600;white-space:nowrap;width:44px;flex-shrink:0}
+  .bg-days{display:flex;gap:2px;flex:1;min-width:0}
+  .bg-day{flex:1;height:22px;min-width:0;border-radius:4px;background:#f0efe9;cursor:pointer;transition:transform .1s}
+  .bg-day:hover{transform:scaleY(1.15);box-shadow:0 0 0 1.5px #c9c6bc}
+  .bg-day.on{background:#1D9E75}
+  .bg-day.today{box-shadow:0 0 0 1.5px #1a1a1a}
+  .bg-day.future{background:#f7f6f2;cursor:default}
+  .bg-day.future:hover{transform:none;box-shadow:none}
+  .bg-axis{display:flex;gap:2px;margin-top:3px}
+  .bg-axis span{flex:1;min-width:0;text-align:center;font-size:9px;color:#bbb;overflow:visible;white-space:nowrap}
+  .bg-axis span.t{color:#1a1a1a;font-weight:800}
+  .bg-sub{display:flex;justify-content:space-between;font-size:12px;color:#999;margin:14px 0 6px;font-weight:600}
+  .bg-chart{display:flex;align-items:flex-end;gap:3px;height:130px;padding:0 2px;border-bottom:1.5px solid #ebe9e2}
+  .bg-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;cursor:default}
+  .bg-bar{width:100%;max-width:26px;background:#1D9E75;border-radius:4px 4px 0 0;min-height:0;transition:height .3s}
+  .bg-bar.zero{background:#ebe9e2;height:3px !important}
+  .bg-bar.future{background:#f3f2ee;height:3px !important}
+  .bg-val{font-size:10px;color:#0d6b47;font-weight:700;margin-bottom:2px;height:13px}
+  .bg-lbl{font-size:9px;color:#aaa;margin-top:4px;height:12px;white-space:nowrap}
+  .bg-col.today .bg-lbl{color:#1a1a1a;font-weight:800}
+  .bg-col.today .bg-bar{background:#0d6b47}
+  .bg-chart.monthly .bg-bar{max-width:34px}
+  .bg-chart.monthly .bg-lbl{font-size:10px}
+  .pc-nav{display:flex;align-items:center;justify-content:center;gap:16px;font-size:15px;font-weight:700;margin-bottom:10px}
+  .pc-summary{display:flex;gap:6px;margin-bottom:10px}
+  .pc-sum{flex:1;background:#f8f7f3;border-radius:10px;padding:8px;text-align:center;font-size:11px;color:#999}
+  .pc-sum b{display:block;font-size:18px;color:#1a1a1a}
+  .pc-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+  .pc-wd{text-align:center;font-size:11px;color:#aaa;padding:2px 0}
+  .pc-cell{min-height:64px;border-radius:8px;padding:4px 5px;background:var(--gbg,#f5f4f0);border-left:3px solid var(--gc,#ddd);cursor:pointer;position:relative;overflow:hidden}
+  .pc-cell.empty{background:none;border:none;cursor:default}
+  .pc-cell.fix{box-shadow:inset 0 0 0 1.5px var(--gc,#ccc)}
+  .pc-cell.today{outline:2px solid #1a1a1a;outline-offset:1px}
+  .pc-cell.done{opacity:0.55}
+  .pc-cell.missed .pc-num{color:#d9534f}
+  .pc-cell.missed::after{content:'미작성';position:absolute;right:4px;bottom:3px;font-size:9px;color:#d9534f;font-weight:600}
+  .pc-top{display:flex;justify-content:space-between;align-items:center}
+  .pc-num{font-size:11px;font-weight:700;color:#555}
+  .pc-pin{font-size:9px}
+  .pc-name{font-size:10px;line-height:1.25;color:var(--gc,#888);font-weight:600;margin-top:2px;overflow-wrap:anywhere;word-break:break-all}
+  .pc-done{font-size:11px;font-weight:800;color:#0d6b47;margin-top:2px}
+  .pc-cell.done{opacity:1;background:repeating-linear-gradient(135deg,var(--gbg,#f5f4f0) 0 5px,color-mix(in srgb,var(--gc,#999) 28%,transparent) 5px 7px)}
+  .pc-cell.done .pc-name{color:var(--gc,#888);text-decoration:line-through;text-decoration-thickness:1.5px}
+  .pc-extra{font-size:9px;color:#888}
+  .pc-legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:11px;color:#888;margin-top:12px}
+  .pc-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+  .pc-lg-done{color:#0d6b47;font-weight:700}
+  .pc-legend i.pc-hatch{width:12px;height:12px;border-radius:3px;background:repeating-linear-gradient(135deg,#E7F6EF 0 3px,#8fcfb2 3px 5px);border:1px solid #8fcfb2}
+  .pc-lg-miss{color:#d9534f;font-weight:600}
+  @media(max-width:480px){.pc-cell{min-height:56px;padding:3px}.pc-name{font-size:9px}}
   .modal-mini-btn{height:30px;padding:0 10px;border:1.5px solid #b8e8d4;background:#f0faf5;color:#0d6b47;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
   .modal-mini-btn:hover{background:#e1f5ec}
   .modal-foot{display:flex;justify-content:center;gap:14px;margin-top:10px;flex-wrap:wrap}
@@ -466,15 +551,31 @@
   .ms-lbl{font-size:11px;color:#999;margin-top:3px}
   .cal-legend{display:flex;align-items:center;gap:6px;margin-top:14px;justify-content:center;font-size:11px;color:#aaa}
   .cal-legend-box{width:16px;height:16px;border-radius:4px;border:1px solid #f0efe9}
+  /* ── 바탕화면 위젯 모드 (?widget) ── */
+  body.widget{padding:16px 20px}
+  body.widget .container{max-width:1600px}
+  body.widget #daily-view,body.widget #weekly-view,body.widget #monthly-view,
+  body.widget #goals-view,body.widget #books-view,body.widget #workout-view,body.widget #blog-view{columns:400px;column-gap:16px}
+  body.widget #daily-view>*,body.widget #weekly-view>*,body.widget #monthly-view>*,
+  body.widget #goals-view>*,body.widget #books-view>*,body.widget #workout-view>*,body.widget #blog-view>*{break-inside:avoid;-webkit-column-break-inside:avoid}
+  .wscroll{display:none;position:fixed;right:18px;bottom:18px;z-index:1500;flex-direction:column;gap:8px}
+  body.widget .wscroll{display:flex}
+  .wscroll button{width:52px;height:52px;border-radius:14px;border:1.5px solid #e0ddd4;background:rgba(255,255,255,0.95);font-size:20px;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.08);color:#444}
+  .wscroll button:hover{background:#f0faf5;border-color:#5DCAA5}
   @media(max-width:480px){.week-stat-grid,.month-summary{grid-template-columns:repeat(3,1fr)}.stat-num,.ms-num{font-size:18px}.heatmap-table td.routine-name{max-width:80px;font-size:10px}.cal-daynum{font-size:10px}.cal-pct{font-size:8px}}
 </style>
 </head>
 <body>
+<div class="wscroll" aria-hidden="true">
+  <button onclick="widgetScroll(-1)" title="위로">▲</button>
+  <button onclick="widgetScroll(1)" title="아래로">▼</button>
+</div>
 <div class="container">
   <div class="top-row">
-    <h1>루틴 기록기</h1>
+    <div class="title-wrap"><h1>루틴 기록기</h1><span class="head-sync" id="head-sync" onclick="syncNow(true)" title="눌러서 지금 동기화"></span></div>
     <div style="display:flex;gap:8px">
       <button class="cal-badge" id="sync-badge" onclick="syncNow(true)" title="동기화" style="display:none;font-size:18px">☁️</button>
+      <button class="cal-badge" id="blog-badge" onclick="toggleBlog()" title="블로그">📝</button>
       <button class="cal-badge" id="workout-badge" onclick="toggleWorkout()" title="운동 기록">💪</button>
       <button class="cal-badge" id="book-badge" onclick="toggleBooks()" title="책장">📚</button>
       <button class="cal-badge" id="goal-badge" onclick="toggleGoals()" title="올해 목표">🎯</button>
@@ -523,6 +624,7 @@
         <button class="counter-btn" onclick="changeCount(1)">+</button>
         <span class="counter-label">편 발행</span>
       </div>
+      <div class="tp-card" id="today-post"></div>
       <div class="idea-block">
         <div class="idea-head">💡 글감 메모 <span class="edit-link" onclick="openAllIdeasView('blog')">📋 글감 관리</span></div>
         <div id="idea-chips" class="idea-chips"></div>
@@ -817,6 +919,41 @@
       </select>
     </div>
     <div id="ai-list"></div>
+  </div>
+
+  <!-- 블로그 -->
+  <div id="blog-view" style="display:none">
+    <div class="section">
+      <div class="section-title">📆 포스팅 캘린더</div>
+      <div class="pc-nav">
+        <button class="month-nav-btn" onclick="movePostCal(-1)">‹</button>
+        <span id="pc-month"></span>
+        <button class="month-nav-btn" onclick="movePostCal(1)">›</button>
+      </div>
+      <div class="pc-summary" id="pc-summary"></div>
+      <div class="pc-grid" id="pc-grid"></div>
+      <div class="pc-legend">
+        <span><i style="background:#1D9E75"></i>기록형</span><span><i style="background:#2F78C4"></i>분석형</span>
+        <span><i style="background:#B7791F"></i>정보형</span><span><i style="background:#C2477A"></i>에세이형</span>
+        <span>📌 고정</span><span class="pc-lg-done"><i class="pc-hatch"></i>작성 완료</span><span class="pc-lg-miss">미작성</span>
+      </div>
+      <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">날짜를 누르면 그날의 일간 리뷰로 이동해요</div>
+    </div>
+    <div class="section">
+      <div class="section-title">📊 블로그 포스팅 그래프</div>
+      <div class="pc-summary" id="bg-stats"></div>
+      <div class="bg-sub"><span>일간</span><span id="bg-day-title"></span></div>
+      <div class="bg-strip"><div class="bg-days" id="bg-daily"></div></div>
+      <div class="bg-axis" id="bg-axis"></div>
+      <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">칸을 누르면 그날 발행 체크 / 해제</div>
+      <div class="bg-sub" style="margin-top:18px"><span>월간</span><span>최근 12개월</span></div>
+      <div class="bg-chart" id="bg-monthly"></div>
+    </div>
+    <div class="section">
+      <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">💡 블로그 글감 <span class="edit-link" onclick="openIdeaEditor(-1,'blog')">＋ 글감 추가</span></div>
+      <div class="ab-count" id="bi-count" style="margin-bottom:10px"></div>
+      <div id="bi-list"></div>
+    </div>
   </div>
 
   <!-- 운동 -->
@@ -1123,6 +1260,20 @@
   </div>
 </div>
 
+<!-- 다른 글 쓸래요 팝업 -->
+<div class="modal-overlay" id="post-alt-modal">
+  <div class="modal">
+    <div class="modal-title">✍️ 다른 글을 썼어요<button class="modal-close" onclick="closePostAlt()">×</button></div>
+    <div style="font-size:12px;color:#999;margin-bottom:8px">이번 달 계획 중 어떤 글을 썼나요? 고르면 그 글이 작성 완료로 표시돼요.</div>
+    <div id="pa-list"></div>
+    <div class="pa-lbl">계획에 없던 글</div>
+    <div class="bs-search-row">
+      <input type="text" id="pa-input" class="bec-input" placeholder="쓴 글 제목" onkeydown="if(event.key==='Enter'){event.preventDefault();addPostExtra();}">
+      <button class="backup-btn bs-search-btn" onclick="addPostExtra()">기록</button>
+    </div>
+  </div>
+</div>
+
 <!-- 책 검색·추가 팝업 -->
 <div class="modal-overlay" id="book-search-modal" style="z-index:1100">
   <div class="modal">
@@ -1363,7 +1514,7 @@ function renderIdeaChipsFor(ctx){
   el.innerHTML=html;
   updateIdeaFold(ctx);
 }
-function renderIdeaChips(){renderIdeaChipsFor('blog');renderIdeaChipsFor('thread');}
+function renderIdeaChips(){renderIdeaChipsFor('blog');renderIdeaChipsFor('thread');if(typeof blogOpen!=='undefined'&&blogOpen)renderBlogIdeas();}
 let editingIdeaIdx=-1;
 let editingIdeaCtx='blog';
 let deleteIdeaArmed=false;
@@ -1870,6 +2021,7 @@ function renderDaily(){
   });
   updateDailyProgress(done);
   document.getElementById('post-count').textContent=state.posts;
+  renderTodayPost();
   document.querySelectorAll('.mood-btn').forEach(b=>{b.className='mood-btn'+(state.mood&&b.textContent.includes(state.mood)?' selected':'');});
   document.getElementById('daily-memo').value=state.memo||'';
   document.getElementById('tomorrow-goal').value=state.tmr||'';
@@ -2018,8 +2170,8 @@ function renderPageInfo(elId,book,prev){
 function allRoutineDefs(){return routines.concat(routinesWeekend);}
 function isReadingRoutine(r){return !!r&&(r.id==='r_read'||/기상.*독서|독서\s*\d+\s*분/.test(r.name||''));}
 function isRunRoutine(r){return !!r&&(r.id==='r_run'||/러닝/.test(r.name||''));}
-function isStrengthRoutine(r){return !!r&&(r.id==='r_workout'||/맨몸\s*운동/.test(r.name||''));}
-function isExerciseRoutine(r){return !!r&&(r.id==='r_run'||r.id==='r_workout'||/러닝|맨몸\s*운동/.test(r.name||''));}
+function isStrengthRoutine(r){return !!r&&(r.id==='r_workout'||/맨몸\s*운동|스쿼트|푸쉬업|푸시업/.test(r.name||''));}
+function isExerciseRoutine(r){return isRunRoutine(r)||isStrengthRoutine(r);}
 function dayCheckedBy(dd,pred){
   if(!dd)return false;
   const m=getChecksMap(dd);
@@ -2037,6 +2189,260 @@ function dayDidStrength(dd){
   return !!dd&&WORKOUT_KEYS.some(k=>dd.workout&&dd.workout[k]&&dd.workout[k].some(s=>Number(s)>0));
 }
 function dayDidExercise(dd){return dayExerciseByRoutine(dd)||dayDidStrength(dd);}
+
+/* ── 오늘의 포스팅 (김스푼 월간 포스팅 캘린더, 2026.10.26 개편안 기준) ── */
+const POST_GROUPS={A:{n:'기록형',c:'#1D9E75',bg:'#E7F6EF'},B:{n:'분석형',c:'#2F78C4',bg:'#E8F1FB'},C:{n:'정보형',c:'#B7791F',bg:'#FBF3E4'},D:{n:'에세이형',c:'#C2477A',bg:'#FBEAF1'}};
+const POST_PLAN={
+  1:{t:'30대 맞벌이 부부 파이어 도전기',s:'파이어 도전기',g:'A',sub:'목표 달성',fix:true},
+  2:{t:'부수입 기록',s:'부수입 기록',g:'A',sub:'파이어 축',fix:true,tip:'전월 부수입 결산. 파이어 도전기와 서로 연결하기'},
+  3:{t:'비교 ①',s:'비교 ①',g:'B'},
+  4:{t:'월배당 100만원 만들기',s:'월배당 100만',g:'A',sub:'목표 달성',fix:true,tip:'전월 분배금 기준으로 쓰기'},
+  5:{t:'정보형 ①',s:'정보형 ①',g:'C',tip:'고정 다음날 → 검색형 글'},
+  6:{t:'기존 소개 ETF 점검 ①',s:'ETF 점검 ①',g:'B'},
+  7:{t:'나스닥100액티브 월별 점검',s:'나스닥100액티브',g:'B',sub:'매월 정기 점검',fix:true},
+  8:{t:'정보형 ②',s:'정보형 ②',g:'C',tip:'고정 다음날 → 검색형 글'},
+  9:{t:'에세이 (투자 생각·시간 관리)',s:'에세이',g:'D',sub:'자유 슬롯',tip:'하락장·시장 이슈가 있으면 당겨서 바로 발행'},
+  10:{t:'미국배당다우존스 적립식 투자',s:'미국배당다우존스',g:'A',sub:'종목 트래킹',fix:true},
+  11:{t:'정보형 ③',s:'정보형 ③',g:'C',tip:'고정 다음날 → 검색형 글'},
+  12:{t:'기존 소개 ETF 점검 ②',s:'ETF 점검 ②',g:'B'},
+  13:{t:'퇴직연금 DC형',s:'퇴직연금 DC형',g:'A',sub:'계좌 트래킹',fix:true},
+  14:{t:'정보형 ④',s:'정보형 ④',g:'C',tip:'고정 다음날 → 검색형 글'},
+  15:{t:'신규 ETF 소개 ①',s:'신규 ETF ①',g:'B'},
+  16:{t:'부모님 노후준비',s:'부모님 노후준비',g:'A',sub:'계좌 트래킹',fix:true,tip:'수익률보다 월 배당금 도달 여부가 핵심'},
+  17:{t:'정보형 ⑤',s:'정보형 ⑤',g:'C',tip:'고정 다음날 → 검색형 글'},
+  18:{t:'투자 전략',s:'투자 전략',g:'B'},
+  19:{t:'ISA 1억 모으기',s:'ISA 1억',g:'A',sub:'계좌 트래킹',fix:true},
+  20:{t:'책 리뷰',s:'책 리뷰',g:'D',sub:'파이어 축',fix:true,tip:'이달 읽은 책 1권을 실제 투자·파이어 계획과 연결하기'},
+  21:{t:'기존 소개 ETF 점검 ③',s:'ETF 점검 ③',g:'B'},
+  22:{t:'미국S&P500 적립식 매수 현황',s:'미국S&P500',g:'A',sub:'종목 트래킹',fix:true},
+  23:{t:'정보형 ⑥',s:'정보형 ⑥',g:'C',tip:'고정 다음날 → 검색형 글'},
+  24:{t:'비교 ②',s:'비교 ②',g:'B'},
+  25:{t:'파이어족 소개',s:'파이어족 소개',g:'D',sub:'에세이',fix:true,tip:'"~다" 체, 마무리 소제목은 "김스푼의 생각"'},
+  26:{t:'정보형 ⑦',s:'정보형 ⑦',g:'C',tip:'고정 다음날 → 검색형 글'},
+  27:{t:'신규 ETF 소개 ②',s:'신규 ETF ②',g:'B'},
+  28:{t:'미국나스닥100 적립식 투자',s:'미국나스닥100',g:'A',sub:'종목 트래킹',fix:true},
+  29:{t:'정보형 ⑧',s:'정보형 ⑧',g:'C',tip:'고정 다음날 → 검색형 글'},
+  30:{t:'기존 소개 ETF 점검 ④',s:'ETF 점검 ④',g:'B'},
+  31:{t:'여유일',s:'여유일',g:null,free:true,tip:'밀린 글·하락장 대응·제도 변경 글. 비워도 돼요'}
+};
+function ymOf(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function loadPostMonth(ym){
+  try{const o=JSON.parse(localStorage.getItem('retro_posting_'+ym)||'null');if(o)return {done:o.done||{},extra:o.extra||[]};}catch(e){}
+  return {done:{},extra:[]};
+}
+function savePostMonth(ym,o){localStorage.setItem('retro_posting_'+ym,JSON.stringify(o));}
+function mdLabel(dk){const d=new Date(dk+'T00:00:00');return (d.getMonth()+1)+'/'+d.getDate();}
+function groupChip(p){
+  if(!p.g)return '';
+  const g=POST_GROUPS[p.g];
+  return `<span class="tp-group" style="color:${g.c};background:${g.bg}">${p.g} ${g.n}${p.sub?' · '+p.sub:''}</span>`;
+}
+function renderTodayPost(){
+  const el=document.getElementById('today-post');if(!el)return;
+  const d=currentDate, day=d.getDate(), ym=ymOf(d), dk=dateToKey(d);
+  const isToday=dk===dateToKey(todayDate());
+  const p=POST_PLAN[day], m=loadPostMonth(ym), mine=m.done[day];
+  const badge=p.free?'<span class="tp-badge free">🌿 여유일</span>':p.fix?'<span class="tp-badge fix">📌 고정 포스팅</span>':'<span class="tp-badge flex">🔄 유동 슬롯</span>';
+  const who=isToday?'오늘은':'이날은';
+  const msg=p.free?`${who} <b>여유일</b>이에요.`:`${who} <b>${escapeHtml(p.t)}</b> 작성하는 날입니다.`;
+  // 이날 쓴 다른 글
+  const others=[];
+  Object.keys(m.done).forEach(k=>{const e=m.done[k];if(e&&e.date===dk&&Number(k)!==day)others.push(`<span class="tp-other">✓ ${escapeHtml(POST_PLAN[k].t)} <small>(${Number(k)}일 계획)</small><span class="tp-x" onclick="undoPostSlot(${k})">×</span></span>`);});
+  m.extra.forEach((e,i)=>{if(e.date===dk)others.push(`<span class="tp-other">✓ ${escapeHtml(e.title)}<span class="tp-x" onclick="undoPostExtra(${i})">×</span></span>`);});
+  let actions;
+  if(mine){
+    const early=mine.date!==dk?` <small>(${mdLabel(mine.date)}에 작성)</small>`:'';
+    actions=`<div class="tp-done">✓ 작성 완료${early}<span class="tp-undo" onclick="undoPostSlot(${day})">취소</span></div>`;
+  }else{
+    actions=`<div class="tp-actions">${p.free?'':`<button class="tp-btn main" onclick="markPostWritten()">✍️ 썼어요</button>`}<button class="tp-btn" onclick="openPostAlt()">${p.free?'✍️ 글 썼어요':'다른 글 쓸래요'}</button></div>`;
+  }
+  el.innerHTML=`<div class="tp-head"><span class="tp-title">✍️ ${isToday?'오늘의':mdLabel(dk)} 포스팅</span><span class="edit-link" onclick="openPostCalendar()">📆 캘린더 보기</span></div>
+    <div class="tp-badges">${badge}${groupChip(p)}</div>
+    <div class="tp-msg">${msg}</div>
+    ${p.tip?`<div class="tp-tip">💡 ${escapeHtml(p.tip)}</div>`:''}
+    ${actions}
+    ${others.length?`<div class="tp-others"><div class="tp-others-lbl">${isToday?'오늘':'이날'} 쓴 글</div>${others.join('')}</div>`:''}`;
+}
+// 글을 쓰면 발행 수가 0일 때 1로 올려줌 (취소하면 되돌림)
+function bumpPostCount(){
+  if(state.posts===0){state.posts=1;document.getElementById('post-count').textContent=1;autosaveDaily();return true;}
+  return false;
+}
+function dropPostCount(entry){
+  if(entry&&entry.auto&&entry.date===dateToKey(currentDate)&&state.posts>0){
+    state.posts--;document.getElementById('post-count').textContent=state.posts;autosaveDaily();
+  }
+}
+function markPostSlot(day){
+  const ym=ymOf(currentDate), m=loadPostMonth(ym);
+  m.done[day]={date:dateToKey(currentDate),auto:bumpPostCount()};
+  savePostMonth(ym,m);
+  renderTodayPost();
+  if(blogOpen)renderBlogView();
+}
+function markPostWritten(){markPostSlot(currentDate.getDate());showToast('✍️ 작성 완료! 수고했어요');}
+function undoPostSlot(day){
+  const ym=ymOf(currentDate), m=loadPostMonth(ym), e=m.done[day];
+  if(!e)return;
+  delete m.done[day];savePostMonth(ym,m);
+  dropPostCount(e);
+  renderTodayPost();showToast('작성 완료를 취소했어요');
+}
+function undoPostExtra(i){
+  const ym=ymOf(currentDate), m=loadPostMonth(ym), e=m.extra[i];
+  if(!e)return;
+  m.extra.splice(i,1);savePostMonth(ym,m);
+  dropPostCount(e);
+  renderTodayPost();
+}
+// 다른 글 쓸래요: 이번 달 남은 슬롯에서 고르거나 직접 입력
+function openPostAlt(){
+  const d=currentDate, day=d.getDate(), ym=ymOf(d), m=loadPostMonth(ym);
+  const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  const ahead=[],behind=[];
+  for(let k=1;k<=last;k++){
+    const p=POST_PLAN[k];
+    if(k===day||p.free||m.done[k])continue;
+    (k>day?ahead:behind).push(k);
+  }
+  const item=k=>{
+    const p=POST_PLAN[k], g=POST_GROUPS[p.g], dd=new Date(d.getFullYear(),d.getMonth(),k);
+    return `<div class="pa-item" onclick="pickPostAlt(${k})"><span class="pa-date">${d.getMonth()+1}/${k} (${DAY_NAMES[dd.getDay()]})</span><span class="pa-dot" style="background:${g.c}"></span><span class="pa-name">${p.fix?'📌 ':''}${escapeHtml(p.t)}</span></div>`;
+  };
+  let h='';
+  if(ahead.length)h+=`<div class="pa-lbl">이번 달 앞으로 쓸 글 (미리 쓰기)</div>`+ahead.map(item).join('');
+  if(behind.length)h+=`<div class="pa-lbl">아직 못 쓴 글 (밀린 글)</div>`+behind.map(item).join('');
+  if(!h)h='<div class="rdm-empty">이번 달 계획한 글을 모두 썼어요 🎉</div>';
+  document.getElementById('pa-list').innerHTML=h;
+  document.getElementById('pa-input').value='';
+  document.getElementById('post-alt-modal').classList.add('show');
+}
+function closePostAlt(){document.getElementById('post-alt-modal').classList.remove('show');}
+function pickPostAlt(k){markPostSlot(k);closePostAlt();showToast('✍️ '+POST_PLAN[k].t+' 작성 완료로 표시했어요');}
+function addPostExtra(){
+  const t=document.getElementById('pa-input').value.trim();
+  if(!t){showToast('쓴 글 제목을 입력해주세요');return;}
+  const ym=ymOf(currentDate), m=loadPostMonth(ym);
+  m.extra.push({date:dateToKey(currentDate),title:t,auto:bumpPostCount()});
+  savePostMonth(ym,m);
+  closePostAlt();renderTodayPost();
+  showToast('✍️ 기록했어요');
+}
+// 월간 포스팅 캘린더
+let postCalCursor=null;
+function openPostCalendar(){if(!blogOpen)toggleBlog();window.scrollTo({top:0});}
+function closePostCalendar(){showTabsView();}
+function movePostCal(n){postCalCursor=new Date(postCalCursor.getFullYear(),postCalCursor.getMonth()+n,1);renderBlogView();}
+function renderBlogView(){
+  if(!postCalCursor)postCalCursor=new Date(currentDate.getFullYear(),currentDate.getMonth(),1);
+  renderPostCalendar();renderBlogCharts();renderBlogIdeas();
+}
+// 블로그 포스팅 그래프 (일간: 선택한 달 / 월간: 최근 12개월)
+function postsOn(dk){const dd=getDailyData(dk);return dd?(Number(dd.posts)||0):0;}
+function renderBlogCharts(){
+  const y=postCalCursor.getFullYear(), mo=postCalCursor.getMonth(), last=new Date(y,mo+1,0).getDate();
+  const todayKey=dateToKey(todayDate());
+  const days=[];let sum=0,best=0,run=0,activeDays=0,countedDays=0;
+  for(let k=1;k<=last;k++){
+    const dk=`${y}-${String(mo+1).padStart(2,'0')}-${String(k).padStart(2,'0')}`;
+    const fut=dk>todayKey, n=fut?0:postsOn(dk);
+    days.push({k,dk,n,fut});
+    if(!fut){countedDays++;sum+=n;if(n>0){activeDays++;run++;best=Math.max(best,run);}else run=0;}
+  }
+  document.getElementById('bg-day-title').textContent=`${y}년 ${mo+1}월`;
+  document.getElementById('bg-daily').innerHTML=days.map(d=>{
+    const cls=['bg-day',d.n>0?'on':'',d.fut?'future':'',d.dk===todayKey?'today':''].join(' ');
+    const click=d.fut?'':` onclick="toggleBlogDay('${d.dk}')"`;
+    return `<div class="${cls}" title="${mo+1}/${d.k}${d.n>0?' · 발행 '+d.n+'편':' · 미발행'}"${click}></div>`;
+  }).join('');
+  document.getElementById('bg-axis').innerHTML=days.map(d=>{
+    const show=d.k===1||d.k%5===0||d.k===last||d.dk===todayKey;
+    return `<span class="${d.dk===todayKey?'t':''}">${show?d.k:''}</span>`;
+  }).join('');
+  // 월간
+  const months=[];
+  for(let i=11;i>=0;i--){
+    const md=new Date(y,mo-i,1), my=md.getFullYear(), mm=md.getMonth(), ml=new Date(my,mm+1,0).getDate();
+    let t=0;
+    for(let k=1;k<=ml;k++){const dk=`${my}-${String(mm+1).padStart(2,'0')}-${String(k).padStart(2,'0')}`;if(dk>todayKey)break;t+=postsOn(dk);}
+    months.push({lbl:(mm===0||i===11)?`${String(my).slice(2)}.${mm+1}`:`${mm+1}월`,t,cur:i===0,fut:dateToKey(md)>todayKey});
+  }
+  const maxM=Math.max(5,...months.map(m=>m.t));
+  const bm=document.getElementById('bg-monthly');
+  bm.className='bg-chart monthly';
+  bm.innerHTML=months.map(m=>`<div class="bg-col${m.cur?' today':''}" title="${m.lbl} · ${m.t}편"><div class="bg-val">${m.t>0?m.t:''}</div><div class="bg-bar ${m.fut?'future':m.t===0?'zero':''}" style="height:${Math.round(m.t/maxM*100)}%"></div><div class="bg-lbl">${m.lbl}</div></div>`).join('');
+  const avg=countedDays?(sum/countedDays).toFixed(1):'0';
+  document.getElementById('bg-stats').innerHTML=
+    `<div class="pc-sum"><b>${sum}</b><span>${mo+1}월 발행</span></div>`+
+    `<div class="pc-sum"><b>${avg}</b><span>하루 평균</span></div>`+
+    `<div class="pc-sum"><b>${best}</b><span>최장 연속</span></div>`;
+}
+// 일간 칸 클릭: 그날 발행 0 ↔ 1 (2편 이상이면 확인 후 해제)
+function toggleBlogDay(dk){
+  const dd=getDayForEdit(dk), n=Number(dd.posts)||0;
+  if(n>1&&!confirm('이날 발행 기록('+n+'편)을 지울까요?'))return;
+  dd.posts=n>0?0:1;
+  commitDay(dk,dd);
+  renderBlogView();
+}
+// 블로그 글감 정리 (예정 → 완료 순)
+function renderBlogIdeas(){
+  const list=ideaListOf('blog');
+  const el=document.getElementById('bi-list'), cnt=document.getElementById('bi-count');
+  if(!el)return;
+  const doneCnt=list.filter(x=>x.done).length;
+  cnt.textContent=`전체 ${list.length}개 · 예정 ${list.length-doneCnt}개 · 완료 ${doneCnt}개`;
+  if(!list.length){el.innerHTML='<div class="empty-msg">아직 글감이 없어요. ＋ 글감 추가로 모아 보세요</div>';return;}
+  const items=list.map((it,i)=>({it,i})).sort((a,b)=>{
+    if(!!a.it.done!==!!b.it.done)return a.it.done?1:-1;
+    if(a.it.done)return (b.it.doneDate||'').localeCompare(a.it.doneDate||'');
+    const ad=a.it.date||'9999', bd=b.it.date||'9999';
+    return ad<bd?-1:ad>bd?1:a.i-b.i;
+  });
+  let h='',shownDoneHead=false;
+  items.forEach(({it,i},idx)=>{
+    if(idx===0&&!it.done)h+='<div class="pa-lbl" style="margin-top:0">✏️ 작성 예정</div>';
+    if(it.done&&!shownDoneHead){h+=`<div class="pa-lbl">✅ 작성 완료</div>`;shownDoneHead=true;}
+    const dateLabel=it.date?`<span class="ai-date">📅 ${formatIdeaDate(it.date)}</span>`:'';
+    const doneLabel=it.done?`<span class="ai-done-badge">✍️ 완료${it.doneDate?' '+formatIdeaDate(it.doneDate):''}</span>`:'';
+    h+=`<div class="ai-card${it.done?' done':''}" onclick="openIdeaEditor(${i},'blog')"><div class="ai-card-head"><span class="ai-keyword">${escapeHtml(it.keyword)}</span>${doneLabel}</div>${dateLabel?`<div class="ai-meta">${dateLabel}</div>`:''}${it.note?`<div class="ai-note">${escapeHtml(it.note)}</div>`:''}</div>`;
+  });
+  el.innerHTML=h;
+}
+function renderPostCalendar(){
+  const y=postCalCursor.getFullYear(), mo=postCalCursor.getMonth(), ym=ymOf(postCalCursor);
+  const m=loadPostMonth(ym), last=new Date(y,mo+1,0).getDate();
+  const todayKey=dateToKey(todayDate());
+  document.getElementById('pc-month').textContent=`${y}년 ${mo+1}월`;
+  const lead=(new Date(y,mo,1).getDay()+6)%7; // 월요일 시작
+  let h=['월','화','수','목','금','토','일'].map(n=>`<div class="pc-wd">${n}</div>`).join('');
+  for(let i=0;i<lead;i++)h+='<div class="pc-cell empty"></div>';
+  let planned=0,doneN=0,fixN=0,fixDone=0;
+  for(let k=1;k<=last;k++){
+    const p=POST_PLAN[k], dk=`${ym}-${String(k).padStart(2,'0')}`, e=m.done[k];
+    const extras=m.extra.filter(x=>x.date===dk).length;
+    if(!p.free){planned++;if(e)doneN++;if(p.fix){fixN++;if(e)fixDone++;}}
+    const g=p.g?POST_GROUPS[p.g]:null;
+    const missed=!e&&!p.free&&dk<todayKey;
+    const cls=['pc-cell',p.fix?'fix':'',e?'done':'',missed?'missed':'',dk===todayKey?'today':''].join(' ');
+    const style=g?`style="--gc:${g.c};--gbg:${g.bg}"`:'';
+    const doneMark=e?`<div class="pc-done">✓${e.date!==dk?' '+mdLabel(e.date):''}</div>`:'';
+    h+=`<div class="${cls}" ${style} onclick="jumpToPostDay('${dk}')" title="${escapeAttr(p.t)}"><div class="pc-top"><span class="pc-num">${k}</span>${p.fix?'<span class="pc-pin">📌</span>':''}</div><div class="pc-name">${escapeHtml(p.s)}</div>${doneMark}${extras?`<div class="pc-extra">+${extras}편</div>`:''}</div>`;
+  }
+  document.getElementById('pc-grid').innerHTML=h;
+  const extraN=m.extra.length;
+  document.getElementById('pc-summary').innerHTML=
+    `<div class="pc-sum"><b>${doneN}</b><span>/ ${planned}편 작성</span></div>`+
+    `<div class="pc-sum"><b>${fixDone}</b><span>/ ${fixN} 고정</span></div>`+
+    `<div class="pc-sum"><b>${extraN}</b><span>계획 외 글</span></div>`;
+}
+function jumpToPostDay(dk){
+  currentDate=new Date(dk+'T00:00:00');
+  currentTab='daily';
+  if(typeof showTabsView==='function')showTabsView();
+  loadDaily();updateDateNav();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
 /* ── 날짜별 기록 수정 공용 (일간 팝업·주간 칸 클릭) ── */
 function getDayForEdit(dk){
@@ -2313,7 +2719,7 @@ async function runBookSearch(){
     const res=await searchBooks(q);
     bsCtx.results=res.books;
     if(!res.books.length){st.textContent='검색 결과가 없어요. 다른 검색어로 찾거나 직접 입력해 주세요.';return;}
-    st.textContent=({aladin:'알라딘',kakao:'카카오 책 검색',google:'구글 북스'}[res.source]||'검색')+' 결과 '+res.books.length+'건 · 눌러서 선택';
+    st.textContent=({aladin:'알라딘',kakao:'카카오 책 검색',google:'구글 북스'}[res.source]||'검색')+' 결과 '+res.books.length+'건 · 눌러서 선택'+(res.note?' (구글 실패: '+res.note.replace(/^Error:\s*/,'')+')':'');
     list.innerHTML=res.books.map((b,i)=>{
       const thumb=b.thumbnail?`<img class="bs-thumb" src="${escapeAttr(b.thumbnail)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'bs-thumb',textContent:'📖'}))">`:'<div class="bs-thumb">📖</div>';
       const meta=[(b.authors||[]).join(', '),b.publisher,b.pages?b.pages+'p':''].filter(Boolean).join(' · ');
@@ -2333,7 +2739,7 @@ async function searchBooks(q){
       let j=null;try{j=JSON.parse(txt);}catch(e){}
       if(!j)kakaoNote='서버 응답이 JSON이 아님';
       else if(j.ok&&Array.isArray(j.books)){
-        if(j.books.length)return {books:j.books,source:j.source||'kakao'};
+        if(j.books.length)return {books:j.books,source:j.source||'kakao',note:j.note||''};
         kakaoNote='결과 0건';
       }
       else if(j.ok&&j.reason==='no_kakao_key')kakaoNote='서버에 카카오 키 없음';
@@ -2344,7 +2750,7 @@ async function searchBooks(q){
     }catch(e){kakaoNote='서버 연결 실패';}
   }
   try{
-    const r=await fetch('https://www.googleapis.com/books/v1/volumes?q='+encodeURIComponent(q)+'&maxResults=20&printType=books');
+    const r=await fetch('https://www.googleapis.com/books/v1/volumes?country=KR&q='+encodeURIComponent(q)+'&maxResults=20&printType=books');
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();
     return {books:(j.items||[]).map(googleToBook),source:'google'};
@@ -2388,7 +2794,7 @@ async function lookupPagesByIsbn(isbn,title,author){
   // 2순위: 구글 북스
   try{
     if(!isbn)throw new Error('no isbn');
-    const r=await fetch('https://www.googleapis.com/books/v1/volumes?q=isbn:'+encodeURIComponent(isbn));
+    const r=await fetch('https://www.googleapis.com/books/v1/volumes?country=KR&q=isbn:'+encodeURIComponent(isbn));
     const j=await r.json();
     const it=(j.items||[]).find(x=>x.volumeInfo&&x.volumeInfo.pageCount);
     if(it&&totalEl.value===''){totalEl.value=it.volumeInfo.pageCount;hint.textContent='쪽수를 구글 북스에서 불러왔어요. 실제 책과 다르면 고쳐 주세요.';return;}
@@ -3815,7 +4221,7 @@ function moveMonth(dir){
   if(new Date(m.getFullYear(),m.getMonth(),1)>today)return;
   monthCursor=m;loadMonthly();
 }
-let goalsOpen=false, booksOpen=false, workoutOpen=false;
+let goalsOpen=false, booksOpen=false, workoutOpen=false, blogOpen=false;
 let workoutCursor=new Date(); workoutCursor.setDate(1); workoutCursor.setHours(0,0,0,0);
 const TAB_ORDER=['daily','weekly','monthly'];
 // 현재 탭(currentTab)에 맞게 일간/주간/월간 화면 표시
@@ -3829,7 +4235,9 @@ function applyTabView(){
 }
 function showTabsView(){
   // 일간/주간/월간 탭 화면으로 복귀
-  goalsOpen=false;booksOpen=false;workoutOpen=false;
+  goalsOpen=false;booksOpen=false;workoutOpen=false;blogOpen=false;
+  document.getElementById('blog-badge').classList.remove('active');
+  document.getElementById('blog-view').style.display='none';
   document.getElementById('goal-badge').classList.remove('active');
   document.getElementById('book-badge').classList.remove('active');
   document.getElementById('workout-badge').classList.remove('active');
@@ -3849,7 +4257,9 @@ function hideTabsView(){
   document.getElementById('monthly-view').style.display='none';
 }
 function closeAllOverlays(){
-  goalsOpen=false;booksOpen=false;workoutOpen=false;
+  goalsOpen=false;booksOpen=false;workoutOpen=false;blogOpen=false;
+  document.getElementById('blog-badge').classList.remove('active');
+  document.getElementById('blog-view').style.display='none';
   document.getElementById('goal-badge').classList.remove('active');
   document.getElementById('book-badge').classList.remove('active');
   document.getElementById('workout-badge').classList.remove('active');
@@ -3875,6 +4285,15 @@ function toggleBooks(){
   document.getElementById('book-badge').classList.add('active');
   document.getElementById('books-view').style.display='block';
   renderBookShelf();
+}
+function toggleBlog(){
+  if(blogOpen){showTabsView();return;}
+  hideTabsView();closeAllOverlays();
+  blogOpen=true;
+  document.getElementById('blog-badge').classList.add('active');
+  document.getElementById('blog-view').style.display='block';
+  postCalCursor=new Date(currentDate.getFullYear(),currentDate.getMonth(),1);
+  renderBlogView();
 }
 function toggleWorkout(){
   if(workoutOpen){showTabsView();return;}
@@ -4119,6 +4538,7 @@ document.getElementById('idea-modal').addEventListener('click',e=>{if(e.target.i
 document.getElementById('book-modal').addEventListener('click',e=>{if(e.target.id==='book-modal')closeBookManager();});
 document.getElementById('review-modal').addEventListener('click',e=>{if(e.target.id==='review-modal')closeDoneReview();});
 document.getElementById('reading-modal').addEventListener('click',e=>{if(e.target.id==='reading-modal')closeReadingModal();});
+document.getElementById('post-alt-modal').addEventListener('click',e=>{if(e.target.id==='post-alt-modal')closePostAlt();});
 document.getElementById('exercise-modal').addEventListener('click',e=>{if(e.target.id==='exercise-modal')closeExerciseModal();});
 document.getElementById('book-search-modal').addEventListener('click',e=>{if(e.target.id==='book-search-modal')closeBookSearch();});
 document.getElementById('month-books-modal').addEventListener('click',e=>{if(e.target.id==='month-books-modal')closeMonthBooks();});
@@ -4145,6 +4565,7 @@ function reloadAllFromStorage(){
   if(booksOpen)renderBookShelf();
   if(goalsOpen){renderGoals();renderRoadmap();renderRetire();}
   if(workoutOpen)loadWorkoutCalendar();
+  if(blogOpen)renderBlogView();
   const aiv=document.getElementById('all-ideas-view');
   if(aiv&&aiv.style.display!=='none')renderAllIdeasList();
 }
@@ -4193,9 +4614,20 @@ function setSyncStatus(msg,isWarn){
   if(el){el.textContent=msg;el.style.color=isWarn?'#c0392b':'#888';}
   const badge=document.getElementById('sync-badge');
   if(badge){
-    badge.style.display=syncEnabled()?'flex':'none';
+    badge.style.display='none'; // 상태는 제목 옆 글씨로 표시
     badge.title=msg;
     badge.textContent=isWarn?'⚠️':(SYNC.busy?'⏳':'☁️');
+  }
+  const hs=document.getElementById('head-sync');
+  if(hs){
+    if(!syncEnabled()){hs.textContent='';hs.className='head-sync';}
+    else if(SYNC.busy){hs.textContent='동기화 중…';hs.className='head-sync busy';}
+    else if(isWarn){hs.textContent='⚠️ 동기화 실패';hs.className='head-sync warn';hs.title=msg;}
+    else{
+      const last=_syncRead('sync_last',0);
+      hs.textContent=last?'마지막 동기화 '+fmtTime(last):'동기화 대기';
+      hs.className='head-sync';hs.title='눌러서 지금 동기화';
+    }
   }
 }
 function fmtTime(ms){
@@ -4310,6 +4742,27 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('online',()=>scheduleSync(500));
 setInterval(()=>{if(syncEnabled()&&document.visibilityState==='visible')syncNow(false);},120000);
+
+/* ── 바탕화면 위젯 모드: 주소 뒤에 ?widget
+   (선택) ?widget&sync=웹앱URL&pw=비밀번호 → 키보드 입력이 안 되는 환경에서 동기화 설정 ── */
+(function initWidgetMode(){
+  let qs;try{qs=new URLSearchParams(location.search);}catch(e){return;}
+  if(qs.has('widget'))document.body.classList.add('widget');
+  const su=qs.get('sync'),pw=qs.get('pw');
+  if(su&&pw&&/^https:\/\/script\.google(usercontent)?\.com\//.test(su)&&(!syncConfig||syncConfig.url!==su||syncConfig.token!==pw)){
+    const changed=!syncConfig||syncConfig.url!==su;
+    syncConfig={url:su,token:pw};
+    _syncWrite('sync_config',syncConfig);
+    if(changed)_syncWrite('sync_since',0);
+  }
+})();
+// 휠이 안 되는 바탕화면에서 클릭으로 스크롤 (열린 팝업이 있으면 팝업 안을 스크롤)
+function widgetScroll(dir){
+  const open=[...document.querySelectorAll('.modal-overlay.show .modal')].pop();
+  const target=open||document.scrollingElement||document.documentElement;
+  const h=open?open.clientHeight:window.innerHeight;
+  target.scrollBy({top:dir*h*0.8,behavior:'smooth'});
+}
 
 // 초기화
 updateDateNav();
