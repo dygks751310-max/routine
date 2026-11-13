@@ -10,8 +10,8 @@
   .container{max-width:640px;margin:0 auto}
   .top-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
   h1{font-size:22px;font-weight:600;color:#1a1a1a;white-space:nowrap}
-  .title-wrap{display:flex;align-items:baseline;gap:8px;min-width:0;flex-wrap:wrap}
-  .head-sync{font-size:11px;color:#aaa;cursor:pointer;white-space:nowrap}
+  .top-row{position:relative}
+  .head-sync{position:absolute;top:-19px;right:0;font-size:10px;line-height:1;color:#aaa;cursor:pointer;white-space:nowrap}
   .head-sync:empty{display:none}
   .head-sync.busy{color:#1D9E75}
   .head-sync.warn{color:#c0392b}
@@ -223,8 +223,6 @@
   .pc-cell.fix{box-shadow:inset 0 0 0 1.5px var(--gc,#ccc)}
   .pc-cell.today{outline:2px solid #1a1a1a;outline-offset:1px}
   .pc-cell.done{opacity:0.55}
-  .pc-cell.missed .pc-num{color:#d9534f}
-  .pc-cell.missed::after{content:'미작성';position:absolute;right:4px;bottom:3px;font-size:9px;color:#d9534f;font-weight:600}
   .pc-top{display:flex;justify-content:space-between;align-items:center}
   .pc-num{font-size:11px;font-weight:700;color:#555}
   .pc-pin{font-size:9px}
@@ -572,7 +570,8 @@
 </div>
 <div class="container">
   <div class="top-row">
-    <div class="title-wrap"><h1>루틴 기록기</h1><span class="head-sync" id="head-sync" onclick="syncNow(true)" title="눌러서 지금 동기화"></span></div>
+    <span class="head-sync" id="head-sync" onclick="syncNow(true)" title="눌러서 지금 동기화"></span>
+    <h1>루틴 기록기</h1>
     <div style="display:flex;gap:8px">
       <button class="cal-badge" id="sync-badge" onclick="syncNow(true)" title="동기화" style="display:none;font-size:18px">☁️</button>
       <button class="cal-badge" id="blog-badge" onclick="toggleBlog()" title="블로그">📝</button>
@@ -935,7 +934,7 @@
       <div class="pc-legend">
         <span><i style="background:#1D9E75"></i>기록형</span><span><i style="background:#2F78C4"></i>분석형</span>
         <span><i style="background:#B7791F"></i>정보형</span><span><i style="background:#C2477A"></i>에세이형</span>
-        <span>📌 고정</span><span class="pc-lg-done"><i class="pc-hatch"></i>작성 완료</span><span class="pc-lg-miss">미작성</span>
+        <span>📌 고정</span><span class="pc-lg-done"><i class="pc-hatch"></i>작성 완료</span>
       </div>
       <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">날짜를 누르면 그날의 일간 리뷰로 이동해요</div>
     </div>
