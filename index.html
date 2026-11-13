@@ -4745,7 +4745,8 @@ setInterval(()=>{if(syncEnabled()&&document.visibilityState==='visible')syncNow(
 /* ── 바탕화면 위젯 모드: 주소 뒤에 ?widget
    (선택) ?widget&sync=웹앱URL&pw=비밀번호 → 키보드 입력이 안 되는 환경에서 동기화 설정 ── */
 (function initWidgetMode(){
-  let qs;try{qs=new URLSearchParams(location.search);}catch(e){return;}
+  // ?widget 또는 #widget 둘 다 인식 (일부 바탕화면 프로그램은 ? 뒤를 버림)
+  let qs;try{qs=new URLSearchParams((location.search||'').replace(/^\?/,'')+'&'+(location.hash||'').replace(/^#/,''));}catch(e){return;}
   if(qs.has('widget'))document.body.classList.add('widget');
   const su=qs.get('sync'),pw=qs.get('pw');
   if(su&&pw&&/^https:\/\/script\.google(usercontent)?\.com\//.test(su)&&(!syncConfig||syncConfig.url!==su||syncConfig.token!==pw)){
