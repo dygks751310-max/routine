@@ -231,6 +231,12 @@
   .pc-cell.done{opacity:1;background:repeating-linear-gradient(135deg,var(--gbg,#f5f4f0) 0 5px,color-mix(in srgb,var(--gc,#999) 28%,transparent) 5px 7px)}
   .pc-cell.done .pc-name{color:var(--gc,#888);text-decoration:line-through;text-decoration-thickness:1.5px}
   .pc-extra{font-size:9px;color:#888}
+  .pc-cell.swapped .pc-name{text-decoration:none;font-weight:800}
+  .pc-plan{font-size:9px;color:#999;margin-top:2px;text-decoration:line-through;overflow-wrap:anywhere}
+  .pc-cell.moved{background:var(--gbg,#f5f4f0);opacity:0.6;border-left-style:dashed}
+  .pc-cell.moved .pc-name{text-decoration:line-through}
+  .pc-moved{font-size:9px;font-weight:700;color:#777;margin-top:2px}
+  .pc-plus{font-size:9px;font-weight:700;color:#0d6b47;margin-top:1px;overflow-wrap:anywhere}
   .pc-legend{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;font-size:11px;color:#888;margin-top:12px}
   .pc-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
   .pc-lg-done{color:#0d6b47;font-weight:700}
@@ -2417,16 +2423,37 @@ function renderPostCalendar(){
   let h=['월','화','수','목','금','토','일'].map(n=>`<div class="pc-wd">${n}</div>`).join('');
   for(let i=0;i<lead;i++)h+='<div class="pc-cell empty"></div>';
   let planned=0,doneN=0,fixN=0,fixDone=0;
+  // 실제로 쓴 날짜 기준으로 모으기: 다른 날 계획 글 / 계획 외 글
+  const byDate={};
+  Object.keys(m.done).forEach(k=>{const e=m.done[k],pp=POST_PLAN[k];if(!e||!pp)return;(byDate[e.date]=byDate[e.date]||[]).push({k:Number(k),name:pp.s,g:pp.g});});
+  m.extra.forEach(x=>{(byDate[x.date]=byDate[x.date]||[]).push({k:0,name:x.title,g:null});});
   for(let k=1;k<=last;k++){
     const p=POST_PLAN[k], dk=`${ym}-${String(k).padStart(2,'0')}`, e=m.done[k];
-    const extras=m.extra.filter(x=>x.date===dk).length;
     if(!p.free){planned++;if(e)doneN++;if(p.fix){fixN++;if(e)fixDone++;}}
+    const ownHere=!!(e&&e.date===dk);
+    const moved=!!(e&&e.date!==dk);
+    const actual=(byDate[dk]||[]).filter(x=>x.k!==k); // 이날 실제로 쓴 다른 글
     const g=p.g?POST_GROUPS[p.g]:null;
-    const missed=!e&&!p.free&&dk<todayKey;
-    const cls=['pc-cell',p.fix?'fix':'',e?'done':'',missed?'missed':'',dk===todayKey?'today':''].join(' ');
-    const style=g?`style="--gc:${g.c};--gbg:${g.bg}"`:'';
-    const doneMark=e?`<div class="pc-done">✓${e.date!==dk?' '+mdLabel(e.date):''}</div>`:'';
-    h+=`<div class="${cls}" ${style} onclick="jumpToPostDay('${dk}')" title="${escapeAttr(p.t)}"><div class="pc-top"><span class="pc-num">${k}</span>${p.fix?'<span class="pc-pin">📌</span>':''}</div><div class="pc-name">${escapeHtml(p.s)}</div>${doneMark}${extras?`<div class="pc-extra">+${extras}편</div>`:''}</div>`;
+    let cls=['pc-cell',p.fix?'fix':'',dk===todayKey?'today':''];
+    let style=g?`--gc:${g.c};--gbg:${g.bg}`:'';
+    let body='';
+    if(actual.length&&!ownHere){
+      // 계획과 다른 글을 쓴 날: 실제 쓴 글을 보여주고, 계획은 작게
+      const ag=actual[0].g?POST_GROUPS[actual[0].g]:{c:'#5f7a6d',bg:'#eef3f0'};
+      cls.push('done','swapped');
+      style=`--gc:${ag.c};--gbg:${ag.bg}`;
+      body=actual.map(x=>`<div class="pc-name pc-actual">✓ ${escapeHtml(x.name)}</div>`).join('')+
+           (p.free?'':`<div class="pc-plan">계획: ${escapeHtml(p.s)}</div>`);
+    }else{
+      if(ownHere)cls.push('done');
+      if(moved)cls.push('moved');
+      body=`<div class="pc-name">${escapeHtml(p.s)}</div>`+
+           (ownHere?'<div class="pc-done">✓</div>':'')+
+           (moved?`<div class="pc-moved">→ ${mdLabel(e.date)}에 씀</div>`:'')+
+           (actual.length?actual.map(x=>`<div class="pc-plus">+ ${escapeHtml(x.name)}</div>`).join(''):'');
+    }
+    const tip=actual.length?`실제: ${actual.map(x=>x.name).join(', ')} / 계획: ${p.t}`:p.t;
+    h+=`<div class="${cls.join(' ')}" style="${style}" onclick="jumpToPostDay('${dk}')" title="${escapeAttr(tip)}"><div class="pc-top"><span class="pc-num">${k}</span>${p.fix?'<span class="pc-pin">📌</span>':''}</div>${body}</div>`;
   }
   document.getElementById('pc-grid').innerHTML=h;
   const extraN=m.extra.length;
