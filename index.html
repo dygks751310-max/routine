@@ -232,6 +232,9 @@
   .pc-cell.done .pc-name{color:var(--gc,#888);text-decoration:line-through;text-decoration-thickness:1.5px}
   .pc-extra{font-size:9px;color:#888}
   .pc-cell.swapped .pc-name{text-decoration:none;font-weight:800}
+  .pd-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:#f0faf5;border-radius:9px;margin-bottom:6px;font-size:13px;color:#0d6b47;font-weight:600}
+  .pd-row small{color:#7bb89c;font-weight:500}
+  .pd-moved{font-size:12px;color:#777;background:#f5f4f0;border-radius:9px;padding:8px 10px;margin-top:8px;line-height:1.5}
   .pc-plan{font-size:9px;color:#999;margin-top:2px;text-decoration:line-through;overflow-wrap:anywhere}
   .pc-cell.moved{background:var(--gbg,#f5f4f0);opacity:0.6;border-left-style:dashed}
   .pc-cell.moved .pc-name{text-decoration:line-through}
@@ -942,7 +945,7 @@
         <span><i style="background:#B7791F"></i>정보형</span><span><i style="background:#C2477A"></i>에세이형</span>
         <span>📌 고정</span><span class="pc-lg-done"><i class="pc-hatch"></i>작성 완료</span>
       </div>
-      <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">날짜를 누르면 그날의 일간 리뷰로 이동해요</div>
+      <div style="font-size:11px;color:#aaa;text-align:center;margin-top:8px">날짜를 누르면 그날 쓴 글을 기록하거나 고칠 수 있어요</div>
     </div>
     <div class="section">
       <div class="section-title">📊 블로그 포스팅 그래프</div>
@@ -1265,11 +1268,19 @@
   </div>
 </div>
 
-<!-- 다른 글 쓸래요 팝업 -->
-<div class="modal-overlay" id="post-alt-modal">
+<!-- 캘린더 날짜 기록 창 -->
+<div class="modal-overlay" id="post-day-modal">
   <div class="modal">
-    <div class="modal-title">✍️ 다른 글을 썼어요<button class="modal-close" onclick="closePostAlt()">×</button></div>
-    <div style="font-size:12px;color:#999;margin-bottom:8px">이번 달 계획 중 어떤 글을 썼나요? 고르면 그 글이 작성 완료로 표시돼요.</div>
+    <div class="modal-title"><span id="pd-title"></span><button class="modal-close" onclick="closePostDaySheet()">×</button></div>
+    <div id="pd-body"></div>
+  </div>
+</div>
+
+<!-- 다른 글 쓸래요 팝업 -->
+<div class="modal-overlay" id="post-alt-modal" style="z-index:1050">
+  <div class="modal">
+    <div class="modal-title"><span id="pa-title">✍️ 다른 글을 썼어요</span><button class="modal-close" onclick="closePostAlt()">×</button></div>
+    <div id="pa-desc" style="font-size:12px;color:#888;margin-bottom:8px;line-height:1.5"></div>
     <div id="pa-list"></div>
     <div class="pa-lbl">계획에 없던 글</div>
     <div class="bs-search-row">
@@ -2268,41 +2279,55 @@ function renderTodayPost(){
     ${actions}
     ${others.length?`<div class="tp-others"><div class="tp-others-lbl">${isToday?'오늘':'이날'} 쓴 글</div>${others.join('')}</div>`:''}`;
 }
-// 글을 쓰면 발행 수가 0일 때 1로 올려줌 (취소하면 되돌림)
-function bumpPostCount(){
-  if(state.posts===0){state.posts=1;document.getElementById('post-count').textContent=1;autosaveDaily();return true;}
+// ── 날짜 기준 포스팅 기록 (일간 카드·캘린더 날짜 창 공용) ──
+// 글을 쓴 날 발행 수가 0이면 1로 올려줌 (취소하면 되돌림)
+function bumpPostCountOn(dk){
+  const dd=getDayForEdit(dk);
+  if((Number(dd.posts)||0)===0){dd.posts=1;commitDay(dk,dd);return true;}
   return false;
 }
-function dropPostCount(entry){
-  if(entry&&entry.auto&&entry.date===dateToKey(currentDate)&&state.posts>0){
-    state.posts--;document.getElementById('post-count').textContent=state.posts;autosaveDaily();
-  }
+function dropPostCountOn(entry){
+  if(!entry||!entry.auto)return;
+  const dd=getDayForEdit(entry.date);
+  if((Number(dd.posts)||0)>0){dd.posts--;commitDay(entry.date,dd);}
 }
-function markPostSlot(day){
-  const ym=ymOf(currentDate), m=loadPostMonth(ym);
-  m.done[day]={date:dateToKey(currentDate),auto:bumpPostCount()};
-  savePostMonth(ym,m);
+function refreshPostViews(){
   renderTodayPost();
   if(blogOpen)renderBlogView();
+  if(document.getElementById('post-day-modal').classList.contains('show'))renderPostDaySheet();
 }
+// day번 계획 글을 dk 날짜에 썼다고 기록
+function markPostSlotOn(day,dk){
+  const ym=dk.slice(0,7), m=loadPostMonth(ym);
+  m.done[day]={date:dk,auto:bumpPostCountOn(dk)};
+  savePostMonth(ym,m);
+  refreshPostViews();
+}
+function markPostSlot(day){markPostSlotOn(day,dateToKey(currentDate));}
 function markPostWritten(){markPostSlot(currentDate.getDate());showToast('✍️ 작성 완료! 수고했어요');}
-function undoPostSlot(day){
-  const ym=ymOf(currentDate), m=loadPostMonth(ym), e=m.done[day];
+function undoPostSlotIn(ym,day){
+  const m=loadPostMonth(ym), e=m.done[day];
   if(!e)return;
   delete m.done[day];savePostMonth(ym,m);
-  dropPostCount(e);
-  renderTodayPost();showToast('작성 완료를 취소했어요');
+  dropPostCountOn(e);
+  refreshPostViews();showToast('기록을 지웠어요');
 }
-function undoPostExtra(i){
-  const ym=ymOf(currentDate), m=loadPostMonth(ym), e=m.extra[i];
+function undoPostExtraIn(ym,i){
+  const m=loadPostMonth(ym), e=m.extra[i];
   if(!e)return;
   m.extra.splice(i,1);savePostMonth(ym,m);
-  dropPostCount(e);
-  renderTodayPost();
+  dropPostCountOn(e);
+  refreshPostViews();showToast('기록을 지웠어요');
 }
-// 다른 글 쓸래요: 이번 달 남은 슬롯에서 고르거나 직접 입력
-function openPostAlt(){
-  const d=currentDate, day=d.getDate(), ym=ymOf(d), m=loadPostMonth(ym);
+function undoPostSlot(day){undoPostSlotIn(ymOf(currentDate),day);}
+function undoPostExtra(i){undoPostExtraIn(ymOf(currentDate),i);}
+function dayLabelFull(dk){const d=new Date(dk+'T00:00:00');return (d.getMonth()+1)+'/'+d.getDate()+'('+DAY_NAMES[d.getDay()]+')';}
+
+// 다른 글 썼어요: 기록할 날짜(postAltDk)에 실제로 쓴 글을 고름
+let postAltDk=null;
+function openPostAlt(dk){
+  postAltDk=dk||dateToKey(currentDate);
+  const d=new Date(postAltDk+'T00:00:00'), day=d.getDate(), ym=postAltDk.slice(0,7), m=loadPostMonth(ym);
   const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
   const ahead=[],behind=[];
   for(let k=1;k<=last;k++){
@@ -2311,28 +2336,56 @@ function openPostAlt(){
     (k>day?ahead:behind).push(k);
   }
   const item=k=>{
-    const p=POST_PLAN[k], g=POST_GROUPS[p.g], dd=new Date(d.getFullYear(),d.getMonth(),k);
-    return `<div class="pa-item" onclick="pickPostAlt(${k})"><span class="pa-date">${d.getMonth()+1}/${k} (${DAY_NAMES[dd.getDay()]})</span><span class="pa-dot" style="background:${g.c}"></span><span class="pa-name">${p.fix?'📌 ':''}${escapeHtml(p.t)}</span></div>`;
+    const p=POST_PLAN[k], g=POST_GROUPS[p.g];
+    return `<div class="pa-item" onclick="pickPostAlt(${k})"><span class="pa-date">${d.getMonth()+1}/${k} 계획</span><span class="pa-dot" style="background:${g.c}"></span><span class="pa-name">${p.fix?'📌 ':''}${escapeHtml(p.t)}</span></div>`;
   };
   let h='';
-  if(ahead.length)h+=`<div class="pa-lbl">이번 달 앞으로 쓸 글 (미리 쓰기)</div>`+ahead.map(item).join('');
-  if(behind.length)h+=`<div class="pa-lbl">아직 못 쓴 글 (밀린 글)</div>`+behind.map(item).join('');
+  if(behind.length)h+=`<div class="pa-lbl">아직 못 쓴 계획 글</div>`+behind.map(item).join('');
+  if(ahead.length)h+=`<div class="pa-lbl">앞으로 계획된 글 (미리 쓴 경우)</div>`+ahead.map(item).join('');
   if(!h)h='<div class="rdm-empty">이번 달 계획한 글을 모두 썼어요 🎉</div>';
+  document.getElementById('pa-title').textContent='✍️ '+dayLabelFull(postAltDk)+'에 쓴 글';
+  document.getElementById('pa-desc').innerHTML=`<b>${dayLabelFull(postAltDk)}</b>에 실제로 쓴 글을 고르세요. 그 날짜 칸에 완료로 표시돼요.`;
   document.getElementById('pa-list').innerHTML=h;
   document.getElementById('pa-input').value='';
   document.getElementById('post-alt-modal').classList.add('show');
 }
 function closePostAlt(){document.getElementById('post-alt-modal').classList.remove('show');}
-function pickPostAlt(k){markPostSlot(k);closePostAlt();showToast('✍️ '+POST_PLAN[k].t+' 작성 완료로 표시했어요');}
+function pickPostAlt(k){markPostSlotOn(k,postAltDk);closePostAlt();showToast('✍️ '+dayLabelFull(postAltDk)+'에 '+POST_PLAN[k].t+' 작성으로 기록했어요');}
 function addPostExtra(){
   const t=document.getElementById('pa-input').value.trim();
   if(!t){showToast('쓴 글 제목을 입력해주세요');return;}
-  const ym=ymOf(currentDate), m=loadPostMonth(ym);
-  m.extra.push({date:dateToKey(currentDate),title:t,auto:bumpPostCount()});
+  const ym=postAltDk.slice(0,7), m=loadPostMonth(ym);
+  m.extra.push({date:postAltDk,title:t,auto:bumpPostCountOn(postAltDk)});
   savePostMonth(ym,m);
-  closePostAlt();renderTodayPost();
+  closePostAlt();refreshPostViews();
   showToast('✍️ 기록했어요');
 }
+
+// 캘린더 날짜 칸 → 그날 기록 창
+let postDayDk=null;
+function openPostDaySheet(dk){postDayDk=dk;renderPostDaySheet();document.getElementById('post-day-modal').classList.add('show');}
+function closePostDaySheet(){document.getElementById('post-day-modal').classList.remove('show');}
+function renderPostDaySheet(){
+  const dk=postDayDk, d=new Date(dk+'T00:00:00'), day=d.getDate(), ym=dk.slice(0,7), m=loadPostMonth(ym), p=POST_PLAN[day], own=m.done[day];
+  const fut=dk>dateToKey(todayDate());
+  const badge=p.free?'<span class="tp-badge free">🌿 여유일</span>':p.fix?'<span class="tp-badge fix">📌 고정 포스팅</span>':'<span class="tp-badge flex">🔄 유동 슬롯</span>';
+  // 이날 실제로 쓴 글
+  const rows=[];
+  Object.keys(m.done).forEach(k=>{const e=m.done[k];if(e&&e.date===dk)rows.push(`<div class="pd-row"><span>✓ ${escapeHtml(POST_PLAN[k].t)}${Number(k)!==day?` <small>(${Number(k)}일 계획 글)</small>`:''}</span><span class="tp-undo" onclick="undoPostSlotIn('${ym}',${k})">지우기</span></div>`);});
+  m.extra.forEach((x,i)=>{if(x.date===dk)rows.push(`<div class="pd-row"><span>✓ ${escapeHtml(x.title)} <small>(계획 외)</small></span><span class="tp-undo" onclick="undoPostExtraIn('${ym}',${i})">지우기</span></div>`);});
+  let planState='';
+  if(own&&own.date!==dk)planState=`<div class="pd-moved">이 계획 글은 <b>${dayLabelFull(own.date)}</b>에 쓴 것으로 기록돼 있어요 <span class="tp-undo" onclick="undoPostSlotIn('${ym}',${day})">기록 지우기</span></div>`;
+  document.getElementById('pd-title').textContent='📆 '+dayLabelFull(dk)+' 포스팅';
+  document.getElementById('pd-body').innerHTML=`
+    <div class="tp-badges">${badge}${groupChip(p)}</div>
+    <div class="tp-msg">계획: <b>${escapeHtml(p.t)}</b></div>
+    ${planState}
+    <div class="pa-lbl">이날 쓴 글</div>
+    ${rows.length?rows.join(''):'<div class="rdm-empty" style="padding:2px 0">아직 기록이 없어요</div>'}
+    ${fut?'<div class="tp-tip">아직 오지 않은 날이에요</div>':`<div class="tp-actions">${(!p.free&&!own)?`<button class="tp-btn main" onclick="markPostSlotOn(${day},'${dk}');showToast('✍️ 계획대로 썼다고 기록했어요')">✍️ 계획대로 썼어요</button>`:''}<button class="tp-btn" onclick="openPostAlt('${dk}')">다른 글 썼어요</button></div>`}
+    <div style="text-align:center;margin-top:12px"><span class="review-manage-link" onclick="closePostDaySheet();jumpToPostDay('${dk}')">이날 일간 리뷰로 이동</span></div>`;
+}
+
 // 월간 포스팅 캘린더
 let postCalCursor=null;
 function openPostCalendar(){if(!blogOpen)toggleBlog();window.scrollTo({top:0});}
@@ -2453,7 +2506,7 @@ function renderPostCalendar(){
            (actual.length?actual.map(x=>`<div class="pc-plus">+ ${escapeHtml(x.name)}</div>`).join(''):'');
     }
     const tip=actual.length?`실제: ${actual.map(x=>x.name).join(', ')} / 계획: ${p.t}`:p.t;
-    h+=`<div class="${cls.join(' ')}" style="${style}" onclick="jumpToPostDay('${dk}')" title="${escapeAttr(tip)}"><div class="pc-top"><span class="pc-num">${k}</span>${p.fix?'<span class="pc-pin">📌</span>':''}</div>${body}</div>`;
+    h+=`<div class="${cls.join(' ')}" style="${style}" onclick="openPostDaySheet('${dk}')" title="${escapeAttr(tip)}"><div class="pc-top"><span class="pc-num">${k}</span>${p.fix?'<span class="pc-pin">📌</span>':''}</div>${body}</div>`;
   }
   document.getElementById('pc-grid').innerHTML=h;
   const extraN=m.extra.length;
@@ -4564,6 +4617,7 @@ document.getElementById('idea-modal').addEventListener('click',e=>{if(e.target.i
 document.getElementById('book-modal').addEventListener('click',e=>{if(e.target.id==='book-modal')closeBookManager();});
 document.getElementById('review-modal').addEventListener('click',e=>{if(e.target.id==='review-modal')closeDoneReview();});
 document.getElementById('reading-modal').addEventListener('click',e=>{if(e.target.id==='reading-modal')closeReadingModal();});
+document.getElementById('post-day-modal').addEventListener('click',e=>{if(e.target.id==='post-day-modal')closePostDaySheet();});
 document.getElementById('post-alt-modal').addEventListener('click',e=>{if(e.target.id==='post-alt-modal')closePostAlt();});
 document.getElementById('exercise-modal').addEventListener('click',e=>{if(e.target.id==='exercise-modal')closeExerciseModal();});
 document.getElementById('book-search-modal').addEventListener('click',e=>{if(e.target.id==='book-search-modal')closeBookSearch();});
